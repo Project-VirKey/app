@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.virkey">
    <application
-        android:label="virkey"
+        android:label="VirKey"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
