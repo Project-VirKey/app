@@ -1,6 +1,6 @@
 {
-    "name": "virkey",
-    "short_name": "virkey",
+    "name": "VirKey",
+    "short_name": "VirKey",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

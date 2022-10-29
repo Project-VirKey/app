@@ -1,5 +1,6 @@
 # sudo bash ./create-dmg.sh
 cp -r "../build/macos/Build/Products/Release/VirKey.app" ./
+rm -f VirKey.dmg
 create-dmg \
   --volicon "VIK_Icon.icns" \
   --hide-extension "VirKey.app" \
