@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
+import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/piano/import_overlay.dart';
 
 class PianoScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _PianoScreenState extends State<PianoScreen> {
       body: Center(
         child: Column(
           children: [
-            const AppText(text: 'Piano Screen', size: 45),
+            const AppText(text: 'Piano Screen', size: 45, family: AppFonts.secondary),
             AppButton(
                 appText: const AppText(text: 'Home'),
                 onPressed: () => context.go('/')),

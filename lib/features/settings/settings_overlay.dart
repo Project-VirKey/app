@@ -3,6 +3,7 @@ import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
+import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 
 OverlayEntry settingsOverlay = OverlayEntry(builder: (context) {
@@ -22,7 +23,7 @@ OverlayEntry settingsOverlay = OverlayEntry(builder: (context) {
                     icon: HeroIcons.arrowUturnLeft,
                     color: AppColors.dark,
                     onPressed: () => settingsOverlay.remove()),
-                const AppText(text: 'Settings', size: 30),
+                const AppText(text: 'Settings', size: 30, family: AppFonts.secondary),
               ],
             )
           ],

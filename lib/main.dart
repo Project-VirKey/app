@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:virkey/constants/colors.dart';
+import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/routing/router.dart';
 
 void main() {
@@ -13,6 +15,10 @@ class App extends StatelessWidget {
     return MaterialApp.router(
       routerConfig: AppRouter.router,
       title: 'VirKey',
+      theme: ThemeData(
+        primaryColor: AppColors.primary,
+        fontFamily: AppFonts.primary,
+      ),
     );
   }
 }

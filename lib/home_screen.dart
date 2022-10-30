@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
+import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/default_components.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 
@@ -28,7 +29,8 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: <Widget>[
           const Center(
-            child: AppText(text: 'Home Screen', size: 45),
+            child:
+                AppText(text: 'ViRKEY', size: 45, family: AppFonts.secondary),
           ),
           AppButton(
               appText:
