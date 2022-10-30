@@ -15,7 +15,6 @@ class PianoScreen extends StatefulWidget {
 class _PianoScreenState extends State<PianoScreen> {
   _showImportOverlay(BuildContext context) {
     OverlayState? pianoOverlayState = Overlay.of(context);
-
     pianoOverlayState?.insertAll([importOverlay]);
   }
 

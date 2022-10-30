@@ -7,8 +7,6 @@ import 'package:virkey/constants/radius.dart';
 
 OverlayEntry importOverlay = OverlayEntry(builder: (context) {
   return Container(
-    width: MediaQuery.of(context).size.width,
-    height: MediaQuery.of(context).size.height,
     color: AppColors.black50,
     child: Container(
         margin: const EdgeInsets.all(11),

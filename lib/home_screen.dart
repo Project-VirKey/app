@@ -15,8 +15,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   _showSettingsOverlay(BuildContext context) async {
-    OverlayState? homeOverlayState = Overlay.of(context);
+    // https://medium.flutterdevs.com/implemented-overlay-in-flutter-fe60d2b33a04
 
+    OverlayState? homeOverlayState = Overlay.of(context);
     homeOverlayState?.insertAll([settingsOverlay]);
   }
 
