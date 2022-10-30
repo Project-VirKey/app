@@ -2,23 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_text.dart';
+import 'package:virkey/constants/colors.dart';
 import 'package:virkey/default_components.dart';
+import 'package:virkey/features/settings/settings_overlay.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  _showSettingsOverlay(BuildContext context) async {
+    OverlayState? homeOverlayState = Overlay.of(context);
+
+    homeOverlayState?.insertAll([settingsOverlay]);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: <Widget>[
-        AppButton(
-            appText: const AppText(text: 'Piano Screen'),
-            onPressed: () => context.go('/piano')),
-        const Center(
-          child: AppText(text: 'Home Screen'),
-        ),
-        const DefaultComponents()
-      ],
+    return Scaffold(
+      backgroundColor: AppColors.secondary,
+      body: Column(
+        children: <Widget>[
+          const Center(
+            child: AppText(text: 'Home Screen', size: 45),
+          ),
+          AppButton(
+              appText:
+                  const AppText(text: 'Piano Screen', color: AppColors.white),
+              onPressed: () => context.go('/piano')),
+          AppButton(
+              appText: const AppText(text: 'Settings Overlay'),
+              onPressed: () => _showSettingsOverlay(context)),
+          const DefaultComponents()
+        ],
+      ),
     );
   }
 }

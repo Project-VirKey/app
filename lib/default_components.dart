@@ -42,7 +42,7 @@ class _DefaultComponentsState extends State<DefaultComponents> {
         const AppText(text: 'Hallo'),
         const AppText(
             text: 'Hallo',
-            light: true,
+            color: AppColors.secondary,
             weight: AppFonts.weightMedium,
             size: 30),
       ],
