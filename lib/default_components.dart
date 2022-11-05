@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 
@@ -18,6 +19,8 @@ class DefaultComponents extends StatefulWidget {
 class _DefaultComponentsState extends State<DefaultComponents> {
   @override
   Widget build(BuildContext context) {
+    bool _enable = true;
+
     return Column(
       children: [
         AppIcon(
@@ -45,6 +48,7 @@ class _DefaultComponentsState extends State<DefaultComponents> {
             color: AppColors.secondary,
             weight: AppFonts.weightMedium,
             size: 30),
+        AppSwitch(value: _enable, onChanged: (bool val) => {print(val)},)
       ],
     );
   }
