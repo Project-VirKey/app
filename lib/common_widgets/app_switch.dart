@@ -29,8 +29,8 @@ class _AppSwitchState extends State<AppSwitch> {
           children: <Widget>[
             Positioned(
                 child: Container(
-              margin: const EdgeInsets.fromLTRB(0, 5, 0, 5),
-              width: 40,
+              margin: const EdgeInsets.fromLTRB(0, 2.5, 0, 2.5),
+              width: 35,
               height: 15,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50.0),
@@ -40,8 +40,8 @@ class _AppSwitchState extends State<AppSwitch> {
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.decelerate,
-              width: 40,
-              height: 25,
+              width: 35,
+              height: 20,
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 300),
                 alignment:
@@ -49,8 +49,8 @@ class _AppSwitchState extends State<AppSwitch> {
                 curve: Curves.decelerate,
                 child: AppShadow(
                   child: Container(
-                    width: 25,
-                    height: 25,
+                    width: 20,
+                    height: 20,
                     decoration: BoxDecoration(
                       color: AppColors.secondary,
                       border: Border.all(color: AppColors.dark),
