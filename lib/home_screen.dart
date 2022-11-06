@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
+import 'package:virkey/common_widgets/app_shadow.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/constants/radius.dart';
 import 'package:virkey/default_components.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 
@@ -27,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: <Widget>[
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 11),
+            padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -53,10 +54,36 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          AppButton(
-              appText: const AppText(text: 'Play', color: AppColors.white),
-              backgroundColor: AppColors.dark,
-              onPressed: () => context.go('/piano')),
+          AppShadow(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.dark,
+                foregroundColor: AppColors.dark,
+                padding: const EdgeInsets.fromLTRB(30, 25, 30, 20),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(AppRadius.radius)),
+              ),
+              onPressed: () => context.go('/piano'),
+              child: Column(
+                children: <Widget>[
+                  Image.asset(
+                    'assets/VIK_Logo_v2.png',
+                    width: 80,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+                    child: AppText(
+                      text: 'Play',
+                      family: AppFonts.secondary,
+                      color: AppColors.secondary,
+                      letterSpacing: 5,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           const DefaultComponents()
         ],
       ),

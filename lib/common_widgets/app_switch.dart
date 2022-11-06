@@ -5,10 +5,10 @@ import 'package:virkey/common_widgets/app_shadow.dart';
 
 class AppSwitch extends StatefulWidget {
   AppSwitch({
-    super.key,
+    Key? key,
     this.value = false,
     required this.onChanged,
-  });
+  }) : super(key: key);
 
   bool value;
   final ValueChanged<bool> onChanged;

@@ -10,23 +10,45 @@ OverlayEntry settingsOverlay = OverlayEntry(builder: (context) {
   return Container(
     color: AppColors.black50,
     child: Container(
-        margin: const EdgeInsets.all(11),
-        decoration: const BoxDecoration(
-          color: AppColors.white,
-          borderRadius: BorderRadius.all(AppRadius.radius),
-        ),
+      margin: const EdgeInsets.all(11),
+      decoration: const BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.all(AppRadius.radius),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(11),
         child: Column(
           children: [
-            Row(
-              children: [
-                AppIcon(
-                    icon: HeroIcons.arrowUturnLeft,
-                    color: AppColors.dark,
-                    onPressed: () => settingsOverlay.remove()),
-                const AppText(text: 'Settings', size: 30, family: AppFonts.secondary),
-              ],
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              height: 40,
+              child: Stack(
+                children: [
+                  const Positioned.fill(
+                      left: 0,
+                      right: 0,
+                      child: Center(
+                        child: AppText(
+                            text: 'Settings',
+                            size: 30,
+                            family: AppFonts.secondary),
+                      )),
+                  Positioned(
+                    left: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: AppIcon(
+                          icon: HeroIcons.arrowUturnLeft,
+                          color: AppColors.dark,
+                          onPressed: () => settingsOverlay.remove()),
+                    ),
+                  ),
+                ],
+              ),
             )
           ],
-        )),
+        ),
+      ),
+    ),
   );
 });
