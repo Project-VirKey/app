@@ -2,27 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
+import 'package:virkey/common_widgets/app_schortcut.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 
 OverlayEntry settingsOverlay = OverlayEntry(builder: (context) {
-  // https://api.flutter.dev/flutter/services/PhysicalKeyboardKey-class.html
-  final FocusNode focusNode = FocusNode();
-  FocusScope.of(context).requestFocus(focusNode);
-
-  return Focus(
-    autofocus: true,
-    focusNode: focusNode,
-    onKey: (FocusNode node, RawKeyEvent event) {
-      if (event.physicalKey == PhysicalKeyboardKey.escape) {
-        settingsOverlay.remove();
-      }
-
-      return event.physicalKey == PhysicalKeyboardKey.escape
-          ? KeyEventResult.handled
-          : KeyEventResult.ignored;
+  return AppKeyboardShortcut(
+    shortcuts: {
+      PhysicalKeyboardKey.escape: () => settingsOverlay.remove(),
     },
     child: Container(
       color: AppColors.black50,
