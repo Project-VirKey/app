@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
-import 'package:virkey/common_widgets/app_keyboard_schortcut.dart';
+import 'package:virkey/common_widgets/app_keyboard_shortcut.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
