@@ -17,6 +17,7 @@ class AppKeyboardShortcut extends StatelessWidget {
   Widget build(BuildContext context) {
     final FocusNode focusNode = FocusNode();
     FocusScope.of(context).requestFocus(focusNode);
+
     return Focus(
       autofocus: true,
       focusNode: focusNode,
