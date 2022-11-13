@@ -29,74 +29,84 @@ class _PianoScreenState extends State<PianoScreen> {
             Container(
               color: AppColors.dark,
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 11, horizontal: 11),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                child: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Row(
-                      children: [
-                        AppIcon(
-                          icon: HeroIcons.arrowUturnLeft,
-                          color: AppColors.secondary,
-                          onPressed: () => context.go('/'),
-                          size: 30,
-                        ),
-                        AppIcon(
-                          icon: HeroIcons.arrowDownTray,
-                          color: AppColors.secondary,
-                          onPressed: () => {},
-                          size: 30,
-                        ),
-                        AppIcon(
-                          icon: HeroIcons.cog6Tooth,
-                          color: AppColors.secondary,
-                          onPressed: () =>
-                              pianoOverlayState?.insert(settingsOverlay),
-                          size: 30,
-                        ),
-                      ],
-                    ),
-                    const Center(
+                    Align(
+                      alignment: Alignment.centerLeft,
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                        child: AppText(
-                            text: 'ViRKEY',
-                            size: 45,
-                            family: AppFonts.secondary,
-                            color: AppColors.secondary),
+                        padding: const EdgeInsets.all(8.0),
+                        child: Wrap(
+                          spacing: 15,
+                          children: [
+                            AppIcon(
+                              icon: HeroIcons.arrowUturnLeft,
+                              color: AppColors.secondary,
+                              onPressed: () => context.go('/'),
+                              size: 30,
+                            ),
+                            AppIcon(
+                              icon: HeroIcons.arrowDownTray,
+                              color: AppColors.secondary,
+                              onPressed: () =>
+                                  pianoOverlayState?.insert(importOverlay),
+                              size: 30,
+                            ),
+                            AppIcon(
+                              icon: HeroIcons.cog6Tooth,
+                              color: AppColors.secondary,
+                              onPressed: () =>
+                                  pianoOverlayState?.insert(settingsOverlay),
+                              size: 30,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    Row(
-                      children: [
-                        const AppText(
-                            text: '00:00:00', color: AppColors.secondary),
-                        AppIcon(
-                          icon: Icons.radio_button_checked,
-                          color: AppColors.secondary,
-                          onPressed: () => {},
-                          size: 30,
-                        ),
-                        AppIcon(
-                          icon: HeroIcons.play,
-                          color: AppColors.secondary,
-                          onPressed: () => {},
-                          size: 30,
-                        ),
-                      ],
+                    const Align(
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                          child: AppText(
+                              text: 'ViRKEY',
+                              size: 28,
+                              letterSpacing: 4,
+                              family: AppFonts.secondary,
+                              color: AppColors.secondary),
+                        )),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Wrap(
+                        spacing: 15,
+                        children: [
+                          const AppText(
+                            text: '00:00:00',
+                            size: 18,
+                            color: AppColors.secondary,
+                            weight: AppFonts.weightLight,
+                            letterSpacing: 4,
+                          ),
+                          AppIcon(
+                            icon: Icons.radio_button_checked,
+                            color: AppColors.secondary,
+                            onPressed: () => {},
+                            size: 30,
+                          ),
+                          AppIcon(
+                            icon: HeroIcons.play,
+                            color: AppColors.secondary,
+                            onPressed: () => {},
+                            size: 30,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
               ),
             ),
-            AppButton(
-                appText: const AppText(text: 'Home'),
-                onPressed: () => context.go('/')),
-            AppButton(
-                appText: const AppText(
-                  text: 'Import Overlay',
-                ),
-                onPressed: () => pianoOverlayState?.insert(importOverlay))
+            const AppText(text: 'Piano')
           ],
         ),
       ),

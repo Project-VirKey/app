@@ -41,8 +41,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 const Center(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                    child: AppText(
-                        text: 'ViRKEY', size: 45, family: AppFonts.secondary),
+                    child: AppShadow(
+                      child: AppText(
+                          text: 'ViRKEY',
+                          size: 40,
+                          family: AppFonts.secondary,
+                          letterSpacing: 4),
+                    ),
                   ),
                 ),
                 AppIcon(

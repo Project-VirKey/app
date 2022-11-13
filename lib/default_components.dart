@@ -50,9 +50,11 @@ class _DefaultComponentsState extends State<DefaultComponents> {
             weight: AppFonts.weightMedium,
             size: 30),
         AppSwitch(value: enable, onChanged: (bool val) => {print(val)}),
-        AppSlider(onChanged: (double value) => {
-          print(value)
-        },)
+        AppSlider(
+          onChanged: (double value) => {print(value)},
+        ),
+        AppButton(
+            appText: const AppText(text: 'Confirm Overlay'), onPressed: () => {})
       ],
     );
   }
