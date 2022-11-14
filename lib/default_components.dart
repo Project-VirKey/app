@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:virkey/common_widgets/app_confirm_overlay.dart';
 import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/common_widgets/app_text.dart';
@@ -21,6 +22,7 @@ class _DefaultComponentsState extends State<DefaultComponents> {
   @override
   Widget build(BuildContext context) {
     bool enable = true;
+    OverlayState? confirmOverlayState = Overlay.of(context);
 
     return Column(
       children: [
@@ -54,7 +56,7 @@ class _DefaultComponentsState extends State<DefaultComponents> {
           onChanged: (double value) => {print(value)},
         ),
         AppButton(
-            appText: const AppText(text: 'Confirm Overlay'), onPressed: () => {})
+            appText: const AppText(text: 'Confirm Overlay'), onPressed: () => confirmOverlayState?.insert(confirmOverlay))
       ],
     );
   }
