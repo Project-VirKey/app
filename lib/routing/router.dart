@@ -17,6 +17,7 @@ class AppRouter {
             DeviceOrientation.portraitUp,
           ]);
 
+          // SafeArea: https://stackoverflow.com/questions/49227667/using-safearea-in-flutter, 15.11.2022
           return Container(
             color: AppColors.secondary,
             child: const SafeArea(child: HomeScreen()),
@@ -31,6 +32,10 @@ class AppRouter {
             DeviceOrientation.landscapeLeft,
             DeviceOrientation.landscapeRight,
           ]);
+
+          // https://api.flutter.dev/flutter/services/SystemChrome/setEnabledSystemUIMode.html
+          // hide notification bar
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: null);
 
           return const PianoScreen();
         },
