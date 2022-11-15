@@ -26,7 +26,7 @@ class _DefaultComponentsState extends State<DefaultComponents> {
       context: context,
       displayText: 'Delete recording "Recording #3"?',
       confirmButtonText: 'Delete',
-      onConfirm: () => {},
+      onConfirm: () => {print('Delete recording 1')},
     );
 
     return Column(

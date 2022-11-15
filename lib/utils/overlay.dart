@@ -37,7 +37,6 @@ class AppOverlay {
           color: AppColors.black50,
           child: SafeArea(
             bottom: orientation == Orientation.portrait,
-            child: IntrinsicHeight(
               child: Container(
                 height:
                     !fillDesktopScreen && PlatformHelper.isDesktop ? 250 : null,
@@ -55,7 +54,6 @@ class AppOverlay {
                   ),
                 ),
               ),
-            ),
           ),
         ),
       );

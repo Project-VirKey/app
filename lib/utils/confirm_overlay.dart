@@ -77,11 +77,14 @@ class AppConfirmOverlay {
         child: Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        AppText(
-          text: displayText,
-          weight: AppFonts.weightMedium,
-          size: 26,
-          textAlign: TextAlign.center,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 2),
+          child: AppText(
+            text: displayText,
+            weight: AppFonts.weightMedium,
+            size: 26,
+            textAlign: TextAlign.center,
+          ),
         ),
       ],
     )),
