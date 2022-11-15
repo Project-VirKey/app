@@ -8,7 +8,7 @@ class AppIcon extends StatelessWidget {
       required this.icon,
       this.size = 24,
       required this.color,
-      required this.onPressed})
+      this.onPressed})
       : super(key: key);
 
   final Object icon;

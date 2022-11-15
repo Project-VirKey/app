@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:virkey/common_widgets/app_checkbox.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
@@ -62,7 +63,8 @@ class _DefaultComponentsState extends State<DefaultComponents> {
         ),
         AppButton(
             appText: const AppText(text: 'Confirm Overlay'),
-            onPressed: () => appConfirmOverlayExample.open())
+            onPressed: () => appConfirmOverlayExample.open(),),
+        AppCheckbox(onChanged: (bool val) => {print(val)})
       ],
     );
   }
