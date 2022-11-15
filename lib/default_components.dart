@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:virkey/common_widgets/app_confirm_overlay.dart';
+import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/common_widgets/app_text.dart';

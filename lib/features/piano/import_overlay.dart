@@ -4,7 +4,7 @@ import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
-import 'package:virkey/common_widgets/app_overlay.dart';
+import 'package:virkey/utils/overlay.dart';
 
 class ImportOverlay {
   final BuildContext context;
