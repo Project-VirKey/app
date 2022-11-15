@@ -111,5 +111,6 @@ flutter_icons:
     image_path: assets/icon/icon_border.png
     icon_size: 256
   macos:
+#    not working
     generate: true
     image_path: assets/icon/icon_border.png
