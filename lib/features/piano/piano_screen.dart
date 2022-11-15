@@ -18,7 +18,8 @@ class PianoScreen extends StatefulWidget {
 class _PianoScreenState extends State<PianoScreen> {
   @override
   Widget build(BuildContext context) {
-    OverlayState? pianoOverlayState = Overlay.of(context);
+    SettingsOverlay settingsOverlay = SettingsOverlay(context: context);
+    ImportOverlay importOverlay = ImportOverlay(context: context);
 
     return Scaffold(
       backgroundColor: AppColors.secondary,
@@ -49,14 +50,13 @@ class _PianoScreenState extends State<PianoScreen> {
                               icon: HeroIcons.arrowDownTray,
                               color: AppColors.secondary,
                               onPressed: () =>
-                                  pianoOverlayState?.insert(importOverlay),
+                              importOverlay.open(),
                               size: 30,
                             ),
                             AppIcon(
                               icon: HeroIcons.cog6Tooth,
                               color: AppColors.secondary,
-                              onPressed: () =>
-                                  pianoOverlayState?.insert(settingsOverlay),
+                              onPressed: () => settingsOverlay.open(),
                               size: 30,
                             ),
                           ],

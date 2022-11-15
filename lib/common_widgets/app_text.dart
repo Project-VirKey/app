@@ -11,6 +11,7 @@ class AppText extends StatelessWidget {
     this.size = AppFonts.sizeDefault,
     this.weight = AppFonts.weightRegular,
     this.letterSpacing = 0,
+    this.textAlign = TextAlign.left,
   }) : super(key: key);
 
   final String text;
@@ -19,11 +20,13 @@ class AppText extends StatelessWidget {
   final double size;
   final FontWeight? weight;
   final double? letterSpacing;
+  final TextAlign textAlign;
 
   @override
   Widget build(BuildContext context) {
     return Text(
       text,
+      textAlign: textAlign,
       style: TextStyle(
           fontFamily: family, color: color, fontSize: size, fontWeight: weight, letterSpacing: letterSpacing, decoration: TextDecoration.none),
     );

@@ -22,7 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     // https://medium.flutterdevs.com/implemented-overlay-in-flutter-fe60d2b33a04
-    OverlayState? homeOverlayState = Overlay.of(context);
+    SettingsOverlay settingsOverlay = SettingsOverlay(context: context);
 
     return Scaffold(
       backgroundColor: AppColors.secondary,
@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 AppIcon(
                   icon: HeroIcons.cog6Tooth,
                   color: AppColors.dark,
-                  onPressed: () => homeOverlayState?.insert(settingsOverlay),
+                  onPressed: () => settingsOverlay.open(),
                   size: 30,
                 ),
                 const Center(
@@ -60,72 +60,72 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          AppShadow(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.dark,
-                foregroundColor: AppColors.dark,
-                padding: const EdgeInsets.fromLTRB(30, 25, 30, 20),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(AppRadius.radius)),
-              ),
-              onPressed: () => context.go('/piano'),
-              child: Column(
-                children: <Widget>[
-                  Image.asset(
-                    'assets/VIK_Logo_v2.png',
-                    width: 80,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
-                    child: AppText(
-                      text: 'Play',
-                      family: AppFonts.secondary,
-                      color: AppColors.secondary,
-                      letterSpacing: 5,
-                      size: 24,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          AppShadow(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.dark,
-                foregroundColor: AppColors.dark,
-                padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(AppRadius.radius)),
-              ),
-              onPressed: () => context.go('/piano'),
-              child: Column(
-                children: <Widget>[
-                  SvgPicture.asset(
-                    'assets/VIK_Logo_v2.svg',
-                    width: 65,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 7, 0, 0),
-                    child: AppText(
-                      text: 'Play',
-                      family: AppFonts.secondary,
-                      color: AppColors.secondary,
-                      letterSpacing: 5,
-                      size: 24,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 20,
-          ),
+          // AppShadow(
+          //   child: ElevatedButton(
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: AppColors.dark,
+          //       foregroundColor: AppColors.dark,
+          //       padding: const EdgeInsets.fromLTRB(30, 25, 30, 20),
+          //       shape: const RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.all(AppRadius.radius)),
+          //     ),
+          //     onPressed: () => context.go('/piano'),
+          //     child: Column(
+          //       children: <Widget>[
+          //         Image.asset(
+          //           'assets/VIK_Logo_v2.png',
+          //           width: 80,
+          //         ),
+          //         const Padding(
+          //           padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+          //           child: AppText(
+          //             text: 'Play',
+          //             family: AppFonts.secondary,
+          //             color: AppColors.secondary,
+          //             letterSpacing: 5,
+          //             size: 24,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(
+          //   height: 20,
+          // ),
+          // AppShadow(
+          //   child: ElevatedButton(
+          //     style: ElevatedButton.styleFrom(
+          //       backgroundColor: AppColors.dark,
+          //       foregroundColor: AppColors.dark,
+          //       padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
+          //       shape: const RoundedRectangleBorder(
+          //           borderRadius: BorderRadius.all(AppRadius.radius)),
+          //     ),
+          //     onPressed: () => context.go('/piano'),
+          //     child: Column(
+          //       children: <Widget>[
+          //         SvgPicture.asset(
+          //           'assets/VIK_Logo_v2.svg',
+          //           width: 65,
+          //         ),
+          //         const Padding(
+          //           padding: EdgeInsets.fromLTRB(0, 7, 0, 0),
+          //           child: AppText(
+          //             text: 'Play',
+          //             family: AppFonts.secondary,
+          //             color: AppColors.secondary,
+          //             letterSpacing: 5,
+          //             size: 24,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(
+          //   height: 20,
+          // ),
           AppShadow(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(

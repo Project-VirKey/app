@@ -22,7 +22,12 @@ class _DefaultComponentsState extends State<DefaultComponents> {
   @override
   Widget build(BuildContext context) {
     bool enable = true;
-    OverlayState? confirmOverlayState = Overlay.of(context);
+    AppConfirmOverlay appConfirmOverlayExample = AppConfirmOverlay(
+      context: context,
+      displayText: 'Delete recording "Recording #3"?',
+      confirmButtonText: 'Delete',
+      onConfirm: () => {},
+    );
 
     return Column(
       children: [
@@ -56,7 +61,8 @@ class _DefaultComponentsState extends State<DefaultComponents> {
           onChanged: (double value) => {print(value)},
         ),
         AppButton(
-            appText: const AppText(text: 'Confirm Overlay'), onPressed: () => confirmOverlayState?.insert(confirmOverlay))
+            appText: const AppText(text: 'Confirm Overlay'),
+            onPressed: () => appConfirmOverlayExample.open())
       ],
     );
   }
