@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
@@ -77,6 +78,72 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   const Padding(
                     padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
+                    child: AppText(
+                      text: 'Play',
+                      family: AppFonts.secondary,
+                      color: AppColors.secondary,
+                      letterSpacing: 5,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          AppShadow(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.dark,
+                foregroundColor: AppColors.dark,
+                padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(AppRadius.radius)),
+              ),
+              onPressed: () => context.go('/piano'),
+              child: Column(
+                children: <Widget>[
+                  SvgPicture.asset(
+                    'assets/VIK_Logo_v2.svg',
+                    width: 65,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 7, 0, 0),
+                    child: AppText(
+                      text: 'Play',
+                      family: AppFonts.secondary,
+                      color: AppColors.secondary,
+                      letterSpacing: 5,
+                      size: 24,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          AppShadow(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.dark,
+                foregroundColor: AppColors.dark,
+                padding: const EdgeInsets.fromLTRB(27, 25, 27, 20),
+                shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(AppRadius.radius)),
+              ),
+              onPressed: () => context.go('/piano'),
+              child: Column(
+                children: <Widget>[
+                  SvgPicture.asset(
+                    'assets/VIK_Logo_v2.svg',
+                    height: 70,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 7, 0, 2),
                     child: AppText(
                       text: 'Play',
                       family: AppFonts.secondary,
