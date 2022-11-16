@@ -69,6 +69,7 @@ flutter:
   assets:
     - assets/images/VIK_Logo_v2.png
     - assets/images/VIK_Logo_v2.svg
+    - assets/audio/mixkit-arcade-retro-game-over-213.wav
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
