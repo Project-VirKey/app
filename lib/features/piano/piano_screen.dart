@@ -6,6 +6,7 @@ import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/piano/import_overlay.dart';
+import 'package:virkey/features/piano/piano_key.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 
 class PianoScreen extends StatefulWidget {
@@ -49,8 +50,7 @@ class _PianoScreenState extends State<PianoScreen> {
                             AppIcon(
                               icon: HeroIcons.arrowDownTray,
                               color: AppColors.secondary,
-                              onPressed: () =>
-                              importOverlay.open(),
+                              onPressed: () => importOverlay.open(),
                               size: 30,
                             ),
                             AppIcon(
@@ -105,7 +105,15 @@ class _PianoScreenState extends State<PianoScreen> {
                 ),
               ),
             ),
-            const AppText(text: 'Piano')
+            Expanded(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (String pk in PianoKeys.white)
+                    Expanded(child: PianoKey(name: pk))
+                ],
+              ),
+            )
           ],
         ),
       ),
