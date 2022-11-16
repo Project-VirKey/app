@@ -36,10 +36,10 @@ class _DefaultComponentsState extends State<DefaultComponents> {
             icon: HeroIcons.arrowDownLeft,
             color: AppColors.primary,
             onPressed: () => {print('tt')}),
-        AppIcon(
-            icon: Icons.record_voice_over_outlined,
-            color: AppColors.dark,
-            onPressed: () => {}),
+        const AppIcon(
+          icon: Icons.record_voice_over_outlined,
+          color: AppColors.dark,
+        ),
         const AppShadow(child: Text('Test Shadow')),
         AppButton(
             appText: const AppText(
@@ -62,8 +62,9 @@ class _DefaultComponentsState extends State<DefaultComponents> {
           onChanged: (double value) => {print(value)},
         ),
         AppButton(
-            appText: const AppText(text: 'Confirm Overlay'),
-            onPressed: () => appConfirmOverlayExample.open(),),
+          appText: const AppText(text: 'Confirm Overlay'),
+          onPressed: () => appConfirmOverlayExample.open(),
+        ),
         AppCheckbox(onChanged: (bool val) => {print(val)})
       ],
     );

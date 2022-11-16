@@ -1,5 +1,5 @@
 name: virkey
-description: A new Flutter project.
+description: The virtual Piano.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -40,6 +40,7 @@ dependencies:
   go_router: ^5.1.1
   flutter_svg: ^1.1.6
   flutter_launcher_icons: ^0.10.0
+  audioplayers: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -66,8 +67,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   # assets:
   assets:
-    - assets/VIK_Logo_v2.png
-    - assets/VIK_Logo_v2.svg
+    - assets/images/VIK_Logo_v2.png
+    - assets/images/VIK_Logo_v2.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -80,37 +81,37 @@ flutter:
   fonts:
     - family: Roboto
       fonts:
-        - asset: fonts/Roboto-Light.ttf
+        - asset: assets/fonts/Roboto-Light.ttf
           weight: 300
-        - asset: fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Regular.ttf
           weight: 400
-        - asset: fonts/Roboto-Medium.ttf
+        - asset: assets/fonts/Roboto-Medium.ttf
           weight: 500
     - family: ZenMaruGothic
       fonts:
-        - asset: fonts/ZenMaruGothic-Regular.ttf
+        - asset: assets/fonts/ZenMaruGothic-Regular.ttf
           weight: 400
-        - asset: fonts/ZenMaruGothic-Medium.ttf
+        - asset: assets/fonts/ZenMaruGothic-Medium.ttf
           weight: 500
     - family: Comfortaa
       fonts:
-        - asset: fonts/Comfortaa-Regular.ttf
+        - asset: assets/fonts/Comfortaa-Regular.ttf
           weight: 400
-        - asset: fonts/Comfortaa-Medium.ttf
+        - asset: assets/fonts/Comfortaa-Medium.ttf
           weight: 500
 
 flutter_icons:
-  image_path: assets/icon/icon_border.png
+  image_path: assets/icons/icon_border.png
   android: true
   adaptive_icon_background: "#242424"
-  adaptive_icon_foreground: assets/icon/icon_big_border.png
+  adaptive_icon_foreground: assets/icons/icon_big_border.png
   ios: true
   remove_alpha_ios: true
   windows:
     generate: true
-    image_path: assets/icon/icon_border.png
+    image_path: assets/icons/icon_border.png
     icon_size: 256
   macos:
 #    not working
     generate: true
-    image_path: assets/icon/icon_border.png
+    image_path: assets/icons/icon_border.png

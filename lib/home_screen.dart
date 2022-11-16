@@ -139,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 children: <Widget>[
                   SvgPicture.asset(
-                    'assets/VIK_Logo_v2.svg',
+                    'assets/images/VIK_Logo_v2.svg',
                     height: 70,
                   ),
                   const Padding(
