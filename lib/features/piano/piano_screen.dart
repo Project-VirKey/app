@@ -106,14 +106,51 @@ class _PianoScreenState extends State<PianoScreen> {
               ),
             ),
             Expanded(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+              child: Stack(
+                alignment: Alignment.topCenter,
                 children: [
-                  for (String pk in PianoKeys.white)
-                    Expanded(child: PianoKey(name: pk))
+                  Row(
+                    children: [
+                      for (String pk in PianoKeys.white)
+                        Expanded(
+                          child: PianoKey(name: pk),
+                        ),
+                    ],
+                  ),
+                  //Padding(
+                  //padding: const EdgeInsets.fromLTRB(100, 0, 100, 0),
+                  //child: Row(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      for (List<String> pk in PianoKeys.black)
+                        if (pk.isEmpty)
+                          const SizedBox()
+                        else
+                          Expanded(
+                            child: PianoKey(
+                              name: pk.isNotEmpty ? pk[0] : '',
+                              black: true,
+                            ),
+                          ),
+                    ],
+                    // ),
+                  )
                 ],
               ),
-            )
+            ),
+            // Expanded(
+            //   child: Row(
+            //     crossAxisAlignment: CrossAxisAlignment.stretch,
+            //     children: [
+            //       for (String pk in PianoKeys.white)
+            //         Expanded(
+            //           child: PianoKey(name: pk),
+            //         )
+            //     ],
+            //   ),
+            // )
           ],
         ),
       ),
