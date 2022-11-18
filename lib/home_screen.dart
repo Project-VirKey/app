@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
@@ -8,7 +9,6 @@ import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
-import 'package:virkey/default_components.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -126,6 +126,9 @@ class _HomeScreenState extends State<HomeScreen> {
           // const SizedBox(
           //   height: 20,
           // ),
+          const SizedBox(
+            height: 60,
+          ),
           AppShadow(
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -156,7 +159,120 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          const DefaultComponents()
+          // const DefaultComponents(),
+          const SizedBox(
+            height: 25,
+          ),
+          // --> for later: Expanded List View
+          // Row(
+          //   children: [
+          //     Expanded(
+          //       child: Container(
+          //         padding: const EdgeInsets.all(5),
+          //         color: AppColors.dark,
+          //         child: const AppText(
+          //           text: 'Recordings',
+          //           color: AppColors.secondary,
+          //           size: 26,
+          //           weight: AppFonts.weightLight,
+          //           textAlign: TextAlign.center,
+          //         ),
+          //       ),
+          //     ),
+          //   ],
+          // ),
+          const AppText(
+            text: 'Find Device ...',
+            size: 20,
+            weight: AppFonts.weightLight,
+            letterSpacing: 3,
+          ),
+          const SizedBox(
+            height: 60,
+          ),
+          Row(
+            children: [
+              Expanded(
+                child: AppShadow(
+                  child: Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 15),
+                    padding: const EdgeInsets.all(5),
+                    decoration: const BoxDecoration(
+                        color: AppColors.dark,
+                        borderRadius: BorderRadius.all(AppRadius.radius)),
+                    child: const AppText(
+                      text: 'Recordings',
+                      color: AppColors.secondary,
+                      size: 26,
+                      weight: AppFonts.weightLight,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            // Expanded -> contain LisView (https://daill.de/flutter-handle-listview-overflow-in-column)
+            child: NotificationListener<UserScrollNotification>(
+              onNotification: (notification) {
+                // if (notification.direction is ScrollDirection.forward) {
+                //   print(notification.direction);
+                // }
+                return true;
+              },
+              child: ListView.separated(
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context, int index) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 30),
+                          child: TextButton(
+                            onPressed: () => {print('expand #$index')},
+                            style: TextButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              foregroundColor: AppColors.dark,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 14),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                AppShadow(
+                                  child: AppText(
+                                    text: 'Recording #${index + 1}',
+                                    size: 18,
+                                  ),
+                                ),
+                                const AppIcon(
+                                  icon: HeroIcons.chevronDown,
+                                  color: AppColors.dark,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return Container(
+                    height: 5,
+                    margin: const EdgeInsets.symmetric(horizontal: 30),
+                    decoration: const BoxDecoration(
+                        color: AppColors.tertiary,
+                        borderRadius: BorderRadius.all(Radius.circular(50))),
+                  );
+                },
+                itemCount: 30,
+              ),
+            ),
+          ),
         ],
       ),
     );

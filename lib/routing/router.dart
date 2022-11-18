@@ -20,7 +20,7 @@ class AppRouter {
           // SafeArea: https://stackoverflow.com/questions/49227667/using-safearea-in-flutter, 15.11.2022
           return Container(
             color: AppColors.secondary,
-            child: const SafeArea(child: HomeScreen()),
+            child: const SafeArea(bottom: false, child: HomeScreen()),
           );
         },
       ),
@@ -35,7 +35,8 @@ class AppRouter {
 
           // https://api.flutter.dev/flutter/services/SystemChrome/setEnabledSystemUIMode.html
           // hide notification bar
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: null);
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
+              overlays: null);
 
           return const PianoScreen();
         },

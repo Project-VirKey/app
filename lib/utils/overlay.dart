@@ -37,23 +37,23 @@ class AppOverlay {
           color: AppColors.black50,
           child: SafeArea(
             bottom: orientation == Orientation.portrait,
-              child: Container(
-                height:
-                    !fillDesktopScreen && PlatformHelper.isDesktop ? 250 : null,
-                width:
-                    !fillDesktopScreen && PlatformHelper.isDesktop ? 650 : null,
-                margin: const EdgeInsets.all(11),
-                decoration: const BoxDecoration(
-                  color: AppColors.white,
-                  borderRadius: BorderRadius.all(AppRadius.radius),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(11),
-                  child: Column(
-                    children: children,
-                  ),
+            child: Container(
+              height:
+                  !fillDesktopScreen && PlatformHelper.isDesktop ? 250 : null,
+              width:
+                  !fillDesktopScreen && PlatformHelper.isDesktop ? 650 : null,
+              margin: const EdgeInsets.all(11),
+              decoration: const BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.all(AppRadius.radius),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(11),
+                child: Column(
+                  children: children,
                 ),
               ),
+            ),
           ),
         ),
       );
