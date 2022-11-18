@@ -20,12 +20,14 @@ class DefaultComponents extends StatefulWidget {
   State<DefaultComponents> createState() => _DefaultComponentsState();
 }
 
-class _DefaultComponentsState extends State<DefaultComponents> {
+class _DefaultComponentsState extends State<DefaultComponents>
+    with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     bool enable = true;
     AppConfirmOverlay appConfirmOverlayExample = AppConfirmOverlay(
       context: context,
+      vsync: this,
       displayText: 'Delete recording "Recording #3"?',
       confirmButtonText: 'Delete',
       onConfirm: () => {print('Delete recording 1')},

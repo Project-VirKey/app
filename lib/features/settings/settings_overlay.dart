@@ -8,8 +8,12 @@ import 'package:virkey/constants/fonts.dart';
 
 class SettingsOverlay {
   final BuildContext context;
+  final TickerProvider vsync;
 
-  SettingsOverlay({required this.context});
+  SettingsOverlay({
+    required this.context,
+    required this.vsync,
+  });
 
   void close() {
     _overlay.close();
@@ -19,7 +23,8 @@ class SettingsOverlay {
     _overlay.open();
   }
 
-  late final AppOverlay _overlay = AppOverlay(context: context, children: [
+  late final AppOverlay _overlay =
+      AppOverlay(context: context, vsync: vsync, children: [
     SizedBox(
       width: MediaQuery.of(context).size.width,
       height: 40,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
@@ -18,11 +17,12 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     // https://medium.flutterdevs.com/implemented-overlay-in-flutter-fe60d2b33a04
-    SettingsOverlay settingsOverlay = SettingsOverlay(context: context);
+    SettingsOverlay settingsOverlay =
+        SettingsOverlay(context: context, vsync: this);
 
     return Scaffold(
       backgroundColor: AppColors.secondary,

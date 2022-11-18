@@ -9,22 +9,33 @@ class AppOverlay {
   final BuildContext context;
   final bool fillDesktopScreen;
   final List<Widget> children;
+  final TickerProvider vsync;
 
   AppOverlay({
     required this.context,
     this.fillDesktopScreen = true,
     required this.children,
+    required this.vsync,
   });
 
   void close() {
-    _overlay.remove();
+    _animationController.reverse().whenComplete(() => {_overlay.remove()});
   }
 
   void open() {
+    _animationController.addListener(() {
+      _overlayState?.setState(() {});
+    });
     _overlayState?.insert(_overlay);
+    _animationController.forward();
   }
 
   late final OverlayState? _overlayState = Overlay.of(context);
+
+  late final AnimationController _animationController = AnimationController(
+      vsync: vsync, duration: const Duration(milliseconds: 150));
+  late final Animation<double> _animation =
+      Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
 
   late final OverlayEntry _overlay = OverlayEntry(builder: (context) {
     return OrientationBuilder(builder: (context, orientation) {
@@ -32,25 +43,37 @@ class AppOverlay {
         shortcuts: {
           PhysicalKeyboardKey.escape: () => close(),
         },
-        child: Container(
-          alignment: Alignment.center,
-          color: AppColors.black50,
-          child: SafeArea(
-            bottom: orientation == Orientation.portrait,
-            child: Container(
-              height:
-                  !fillDesktopScreen && PlatformHelper.isDesktop ? 250 : null,
-              width:
-                  !fillDesktopScreen && PlatformHelper.isDesktop ? 650 : null,
-              margin: const EdgeInsets.all(11),
-              decoration: const BoxDecoration(
-                color: AppColors.white,
-                borderRadius: BorderRadius.all(AppRadius.radius),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(11),
-                child: Column(
-                  children: children,
+        child: Opacity(
+          opacity: _animation.value,
+          child: Container(
+            alignment: Alignment.center,
+            color: AppColors.black50,
+            child: SafeArea(
+              bottom: orientation == Orientation.portrait,
+              child: SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(0, 1),
+                  // starting position (x, y) -> y = 1 -> bottom
+                  end: Offset.zero, // goal position
+                ).animate(_animationController),
+                child: Container(
+                  height: !fillDesktopScreen && PlatformHelper.isDesktop
+                      ? 250
+                      : null,
+                  width: !fillDesktopScreen && PlatformHelper.isDesktop
+                      ? 650
+                      : null,
+                  margin: const EdgeInsets.all(11),
+                  decoration: const BoxDecoration(
+                    color: AppColors.white,
+                    borderRadius: BorderRadius.all(AppRadius.radius),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(11),
+                    child: Column(
+                      children: children,
+                    ),
+                  ),
                 ),
               ),
             ),

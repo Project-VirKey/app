@@ -11,12 +11,14 @@ class AppConfirmOverlay {
   final String displayText;
   final String confirmButtonText;
   final dynamic onConfirm;
+  final TickerProvider vsync;
 
   AppConfirmOverlay({
     required this.context,
     required this.displayText,
     required this.confirmButtonText,
     required this.onConfirm,
+    required this.vsync,
   });
 
   void close() {
@@ -71,23 +73,26 @@ class AppConfirmOverlay {
     }
   }
 
-  late final AppOverlay _overlay =
-      AppOverlay(context: context, fillDesktopScreen: false, children: [
-    Expanded(
-        child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+  late final AppOverlay _overlay = AppOverlay(
+      context: context,
+      vsync: vsync,
+      fillDesktopScreen: false,
       children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-          child: AppText(
-            text: displayText,
-            weight: AppFonts.weightMedium,
-            size: 26,
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ],
-    )),
-    ..._buttons()
-  ]);
+        Expanded(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: AppText(
+                text: displayText,
+                weight: AppFonts.weightMedium,
+                size: 26,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        )),
+        ..._buttons()
+      ]);
 }

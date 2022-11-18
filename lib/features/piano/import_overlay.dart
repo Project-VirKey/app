@@ -8,8 +8,9 @@ import 'package:virkey/utils/overlay.dart';
 
 class ImportOverlay {
   final BuildContext context;
+  final TickerProvider vsync;
 
-  ImportOverlay({required this.context});
+  ImportOverlay({required this.context, required this.vsync});
 
   void close() {
     _overlay.close();
@@ -19,7 +20,8 @@ class ImportOverlay {
     _overlay.open();
   }
 
-  late final AppOverlay _overlay = AppOverlay(context: context, children: [
+  late final AppOverlay _overlay =
+      AppOverlay(context: context, vsync: vsync, children: [
     SizedBox(
       width: MediaQuery.of(context).size.width,
       height: 40,
