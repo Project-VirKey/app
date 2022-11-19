@@ -111,11 +111,7 @@ class _PianoScreenState extends State<PianoScreen>
             Expanded(
               child: Stack(
                 alignment: Alignment.topCenter,
-                children: [
-                  Row(
-                    children: [...PianoKeys.keys],
-                  ),
-                ],
+                children: const [PianoKeys()],
               ),
             ),
           ],
