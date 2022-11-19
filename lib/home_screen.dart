@@ -60,102 +60,40 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
           ),
-          // AppShadow(
-          //   child: ElevatedButton(
-          //     style: ElevatedButton.styleFrom(
-          //       backgroundColor: AppColors.dark,
-          //       foregroundColor: AppColors.dark,
-          //       padding: const EdgeInsets.fromLTRB(30, 25, 30, 20),
-          //       shape: const RoundedRectangleBorder(
-          //           borderRadius: BorderRadius.all(AppRadius.radius)),
-          //     ),
-          //     onPressed: () => context.go('/piano'),
-          //     child: Column(
-          //       children: <Widget>[
-          //         Image.asset(
-          //           'assets/VIK_Logo_v2.png',
-          //           width: 80,
-          //         ),
-          //         const Padding(
-          //           padding: EdgeInsets.fromLTRB(0, 10, 0, 5),
-          //           child: AppText(
-          //             text: 'Play',
-          //             family: AppFonts.secondary,
-          //             color: AppColors.secondary,
-          //             letterSpacing: 5,
-          //             size: 24,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(
-          //   height: 20,
-          // ),
-          // AppShadow(
-          //   child: ElevatedButton(
-          //     style: ElevatedButton.styleFrom(
-          //       backgroundColor: AppColors.dark,
-          //       foregroundColor: AppColors.dark,
-          //       padding: const EdgeInsets.fromLTRB(25, 25, 25, 20),
-          //       shape: const RoundedRectangleBorder(
-          //           borderRadius: BorderRadius.all(AppRadius.radius)),
-          //     ),
-          //     onPressed: () => context.go('/piano'),
-          //     child: Column(
-          //       children: <Widget>[
-          //         SvgPicture.asset(
-          //           'assets/VIK_Logo_v2.svg',
-          //           width: 65,
-          //         ),
-          //         const Padding(
-          //           padding: EdgeInsets.fromLTRB(0, 7, 0, 0),
-          //           child: AppText(
-          //             text: 'Play',
-          //             family: AppFonts.secondary,
-          //             color: AppColors.secondary,
-          //             letterSpacing: 5,
-          //             size: 24,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(
-          //   height: 20,
-          // ),
           const SizedBox(
             height: 60,
           ),
           AppShadow(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.dark,
-                foregroundColor: AppColors.dark,
-                padding: const EdgeInsets.fromLTRB(27, 25, 27, 20),
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(AppRadius.radius)),
-              ),
-              onPressed: () => context.go('/piano'),
-              child: Column(
-                children: <Widget>[
-                  SvgPicture.asset(
-                    'assets/images/VIK_Logo_v2.svg',
-                    height: 70,
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 7, 0, 2),
-                    child: AppText(
-                      text: 'Play',
-                      family: AppFonts.secondary,
-                      color: AppColors.secondary,
-                      letterSpacing: 5,
-                      size: 24,
+            child: SizedBox(
+              width: 150,
+              height: 150,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.dark,
+                  foregroundColor: AppColors.tertiary,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(AppRadius.radius)),
+                ),
+                onPressed: () => context.go('/piano'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SvgPicture.asset(
+                      'assets/images/VIK_Logo_v2.svg',
+                      height: 73,
                     ),
-                  ),
-                ],
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(0, 7.5, 0, 0),
+                      child: AppText(
+                        text: 'Play',
+                        family: AppFonts.secondary,
+                        color: AppColors.secondary,
+                        letterSpacing: 6,
+                        size: 28,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
