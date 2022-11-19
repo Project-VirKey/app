@@ -23,24 +23,19 @@ class AppIcon extends StatelessWidget {
       child: GestureDetector(
         onTap: onPressed,
         child: AppShadow(
-          child: Column(
-            children: [
-              if (icon is HeroIcons) ...[
-                HeroIcon(
-                  icon as HeroIcons,
-                  color: color,
-                  size: size,
-                ),
-              ] else if (icon is IconData) ...[
-                Icon(
-                  icon as IconData,
-                  color: color,
-                  size: size,
-                )
-              ],
-            ],
-          ),
-        ),
+            child: (icon is HeroIcons)
+                ? HeroIcon(
+                    icon as HeroIcons,
+                    color: color,
+                    size: size,
+                  )
+                : (icon is IconData)
+                    ? Icon(
+                        icon as IconData,
+                        color: color,
+                        size: size,
+                      )
+                    : Container()),
       ),
     );
   }
