@@ -70,11 +70,12 @@ class _PianoScreenState extends State<PianoScreen>
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
                           child: AppText(
-                              text: 'ViRKEY',
-                              size: 28,
-                              letterSpacing: 4,
-                              family: AppFonts.secondary,
-                              color: AppColors.secondary),
+                            text: 'ViRKEY',
+                            size: 28,
+                            letterSpacing: 4,
+                            family: AppFonts.secondary,
+                            color: AppColors.secondary,
+                          ),
                         )),
                     Align(
                       alignment: Alignment.centerRight,
@@ -112,47 +113,11 @@ class _PianoScreenState extends State<PianoScreen>
                 alignment: Alignment.topCenter,
                 children: [
                   Row(
-                    children: [
-                      for (String pk in PianoKeys.white)
-                        Expanded(
-                          child: PianoKey(name: pk),
-                        ),
-                    ],
+                    children: [...PianoKeys.keys],
                   ),
-                  //Padding(
-                  //padding: const EdgeInsets.fromLTRB(100, 0, 100, 0),
-                  //child: Row(
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (List<String> pk in PianoKeys.black)
-                        if (pk.isEmpty)
-                          const SizedBox()
-                        else
-                          Expanded(
-                            child: PianoKey(
-                              name: pk.isNotEmpty ? pk[0] : '',
-                              black: true,
-                            ),
-                          ),
-                    ],
-                    // ),
-                  )
                 ],
               ),
             ),
-            // Expanded(
-            //   child: Row(
-            //     crossAxisAlignment: CrossAxisAlignment.stretch,
-            //     children: [
-            //       for (String pk in PianoKeys.white)
-            //         Expanded(
-            //           child: PianoKey(name: pk),
-            //         )
-            //     ],
-            //   ),
-            // )
           ],
         ),
       ),

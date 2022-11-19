@@ -33,7 +33,9 @@ class AppOverlay {
   late final OverlayState? _overlayState = Overlay.of(context);
 
   late final AnimationController _animationController = AnimationController(
-      vsync: vsync, duration: const Duration(milliseconds: 150));
+    vsync: vsync,
+    duration: const Duration(milliseconds: 150),
+  );
   late final Animation<double> _animation =
       Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
 
