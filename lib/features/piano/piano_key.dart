@@ -70,7 +70,7 @@ class PianoKey extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Container(
-            margin: const EdgeInsets.fromLTRB(5, 0, 5, 5),
+            margin: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 foregroundColor: AppColors.dark,
@@ -91,7 +91,7 @@ class PianoKey extends StatelessWidget {
               },
               child: Container(
                 alignment: Alignment.bottomCenter,
-                padding: const EdgeInsets.fromLTRB(0, 0, 0, 25),
+                padding: const EdgeInsets.only(bottom: 25),
                 child: AppText(
                   text: name,
                   size: 45,
@@ -129,7 +129,7 @@ class PianoKey extends StatelessWidget {
                   },
                   child: Container(
                     alignment: Alignment.bottomCenter,
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 20),
+                    padding: const EdgeInsets.only(bottom: 20),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [

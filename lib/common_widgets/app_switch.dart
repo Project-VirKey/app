@@ -29,7 +29,7 @@ class _AppSwitchState extends State<AppSwitch> {
           children: <Widget>[
             Positioned(
                 child: Container(
-              margin: const EdgeInsets.fromLTRB(0, 2.5, 0, 2.5),
+              margin: const EdgeInsets.symmetric(vertical: 2.5),
               width: 35,
               height: 15,
               decoration: BoxDecoration(

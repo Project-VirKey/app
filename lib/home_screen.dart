@@ -109,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
                 const Center(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                    padding: EdgeInsets.only(top: 5),
                     child: AppShadow(
                       child: AppText(
                           text: 'ViRKEY',
@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       height: 73,
                     ),
                     const Padding(
-                      padding: EdgeInsets.fromLTRB(0, 7.5, 0, 0),
+                      padding: EdgeInsets.only(top: 7.5),
                       child: AppText(
                         text: 'Play',
                         family: AppFonts.secondary,
@@ -297,9 +297,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                               if (expandedItem)
                                 Container(
-                                  margin: const EdgeInsets.symmetric(
-                                    horizontal: 50,
-                                    vertical: 15,
+                                  margin: const EdgeInsets.only(
+                                    left: 50,
+                                    right: 50,
+                                    top: 15,
+                                    bottom: 35,
                                   ),
                                   child: Column(
                                     children: [
@@ -308,11 +310,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         icon: HeroIcons.pencilSquare,
                                         onPressed: () => {},
                                       ),
-                                      const AppText(
-                                        text: 'Audio-Playback',
-                                        size: 16,
-                                        textAlign: TextAlign.center,
-                                      ),
+                                      const ExpandedListItemTitle(
+                                          title: 'Audio-Playback'),
                                       PropertyDescriptionActionCombination(
                                         title: 'Audio',
                                         icon: HeroIcons.arrowDownTray,
@@ -323,11 +322,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         icon: HeroIcons.trash,
                                         onPressed: () => {},
                                       ),
-                                      const AppText(
-                                        text: 'Export',
-                                        size: 16,
-                                        textAlign: TextAlign.center,
-                                      ),
+                                      const ExpandedListItemTitle(
+                                          title: 'Export'),
                                       PropertyDescriptionActionCombination(
                                         title: 'Audio',
                                         icon: HeroIcons.arrowUpTray,
@@ -343,11 +339,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         icon: HeroIcons.arrowUpTray,
                                         onPressed: () => {},
                                       ),
-                                      const AppText(
-                                        text: 'Delete',
-                                        size: 16,
-                                        textAlign: TextAlign.center,
-                                      ),
+                                      const ExpandedListItemTitle(
+                                          title: 'Delete'),
                                       PropertyDescriptionActionCombination(
                                         title: 'Delete Recording',
                                         icon: HeroIcons.trash,
@@ -372,6 +365,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 }
 
+class ExpandedListItemTitle extends StatelessWidget {
+  const ExpandedListItemTitle({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 18, bottom: 9),
+      child: AppText(
+        text: title,
+        size: 16,
+        letterSpacing: 3,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+}
+
 class PropertyDescriptionActionCombination extends StatelessWidget {
   const PropertyDescriptionActionCombination({
     Key? key,
@@ -386,20 +401,23 @@ class PropertyDescriptionActionCombination extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        AppText(
-          text: title,
-          size: 16,
-          letterSpacing: 3,
-          weight: AppFonts.weightLight,
-        ),
-        AppIcon(
-          icon: icon,
-          color: AppColors.dark,
-        )
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          AppText(
+            text: title,
+            size: 16,
+            letterSpacing: 3,
+            weight: AppFonts.weightLight,
+          ),
+          AppIcon(
+            icon: icon,
+            color: AppColors.dark,
+          )
+        ],
+      ),
     );
   }
 }

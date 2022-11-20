@@ -68,7 +68,7 @@ class _PianoScreenState extends State<PianoScreen>
                     const Align(
                         alignment: Alignment.center,
                         child: Padding(
-                          padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
+                          padding: EdgeInsets.only(top: 5),
                           child: AppText(
                             text: 'ViRKEY',
                             size: 28,

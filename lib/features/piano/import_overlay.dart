@@ -37,7 +37,7 @@ class ImportOverlay {
           Positioned(
             left: 0,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8),
               child: AppIcon(
                   icon: HeroIcons.arrowUturnLeft,
                   color: AppColors.dark,
