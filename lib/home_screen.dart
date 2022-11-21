@@ -5,6 +5,7 @@ import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_shadow.dart';
+import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
@@ -371,6 +372,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   ),
                                   child: Column(
                                     children: [
+                                      AppSlider(
+                                          onChanged: (val) => {print(val)}),
                                       PropertyDescriptionActionCombination(
                                         title: recordingsList[index],
                                         child: const AppIcon(

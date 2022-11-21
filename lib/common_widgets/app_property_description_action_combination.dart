@@ -16,10 +16,11 @@ class PropertyDescriptionActionCombination extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool emptyChild = child is Container && ((child as Container).child == null);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
-        mainAxisAlignment: title.isEmpty ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: title.isEmpty || emptyChild ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
         children: [
           if (title.isNotEmpty)
             AppText(
@@ -28,6 +29,7 @@ class PropertyDescriptionActionCombination extends StatelessWidget {
               letterSpacing: 3,
               weight: AppFonts.weightLight,
             ),
+          if (!emptyChild)
           child,
         ],
       ),

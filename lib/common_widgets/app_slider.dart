@@ -19,7 +19,7 @@ class _AppSliderState extends State<AppSlider> {
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
           thumbShape:
-              CircleSliderThumb(thumbRadius: 22, sliderValue: widget.value),
+              CircleSliderThumb(thumbRadius: 18, sliderValue: widget.value),
           trackHeight: 5,
           overlayColor: AppColors.dark.withOpacity(.2),
           overlayShape: const RoundSliderOverlayShape(overlayRadius: 20.0),
@@ -80,7 +80,7 @@ class CircleSliderThumb extends SliderComponentShape {
 
     outerPath.addOval(Rect.fromCircle(
       center: center,
-      radius: 10.0,
+      radius: 9.0,
     ));
 
     outerPath.close();
@@ -95,7 +95,7 @@ class CircleSliderThumb extends SliderComponentShape {
 
     innerPath.addOval(Rect.fromCircle(
       center: center,
-      radius: 10.0,
+      radius: 9.0,
     ));
 
     innerPath.close();

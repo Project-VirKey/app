@@ -5,6 +5,7 @@ import 'package:virkey/common_widgets/app_checkbox.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
+import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
@@ -76,13 +77,26 @@ class SettingsOverlay {
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).orientation == Orientation.landscape
-                            ? (MediaQuery.of(context).size.width * .5)
-                            : double.infinity,
+                    maxWidth: MediaQuery.of(context).orientation ==
+                            Orientation.landscape
+                        ? (MediaQuery.of(context).size.width * .5)
+                        : double.infinity,
                   ),
                   child: Column(
                     children: [
                       const PropertiesDescriptionTitle(title: 'Volume'),
+                      PropertyDescriptionActionCombination(
+                          title: 'Sound Library', child: Container()),
+                      Material(
+                        color: Colors.transparent,
+                        child: AppSlider(onChanged: (val) => {print(val)}),
+                      ),
+                      PropertyDescriptionActionCombination(
+                          title: 'Audio-Playback', child: Container()),
+                      Material(
+                        color: Colors.transparent,
+                        child: AppSlider(onChanged: (val) => {print(val)}),
+                      ),
                       const PropertiesDescriptionTitle(title: 'Default Folder'),
                       PropertyDescriptionActionCombination(
                         title: '/dfdg/dsdf/folder/',
@@ -115,14 +129,16 @@ class SettingsOverlay {
                       PropertyDescriptionActionCombination(
                         title: 'Default Piano',
                         child: AppCheckbox(
-                            value: false,
-                            onChanged: (bool val) => {print(val)}),
+                            value: true, onChanged: (bool val) => {print(val)}),
                       ),
                       PropertyDescriptionActionCombination(
                         title: 'Electric',
                         child: AppCheckbox(
                             value: false,
                             onChanged: (bool val) => {print(val)}),
+                      ),
+                      const SizedBox(
+                        height: 20,
                       ),
                       GestureDetector(
                         onTap: _launchUrl,
