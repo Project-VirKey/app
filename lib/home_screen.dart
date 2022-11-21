@@ -21,8 +21,15 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _listExpanded = false;
+  double _appTitleSize = 45;
+  late final Duration _expandDuration = const Duration(milliseconds: 250);
 
-  double _virkeyTitleSize = 45;
+  late final AnimationController _recordingsAnimationController =
+      AnimationController(vsync: this, duration: _expandDuration)..forward();
+  late final BorderRadiusTween _borderRadiusTween = BorderRadiusTween(
+      begin: const BorderRadius.all(AppRadius.radius), end: BorderRadius.zero);
+  late final EdgeInsetsTween _edgeInsetsTween = EdgeInsetsTween(
+      begin: const EdgeInsets.symmetric(horizontal: 15), end: EdgeInsets.zero);
 
   @override
   void dispose() {
@@ -44,7 +51,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'Rec6',
       'Rec7',
       'Rec8',
-      'Rec9'
+      'Rec9',
+      'Rec10',
+      'Rec11',
+      'Rec12',
+      'Rec13',
+      'Rec14',
+      'Rec15',
+      'Rec16',
+      'Rec17',
+      'Rec18',
+      'Rec19',
+      'Rec20',
+      'Rec21',
+      'Rec22',
     ];
     final items = List.of(itemsRep);
     final recordingsListKey = GlobalKey<AnimatedListState>();
@@ -122,12 +142,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     padding: const EdgeInsets.only(top: 5),
                     child: AppShadow(
                       child: AnimatedDefaultTextStyle(
-                        style: TextStyle(fontSize: _virkeyTitleSize),
+                        style: TextStyle(fontSize: _appTitleSize),
                         duration: const Duration(milliseconds: 250),
                         child: const Text(
                           'ViRKEY',
                           style: TextStyle(
-                              fontFamily: AppFonts.secondary, letterSpacing: 4, color: AppColors.dark),
+                              fontFamily: AppFonts.secondary,
+                              letterSpacing: 4,
+                              color: AppColors.dark),
                         ),
                       ),
                     ),
@@ -209,35 +231,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ],
             ),
           ),
-          // const DefaultComponents(),
-          // --> for later: Expanded List View
-          // Row(
-          //   children: [
-          //     Expanded(
-          //       child: Container(
-          //         padding: const EdgeInsets.all(5),
-          //         color: AppColors.dark,
-          //         child: const AppText(
-          //           text: 'Recordings',
-          //           color: AppColors.secondary,
-          //           size: 26,
-          //           weight: AppFonts.weightLight,
-          //           textAlign: TextAlign.center,
-          //         ),
-          //       ),
-          //     ),
-          //   ],
-          // ),
           Row(
             children: [
               Expanded(
                 child: AppShadow(
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 15),
+                    margin: _edgeInsetsTween
+                        .evaluate(_recordingsAnimationController),
                     padding: const EdgeInsets.all(5),
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                         color: AppColors.dark,
-                        borderRadius: BorderRadius.all(AppRadius.radius)),
+                        borderRadius: _borderRadiusTween.evaluate(
+                            CurvedAnimation(
+                                parent: _recordingsAnimationController,
+                                curve: Curves.ease))),
                     child: const AppText(
                       text: 'Recordings',
                       color: AppColors.secondary,
@@ -251,34 +258,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-          AppButton(
-              appText: const AppText(
-                text: 'L',
-              ),
-              onPressed: () => {
-                    setState(() {
-                      _listExpanded = !_listExpanded;
-                      _virkeyTitleSize -= 5 * (_listExpanded ? 1: -1);
-                    }),
-                    print(_listExpanded)
-                  }),
           Expanded(
             // Expanded -> contain ListView (https://daill.de/flutter-handle-listview-overflow-in-column)
             child: NotificationListener<UserScrollNotification>(
               onNotification: (notification) {
                 final ScrollDirection direction = notification.direction;
                 if (direction == ScrollDirection.reverse) {
-                  setState(() {
-                    _listExpanded = true;
-                    _virkeyTitleSize = 40;
-                  });
+                  if (_listExpanded != true) {
+                    setState(() {
+                      _recordingsAnimationController.reverse();
+                      _listExpanded = true;
+                      _appTitleSize = 40;
+                    });
+                  }
                 } else if (direction == ScrollDirection.forward) {
-                  setState(() {
-                    _listExpanded = false;
-                    _virkeyTitleSize = 45;
-                  });
+                  if (_listExpanded != false) {
+                    setState(() {
+                      _recordingsAnimationController.forward();
+                      _listExpanded = false;
+                      _appTitleSize = 45;
+                    });
+                  }
                 }
-                print(_listExpanded);
                 return true;
               },
               child: AnimatedList(
