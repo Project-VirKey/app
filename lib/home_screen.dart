@@ -64,17 +64,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       'Rec21',
       'Rec22',
     ];
-    final items = List.of(itemsRep);
+
+    final recordingsList = List.of(itemsRep);
     final recordingsListKey = GlobalKey<AnimatedListState>();
     bool expandedItem = false;
 
-    void addItem(String value) {
-      items.insert(0, value);
+    void addRecordingItem(String value) {
+      recordingsList.insert(0, value);
       recordingsListKey.currentState!
           .insertItem(0, duration: const Duration(milliseconds: 150));
     }
 
-    void removeItem(int index) {
+    void removeRecordingItem(int index) {
       recordingsListKey.currentState!.removeItem(0, (context, animation) {
         return SizeTransition(
           sizeFactor: animation,
@@ -85,11 +86,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               )),
         );
       }, duration: const Duration(milliseconds: 150));
-      items.removeAt(index);
+      recordingsList.removeAt(index);
     }
 
-    void removeAllItems() {
-      for (var i = 0; i <= items.length - 1; i++) {
+    void removeAllRecordingItems() {
+      for (var i = 0; i <= recordingsList.length - 1; i++) {
         recordingsListKey.currentState?.removeItem(0,
             (BuildContext context, Animation<double> animation) {
           return SizeTransition(
@@ -102,25 +103,25 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           );
         }, duration: const Duration(milliseconds: 150));
       }
-      items.clear();
+      recordingsList.clear();
     }
 
-    void expandItem(int index) {
-      String item = items[index];
-      removeAllItems();
-      addItem(item);
+    void expandRecordingItem(int index) {
+      String item = recordingsList[index];
+      removeAllRecordingItems();
+      addRecordingItem(item);
       expandedItem = true;
     }
 
-    void contractItem() {
-      removeAllItems();
+    void contractRecordingItem() {
+      removeAllRecordingItems();
       for (var element in itemsRep.reversed) {
-        addItem(element);
+        addRecordingItem(element);
       }
       expandedItem = false;
     }
 
-    void expandList() {
+    void expandRecordingsList() {
       // if the list is not fully expanded
       if (!_listExpanded) {
         setState(() {
@@ -131,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       }
     }
 
-    void contractList() {
+    void contractRecordingsList() {
       // if the list is fully expanded
       // inactive when detailed view of a recording is open (!expandedItem)
       if (_listExpanded && !expandedItem) {
@@ -260,10 +261,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     onVerticalDragUpdate: (DragUpdateDetails details) => {
                       if (details.delta.dy < 0)
                         // if the title has been dragged above y position 0
-                        expandList()
+                        expandRecordingsList()
                       else if (details.delta.dy > 0)
                         // if the title has been dragged below y position 0
-                        contractList()
+                        contractRecordingsList()
                     },
                     child: Container(
                       margin: _edgeInsetsTween
@@ -294,10 +295,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               onNotification: (notification) {
                 if (notification.metrics.pixels > 0.0) {
                   // if the list has been scrolled past y position 0
-                  expandList();
+                  expandRecordingsList();
                 } else if (notification.metrics.pixels < 0) {
                   // if the list has been scrolled above y 0 (negative value)
-                  contractList();
+                  contractRecordingsList();
                 }
                 return true;
               },
@@ -305,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 key: recordingsListKey,
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
-                initialItemCount: items.length,
+                initialItemCount: recordingsList.length,
                 itemBuilder: (context, index, animation) {
                   return SizeTransition(
                     key: UniqueKey(),
@@ -322,9 +323,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 child: TextButton(
                                   onPressed: () => {
                                     if (expandedItem)
-                                      {contractItem()}
+                                      {contractRecordingItem()}
                                     else
-                                      {expandItem(index)}
+                                      {expandRecordingItem(index)}
                                   },
                                   style: TextButton.styleFrom(
                                     backgroundColor: Colors.transparent,
@@ -338,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     children: [
                                       AppShadow(
                                         child: AppText(
-                                          text: items[index],
+                                          text: recordingsList[index],
                                           size: 18,
                                           letterSpacing: 3,
                                         ),
@@ -373,7 +374,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   child: Column(
                                     children: [
                                       PropertyDescriptionActionCombination(
-                                        title: items[index],
+                                        title: recordingsList[index],
                                         icon: HeroIcons.pencilSquare,
                                         onPressed: () => {},
                                       ),
