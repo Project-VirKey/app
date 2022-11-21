@@ -18,12 +18,13 @@ class PianoScreen extends StatefulWidget {
 
 class _PianoScreenState extends State<PianoScreen>
     with TickerProviderStateMixin {
+  late SettingsOverlay settingsOverlay =
+      SettingsOverlay(context: context, vsync: this);
+  late ImportOverlay importOverlay =
+      ImportOverlay(context: context, vsync: this);
+
   @override
   Widget build(BuildContext context) {
-    SettingsOverlay settingsOverlay =
-        SettingsOverlay(context: context, vsync: this);
-    ImportOverlay importOverlay = ImportOverlay(context: context, vsync: this);
-
     return Scaffold(
       backgroundColor: AppColors.secondary,
       body: Center(
