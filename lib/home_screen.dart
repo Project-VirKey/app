@@ -18,6 +18,113 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  // https://medium.flutterdevs.com/implemented-overlay-in-flutter-fe60d2b33a04
+  late final SettingsOverlay _settingsOverlay =
+      SettingsOverlay(context: context, vsync: this);
+
+  static const _itemsRep = [
+    'Rec1',
+    'Rec2',
+    'Rec3',
+    'Rec4',
+    'Rec5',
+    'Rec6',
+    'Rec7',
+    'Rec8',
+    'Rec9',
+    'Rec10',
+    'Rec11',
+    'Rec12',
+    'Rec13',
+    'Rec14',
+    'Rec15',
+    'Rec16',
+    'Rec17',
+    'Rec18',
+    'Rec19',
+    'Rec20',
+    'Rec21',
+    'Rec22',
+  ];
+
+  final recordingsList = List.of(_itemsRep);
+  final recordingsListKey = GlobalKey<AnimatedListState>();
+  bool expandedItem = false;
+
+  void _addRecordingItem(String value) {
+    recordingsList.insert(0, value);
+    recordingsListKey.currentState!
+        .insertItem(0, duration: const Duration(milliseconds: 150));
+  }
+
+  void _removeRecordingItem(int index) {
+    recordingsListKey.currentState!.removeItem(0, (context, animation) {
+      return SizeTransition(
+        sizeFactor: animation,
+        child: Card(
+            color: AppColors.secondary,
+            child: Container(
+              height: 20,
+            )),
+      );
+    }, duration: const Duration(milliseconds: 150));
+    recordingsList.removeAt(index);
+  }
+
+  void _removeAllRecordingItems() {
+    for (var i = 0; i <= recordingsList.length - 1; i++) {
+      recordingsListKey.currentState?.removeItem(0,
+          (BuildContext context, Animation<double> animation) {
+        return SizeTransition(
+          sizeFactor: animation,
+          child: Card(
+              color: AppColors.secondary,
+              child: Container(
+                height: 20,
+              )),
+        );
+      }, duration: const Duration(milliseconds: 150));
+    }
+    recordingsList.clear();
+  }
+
+  void _expandRecordingItem(int index) {
+    String item = recordingsList[index];
+    _removeAllRecordingItems();
+    _addRecordingItem(item);
+    expandedItem = true;
+  }
+
+  void _contractRecordingItem() {
+    _removeAllRecordingItems();
+    for (var element in _itemsRep.reversed) {
+      _addRecordingItem(element);
+    }
+    expandedItem = false;
+  }
+
+  void _expandRecordingsList() {
+    // if the list is not fully expanded
+    if (!_listExpanded) {
+      setState(() {
+        _recordingsAnimationController.reverse();
+        _listExpanded = true;
+        _appTitleSize = 40;
+      });
+    }
+  }
+
+  void _contractRecordingsList() {
+    // if the list is fully expanded
+    if (_listExpanded) {
+      setState(() {
+        _recordingsAnimationController.forward();
+        _listExpanded = false;
+        _appTitleSize = 45;
+      });
+    }
+  }
+
   bool _listExpanded = false;
   double _appTitleSize = 45;
   late final Duration _expandDuration = const Duration(milliseconds: 250);
@@ -30,120 +137,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       begin: const EdgeInsets.symmetric(horizontal: 15), end: EdgeInsets.zero);
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    // https://medium.flutterdevs.com/implemented-overlay-in-flutter-fe60d2b33a04
-    SettingsOverlay settingsOverlay =
-        SettingsOverlay(context: context, vsync: this);
-
-    const itemsRep = [
-      'Rec1',
-      'Rec2',
-      'Rec3',
-      'Rec4',
-      'Rec5',
-      'Rec6',
-      'Rec7',
-      'Rec8',
-      'Rec9',
-      'Rec10',
-      'Rec11',
-      'Rec12',
-      'Rec13',
-      'Rec14',
-      'Rec15',
-      'Rec16',
-      'Rec17',
-      'Rec18',
-      'Rec19',
-      'Rec20',
-      'Rec21',
-      'Rec22',
-    ];
-
-    final recordingsList = List.of(itemsRep);
-    final recordingsListKey = GlobalKey<AnimatedListState>();
-    bool expandedItem = false;
-
-    void addRecordingItem(String value) {
-      recordingsList.insert(0, value);
-      recordingsListKey.currentState!
-          .insertItem(0, duration: const Duration(milliseconds: 150));
-    }
-
-    void removeRecordingItem(int index) {
-      recordingsListKey.currentState!.removeItem(0, (context, animation) {
-        return SizeTransition(
-          sizeFactor: animation,
-          child: Card(
-              color: AppColors.secondary,
-              child: Container(
-                height: 20,
-              )),
-        );
-      }, duration: const Duration(milliseconds: 150));
-      recordingsList.removeAt(index);
-    }
-
-    void removeAllRecordingItems() {
-      for (var i = 0; i <= recordingsList.length - 1; i++) {
-        recordingsListKey.currentState?.removeItem(0,
-            (BuildContext context, Animation<double> animation) {
-          return SizeTransition(
-            sizeFactor: animation,
-            child: Card(
-                color: AppColors.secondary,
-                child: Container(
-                  height: 20,
-                )),
-          );
-        }, duration: const Duration(milliseconds: 150));
-      }
-      recordingsList.clear();
-    }
-
-    void expandRecordingItem(int index) {
-      String item = recordingsList[index];
-      removeAllRecordingItems();
-      addRecordingItem(item);
-      expandedItem = true;
-    }
-
-    void contractRecordingItem() {
-      removeAllRecordingItems();
-      for (var element in itemsRep.reversed) {
-        addRecordingItem(element);
-      }
-      expandedItem = false;
-    }
-
-    void expandRecordingsList() {
-      // if the list is not fully expanded
-      if (!_listExpanded) {
-        setState(() {
-          _recordingsAnimationController.reverse();
-          _listExpanded = true;
-          _appTitleSize = 40;
-        });
-      }
-    }
-
-    void contractRecordingsList() {
-      // if the list is fully expanded
-      // inactive when detailed view of a recording is open (!expandedItem)
-      if (_listExpanded && !expandedItem) {
-        setState(() {
-          _recordingsAnimationController.forward();
-          _listExpanded = false;
-          _appTitleSize = 45;
-        });
-      }
-    }
-
     return Scaffold(
       backgroundColor: AppColors.secondary,
       body: Column(
@@ -156,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 AppIcon(
                   icon: HeroIcons.cog6Tooth,
                   color: AppColors.dark,
-                  onPressed: () => settingsOverlay.open(),
+                  onPressed: () => _settingsOverlay.open(),
                   size: 30,
                 ),
                 Center(
@@ -261,10 +255,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     onVerticalDragUpdate: (DragUpdateDetails details) => {
                       if (details.delta.dy < 0)
                         // if the title has been dragged above y position 0
-                        expandRecordingsList()
+                        _expandRecordingsList()
                       else if (details.delta.dy > 0)
                         // if the title has been dragged below y position 0
-                        contractRecordingsList()
+                        _contractRecordingsList()
                     },
                     child: Container(
                       margin: _edgeInsetsTween
@@ -295,10 +289,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               onNotification: (notification) {
                 if (notification.metrics.pixels > 0.0) {
                   // if the list has been scrolled past y position 0
-                  expandRecordingsList();
-                } else if (notification.metrics.pixels < 0) {
+                  _expandRecordingsList();
+                } else if (notification.metrics.pixels < 0 && !expandedItem) {
                   // if the list has been scrolled above y 0 (negative value)
-                  contractRecordingsList();
+                  // inactive when detailed view of a recording is open (!expandedItem)
+                  _contractRecordingsList();
                 }
                 return true;
               },
@@ -323,9 +318,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 child: TextButton(
                                   onPressed: () => {
                                     if (expandedItem)
-                                      {contractRecordingItem()}
+                                      {_contractRecordingItem()}
                                     else
-                                      {expandRecordingItem(index)}
+                                      {_expandRecordingItem(index)}
                                   },
                                   style: TextButton.styleFrom(
                                     backgroundColor: Colors.transparent,
