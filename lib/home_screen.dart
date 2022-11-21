@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
@@ -19,6 +20,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  bool _listExpanded = false;
+
+  double _virkeyTitleSize = 45;
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     // https://medium.flutterdevs.com/implemented-overlay-in-flutter-fe60d2b33a04
@@ -107,15 +117,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   onPressed: () => settingsOverlay.open(),
                   size: 30,
                 ),
-                const Center(
+                Center(
                   child: Padding(
-                    padding: EdgeInsets.only(top: 5),
+                    padding: const EdgeInsets.only(top: 5),
                     child: AppShadow(
-                      child: AppText(
-                          text: 'ViRKEY',
-                          size: 40,
-                          family: AppFonts.secondary,
-                          letterSpacing: 4),
+                      child: AnimatedDefaultTextStyle(
+                        style: TextStyle(fontSize: _virkeyTitleSize),
+                        duration: const Duration(milliseconds: 250),
+                        child: const Text(
+                          'ViRKEY',
+                          style: TextStyle(
+                              fontFamily: AppFonts.secondary, letterSpacing: 4, color: AppColors.dark),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -129,46 +143,73 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
           const SizedBox(
-            height: 60,
+            height: 20,
           ),
-          AppShadow(
-            child: SizedBox(
+          AnimatedCrossFade(
+            // https://www.geeksforgeeks.org/flutter-animatedcrossfade-widget
+            crossFadeState: _listExpanded
+                ? CrossFadeState.showFirst
+                : CrossFadeState.showSecond,
+            duration: const Duration(milliseconds: 250),
+            firstChild: const SizedBox(
               width: 150,
-              height: 150,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.dark,
-                  foregroundColor: AppColors.tertiary,
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(AppRadius.radius)),
+              height: 0,
+            ),
+            secondChild: Column(
+              children: [
+                const SizedBox(
+                  height: 40,
                 ),
-                onPressed: () => context.go('/piano'),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    SvgPicture.asset(
-                      'assets/images/VIK_Logo_v2.svg',
-                      height: 73,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 7.5),
-                      child: AppText(
-                        text: 'Play',
-                        family: AppFonts.secondary,
-                        color: AppColors.secondary,
-                        letterSpacing: 6,
-                        size: 28,
+                AppShadow(
+                  child: SizedBox(
+                    width: 150,
+                    height: 150,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.dark,
+                        foregroundColor: AppColors.tertiary,
+                        shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.all(AppRadius.radius)),
+                      ),
+                      onPressed: () => context.go('/piano'),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          SvgPicture.asset(
+                            'assets/images/VIK_Logo_v2.svg',
+                            height: 73,
+                          ),
+                          const Padding(
+                            padding: EdgeInsets.only(top: 7.5),
+                            child: AppText(
+                              text: 'Play',
+                              family: AppFonts.secondary,
+                              color: AppColors.secondary,
+                              letterSpacing: 6,
+                              size: 28,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(
+                  height: 25,
+                ),
+                const AppText(
+                  text: 'Find Device ...',
+                  size: 20,
+                  weight: AppFonts.weightLight,
+                  letterSpacing: 3,
+                ),
+                const SizedBox(
+                  height: 60,
+                ),
+              ],
             ),
           ),
           // const DefaultComponents(),
-          const SizedBox(
-            height: 25,
-          ),
           // --> for later: Expanded List View
           // Row(
           //   children: [
@@ -187,15 +228,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           //     ),
           //   ],
           // ),
-          const AppText(
-            text: 'Find Device ...',
-            size: 20,
-            weight: AppFonts.weightLight,
-            letterSpacing: 3,
-          ),
-          const SizedBox(
-            height: 60,
-          ),
           Row(
             children: [
               Expanded(
@@ -219,13 +251,34 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
+          AppButton(
+              appText: const AppText(
+                text: 'L',
+              ),
+              onPressed: () => {
+                    setState(() {
+                      _listExpanded = !_listExpanded;
+                      _virkeyTitleSize -= 5 * (_listExpanded ? 1: -1);
+                    }),
+                    print(_listExpanded)
+                  }),
           Expanded(
             // Expanded -> contain ListView (https://daill.de/flutter-handle-listview-overflow-in-column)
             child: NotificationListener<UserScrollNotification>(
               onNotification: (notification) {
-                // if (notification.direction is ScrollDirection.forward) {
-                //   print(notification.direction);
-                // }
+                final ScrollDirection direction = notification.direction;
+                if (direction == ScrollDirection.reverse) {
+                  setState(() {
+                    _listExpanded = true;
+                    _virkeyTitleSize = 40;
+                  });
+                } else if (direction == ScrollDirection.forward) {
+                  setState(() {
+                    _listExpanded = false;
+                    _virkeyTitleSize = 45;
+                  });
+                }
+                print(_listExpanded);
                 return true;
               },
               child: AnimatedList(
