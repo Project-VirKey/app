@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_shadow.dart';
 import 'package:virkey/common_widgets/app_text.dart';
@@ -122,6 +120,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       expandedItem = false;
     }
 
+    void expandList() {
+      // if the list is not fully expanded
+      if (!_listExpanded) {
+        setState(() {
+          _recordingsAnimationController.reverse();
+          _listExpanded = true;
+          _appTitleSize = 40;
+        });
+      }
+    }
+
+    void contractList() {
+      // if the list is fully expanded
+      // inactive when detailed view of a recording is open (!expandedItem)
+      if (_listExpanded && !expandedItem) {
+        setState(() {
+          _recordingsAnimationController.forward();
+          _listExpanded = false;
+          _appTitleSize = 45;
+        });
+      }
+    }
+
     return Scaffold(
       backgroundColor: AppColors.secondary,
       body: Column(
@@ -235,23 +256,33 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             children: [
               Expanded(
                 child: AppShadow(
-                  child: Container(
-                    margin: _edgeInsetsTween
-                        .evaluate(_recordingsAnimationController),
-                    padding: const EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                        color: AppColors.dark,
-                        borderRadius: _borderRadiusTween.evaluate(
-                            CurvedAnimation(
-                                parent: _recordingsAnimationController,
-                                curve: Curves.ease))),
-                    child: const AppText(
-                      text: 'Recordings',
-                      color: AppColors.secondary,
-                      size: 26,
-                      letterSpacing: 3,
-                      weight: AppFonts.weightLight,
-                      textAlign: TextAlign.center,
+                  child: GestureDetector(
+                    onVerticalDragUpdate: (DragUpdateDetails details) => {
+                      if (details.delta.dy < 0)
+                        // if the title has been dragged above y position 0
+                        expandList()
+                      else if (details.delta.dy > 0)
+                        // if the title has been dragged below y position 0
+                        contractList()
+                    },
+                    child: Container(
+                      margin: _edgeInsetsTween
+                          .evaluate(_recordingsAnimationController),
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          color: AppColors.dark,
+                          borderRadius: _borderRadiusTween.evaluate(
+                              CurvedAnimation(
+                                  parent: _recordingsAnimationController,
+                                  curve: Curves.ease))),
+                      child: const AppText(
+                        text: 'Recordings',
+                        color: AppColors.secondary,
+                        size: 26,
+                        letterSpacing: 3,
+                        weight: AppFonts.weightLight,
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ),
                 ),
@@ -259,26 +290,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ],
           ),
           Expanded(
-            // Expanded -> contain ListView (https://daill.de/flutter-handle-listview-overflow-in-column)
-            child: NotificationListener<UserScrollNotification>(
+            child: NotificationListener<ScrollNotification>(
               onNotification: (notification) {
-                final ScrollDirection direction = notification.direction;
-                if (direction == ScrollDirection.reverse) {
-                  if (_listExpanded != true) {
-                    setState(() {
-                      _recordingsAnimationController.reverse();
-                      _listExpanded = true;
-                      _appTitleSize = 40;
-                    });
-                  }
-                } else if (direction == ScrollDirection.forward) {
-                  if (_listExpanded != false) {
-                    setState(() {
-                      _recordingsAnimationController.forward();
-                      _listExpanded = false;
-                      _appTitleSize = 45;
-                    });
-                  }
+                if (notification.metrics.pixels > 0.0) {
+                  // if the list has been scrolled past y position 0
+                  expandList();
+                } else if (notification.metrics.pixels < 0) {
+                  // if the list has been scrolled above y 0 (negative value)
+                  contractList();
                 }
                 return true;
               },
@@ -291,12 +310,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   return SizeTransition(
                     key: UniqueKey(),
                     sizeFactor: animation,
-                    // position: animation.drive(
-                    //   Tween(
-                    //     begin: const Offset(0, 1),
-                    //     end: Offset.zero,
-                    //   ),
-                    // ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
