@@ -293,8 +293,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 if (notification.metrics.pixels > 0.0) {
                   // if the list has been scrolled past y position 0
                   _expandRecordingsList();
-                } else if (notification.metrics.pixels < 0 && !expandedItem) {
-                  // if the list has been scrolled above y 0 (negative value)
+                } else if (notification.metrics.pixels <= 0 && !expandedItem) {
+                  // if the list has been scrolled above/equal y 0 (negative value)
                   // inactive when detailed view of a recording is open (!expandedItem)
                   _contractRecordingsList();
                 }
