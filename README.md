@@ -1,5 +1,5 @@
 # VirKey
 
-> Das virtuelle Klavier
+> The virtual Keyboard.
 
 ## Getting Started
