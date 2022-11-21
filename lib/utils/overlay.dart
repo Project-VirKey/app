@@ -40,7 +40,6 @@ class AppOverlay {
       Tween<double>(begin: 0.0, end: 1.0).animate(_animationController);
 
   late final OverlayEntry _overlay = OverlayEntry(builder: (context) {
-    return OrientationBuilder(builder: (context, orientation) {
       return AppKeyboardShortcut(
         shortcuts: {
           PhysicalKeyboardKey.escape: () => close(),
@@ -51,7 +50,7 @@ class AppOverlay {
             alignment: Alignment.center,
             color: AppColors.black50,
             child: SafeArea(
-              bottom: orientation == Orientation.portrait,
+              bottom: MediaQuery.of(context).orientation == Orientation.portrait,
               child: SlideTransition(
                 position: Tween<Offset>(
                   begin: const Offset(0, 1),
@@ -82,6 +81,5 @@ class AppOverlay {
           ),
         ),
       );
-    });
   });
 }

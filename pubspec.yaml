@@ -41,6 +41,7 @@ dependencies:
   flutter_svg: ^1.1.6
   flutter_launcher_icons: ^0.10.0
   audioplayers: ^1.1.1
+  url_launcher: ^6.1.6
 
 dev_dependencies:
   flutter_test:

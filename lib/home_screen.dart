@@ -3,12 +3,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
+import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_shadow.dart';
+import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
+import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -370,43 +373,75 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     children: [
                                       PropertyDescriptionActionCombination(
                                         title: recordingsList[index],
-                                        icon: HeroIcons.pencilSquare,
+                                        child: const AppIcon(
+                                          icon: HeroIcons.pencilSquare,
+                                          color: AppColors.dark,
+                                        ),
                                         onPressed: () => {},
                                       ),
-                                      const ExpandedListItemTitle(
+                                      const PropertiesDescriptionTitle(
                                           title: 'Audio-Playback'),
                                       PropertyDescriptionActionCombination(
                                         title: 'Audio',
-                                        icon: HeroIcons.arrowDownTray,
+                                        child: const AppIcon(
+                                          icon: HeroIcons.arrowDownTray,
+                                          color: AppColors.dark,
+                                        ),
                                         onPressed: () => {},
                                       ),
                                       PropertyDescriptionActionCombination(
                                         title: 'File1.mp3',
-                                        icon: HeroIcons.trash,
-                                        onPressed: () => {},
+                                        child: Row(
+                                          children: [
+                                            AppSwitch(
+                                              value: false,
+                                              onChanged: (bool val) =>
+                                                  {print(val)},
+                                            ),
+                                            const SizedBox(
+                                              width: 20,
+                                            ),
+                                            const AppIcon(
+                                              icon: HeroIcons.trash,
+                                              color: AppColors.dark,
+                                            ),
+                                          ],
+                                        ),
                                       ),
-                                      const ExpandedListItemTitle(
+                                      const PropertiesDescriptionTitle(
                                           title: 'Export'),
                                       PropertyDescriptionActionCombination(
                                         title: 'Audio',
-                                        icon: HeroIcons.arrowUpTray,
+                                        child: const AppIcon(
+                                          icon: HeroIcons.arrowUpTray,
+                                          color: AppColors.dark,
+                                        ),
                                         onPressed: () => {},
                                       ),
                                       PropertyDescriptionActionCombination(
                                         title: 'MIDI',
-                                        icon: HeroIcons.arrowUpTray,
+                                        child: const AppIcon(
+                                          icon: HeroIcons.arrowUpTray,
+                                          color: AppColors.dark,
+                                        ),
                                         onPressed: () => {},
                                       ),
                                       PropertyDescriptionActionCombination(
                                         title: 'Audio & MIDI',
-                                        icon: HeroIcons.arrowUpTray,
+                                        child: const AppIcon(
+                                          icon: HeroIcons.arrowUpTray,
+                                          color: AppColors.dark,
+                                        ),
                                         onPressed: () => {},
                                       ),
-                                      const ExpandedListItemTitle(
+                                      const PropertiesDescriptionTitle(
                                           title: 'Delete'),
                                       PropertyDescriptionActionCombination(
                                         title: 'Delete Recording',
-                                        icon: HeroIcons.trash,
+                                        child: const AppIcon(
+                                          icon: HeroIcons.trash,
+                                          color: AppColors.dark,
+                                        ),
                                         onPressed: () => {},
                                       ),
                                     ],
@@ -422,63 +457,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class ExpandedListItemTitle extends StatelessWidget {
-  const ExpandedListItemTitle({
-    Key? key,
-    required this.title,
-  }) : super(key: key);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 18, bottom: 9),
-      child: AppText(
-        text: title,
-        size: 16,
-        letterSpacing: 3,
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-}
-
-class PropertyDescriptionActionCombination extends StatelessWidget {
-  const PropertyDescriptionActionCombination({
-    Key? key,
-    required this.title,
-    required this.icon,
-    required this.onPressed,
-  }) : super(key: key);
-
-  final String title;
-  final Object icon;
-  final dynamic onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          AppText(
-            text: title,
-            size: 16,
-            letterSpacing: 3,
-            weight: AppFonts.weightLight,
-          ),
-          AppIcon(
-            icon: icon,
-            color: AppColors.dark,
-          )
         ],
       ),
     );

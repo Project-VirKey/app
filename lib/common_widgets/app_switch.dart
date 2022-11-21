@@ -38,12 +38,12 @@ class _AppSwitchState extends State<AppSwitch> {
               ),
             )),
             AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
+              duration: const Duration(milliseconds: 250),
               curve: Curves.decelerate,
               width: 35,
               height: 20,
               child: AnimatedAlign(
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 250),
                 alignment:
                     widget.value ? Alignment.centerRight : Alignment.centerLeft,
                 curve: Curves.decelerate,

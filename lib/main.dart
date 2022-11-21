@@ -17,7 +17,8 @@ class App extends StatelessWidget {
       routerConfig: AppRouter.router,
       title: 'VirKey',
       theme: ThemeData(
-        primaryColor: AppColors.primary,
+        primaryColor: AppColors.secondary,
+        primarySwatch: Colors.grey,
         fontFamily: AppFonts.primary,
       ),
     );
