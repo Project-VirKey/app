@@ -374,13 +374,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   child: Column(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 5),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 5),
                                         child: Stack(
                                           alignment: Alignment.bottomCenter,
                                           children: [
                                             Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: const [
                                                 AppText(
                                                   text: '0:12',
@@ -396,16 +398,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             ),
                                             Positioned(
                                               child: Padding(
-                                                padding: const EdgeInsets.symmetric(vertical: 7),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 7),
                                                 child: AppPlayPauseButton(
-                                                    onChanged: (val) => {}),
+                                                  onChanged: (val) => {},
+                                                ),
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
                                       AppSlider(
-                                          onChanged: (val) => {print(val)}),
+                                        value: 20,
+                                        onChanged: (val) => {print(val)},
+                                      ),
                                       PropertyDescriptionActionCombination(
                                         title: recordingsList[index],
                                         child: const AppIcon(

@@ -89,13 +89,13 @@ class SettingsOverlay {
                           title: 'Sound Library', child: Container()),
                       Material(
                         color: Colors.transparent,
-                        child: AppSlider(onChanged: (val) => {print(val)}),
+                        child: AppSlider(value: 10, onChanged: (val) => {print(val)}),
                       ),
                       PropertyDescriptionActionCombination(
                           title: 'Audio-Playback', child: Container()),
                       Material(
                         color: Colors.transparent,
-                        child: AppSlider(onChanged: (val) => {print(val)}),
+                        child: AppSlider(value: 10, onChanged: (val) => {print(val)}),
                       ),
                       const PropertiesDescriptionTitle(title: 'Default Folder'),
                       PropertyDescriptionActionCombination(
@@ -121,10 +121,13 @@ class SettingsOverlay {
                             onChanged: (bool val) => {print(val)},
                           )),
                       const PropertiesDescriptionTitle(title: 'Sound Library'),
-                      AppIcon(
-                        icon: HeroIcons.arrowDownTray,
-                        color: AppColors.dark,
-                        onPressed: () => {},
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 3),
+                        child: AppIcon(
+                          icon: HeroIcons.arrowDownTray,
+                          color: AppColors.dark,
+                          onPressed: () => {},
+                        ),
                       ),
                       PropertyDescriptionActionCombination(
                         title: 'Default Piano',
