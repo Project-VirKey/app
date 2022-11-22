@@ -373,7 +373,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   ),
                                   child: Column(
                                     children: [
-                                      AppPlayPauseButton(onChanged: (val) => {}),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 5),
+                                        child: Stack(
+                                          alignment: Alignment.bottomCenter,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              children: const [
+                                                AppText(
+                                                  text: '0:12',
+                                                  size: 18,
+                                                  letterSpacing: 3,
+                                                ),
+                                                AppText(
+                                                  text: '4:23',
+                                                  size: 18,
+                                                  letterSpacing: 3,
+                                                ),
+                                              ],
+                                            ),
+                                            Positioned(
+                                              child: Padding(
+                                                padding: const EdgeInsets.symmetric(vertical: 7),
+                                                child: AppPlayPauseButton(
+                                                    onChanged: (val) => {}),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                       AppSlider(
                                           onChanged: (val) => {print(val)}),
                                       PropertyDescriptionActionCombination(

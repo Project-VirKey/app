@@ -36,8 +36,8 @@ class _AppPlayPauseButtonState extends State<AppPlayPauseButton> {
             alignment: Alignment.center,
             children: [
               Container(
-                width: 50,
-                height: 50,
+                width: 45,
+                height: 45,
                 decoration: BoxDecoration(
                   color: AppColors.secondary,
                   border: Border.all(color: AppColors.dark),
