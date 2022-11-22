@@ -5,6 +5,7 @@ import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/piano/import_overlay.dart';
 import 'package:virkey/features/piano/piano_key.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
@@ -81,11 +82,13 @@ class _PianoScreenState extends State<PianoScreen>
                     Align(
                       alignment: Alignment.centerRight,
                       child: Wrap(
+                        // vertical centering of containing widgets
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         spacing: 15,
                         children: [
                           const AppText(
                             text: '00:00:00',
-                            size: 18,
+                            size: 20,
                             color: AppColors.secondary,
                             weight: AppFonts.weightLight,
                             letterSpacing: 4,
@@ -111,8 +114,16 @@ class _PianoScreenState extends State<PianoScreen>
             ),
             Expanded(
               child: Stack(
-                alignment: Alignment.topCenter,
-                children: const [PianoKeys()],
+                // alignment: Alignment.topCenter,
+                children: const [
+                  PianoKeysWhite(),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    top: 0,
+                    child: PianoKeysBlack(),
+                  )
+                ],
               ),
             ),
           ],

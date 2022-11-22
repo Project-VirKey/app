@@ -5,18 +5,14 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 
-class PianoKeys extends StatelessWidget {
-  const PianoKeys({Key? key}) : super(key: key);
-
+class PianoKeys {
   // C D E F G A B
 
   // C# D# F# G# A#
   // Db Eb Gb Ab Bb
-
   static const List<String> white = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
   static const List<List<String>> black = [
-    [],
     ['C#', 'Db'],
     ['D#', 'Eb'],
     [],
@@ -24,16 +20,15 @@ class PianoKeys extends StatelessWidget {
     ['G#', 'Ab'],
     ['A#', 'Bb']
   ];
+}
 
-  static List<Widget> get keys {
+class PianoKeysWhite extends StatelessWidget {
+  const PianoKeysWhite({Key? key}) : super(key: key);
+
+  static List<PianoKey> get keys {
     List<PianoKey> pianoKeys = [];
-    white.asMap().forEach((index, name) {
-      pianoKeys.insert(
-          index,
-          PianoKey(
-            name: name,
-            blackKey: PianoKeys.black.elementAt(index),
-          ));
+    PianoKeys.white.asMap().forEach((index, name) {
+      pianoKeys.insert(index, PianoKey(name: name));
     });
 
     return pianoKeys;
@@ -47,115 +42,183 @@ class PianoKeys extends StatelessWidget {
   }
 }
 
+class PianoKeysBlack extends StatelessWidget {
+  const PianoKeysBlack({Key? key}) : super(key: key);
+
+  static List<PianoKey> get keys {
+    const double multiplierSpacer = .42;
+    const double multiplierNoKey = 1.2;
+
+    List<PianoKey> pianoKeys = [];
+
+    pianoKeys.add(const PianoKey(
+      name: '',
+      widthMultiplier: multiplierSpacer * multiplierNoKey,
+      black: true,
+    ));
+
+    PianoKeys.black.asMap().forEach((index, pianoKey) {
+      print(pianoKey);
+      pianoKeys.add(const PianoKey(
+        name: '',
+        widthMultiplier: multiplierSpacer,
+        black: true,
+      ));
+
+      if (pianoKey.isEmpty) {
+        pianoKeys.add(const PianoKey(
+          name: '',
+          secondName: '',
+          black: true,
+        ));
+      } else {
+        pianoKeys.add(PianoKey(
+          name: pianoKey[0],
+          secondName: pianoKey[1],
+          black: true,
+        ));
+      }
+    });
+
+    pianoKeys.add(const PianoKey(
+      name: '',
+      widthMultiplier: multiplierSpacer,
+      black: true,
+    ));
+
+    pianoKeys.add(const PianoKey(
+      name: '',
+      widthMultiplier: multiplierSpacer * multiplierNoKey,
+      black: true,
+    ));
+
+    return pianoKeys;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [...keys],
+    );
+  }
+}
+
 class PianoKey extends StatelessWidget {
   const PianoKey(
       {Key? key,
-      this.blackKey = const [],
+      this.black = false,
       required this.name,
-      this.secondName = ''})
+      this.secondName = '',
+      this.widthMultiplier = 1})
       : super(key: key);
 
-  final List<String> blackKey;
+  final bool black;
   final String name;
   final String secondName;
+  final double widthMultiplier;
 
   @override
   Widget build(BuildContext context) {
     final player = AudioPlayer();
     player.setPlayerMode(PlayerMode.lowLatency);
 
-    return Expanded(
-      child: Stack(
-        alignment: Alignment.centerRight,
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            margin: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: AppColors.dark,
-                backgroundColor: AppColors.white,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: AppRadius.radius,
-                    bottomRight: AppRadius.radius,
-                  ),
-                ),
-              ),
-              onPressed: () async => {
-                await player.stop(),
-                await player.setSource(
-                  AssetSource('audio/mixkit-arcade-retro-game-over-213.wav'),
-                ),
-                await player.resume()
-              },
-              child: Container(
-                alignment: Alignment.bottomCenter,
-                padding: const EdgeInsets.only(bottom: 25),
-                child: AppText(
-                  text: name,
-                  size: 45,
-                  color: AppColors.dark,
-                  family: AppFonts.secondary,
+    if (black) {
+      if (name.isEmpty) {
+        return Container(
+          width: MediaQuery.of(context).size.width * .1 * widthMultiplier,
+        );
+      } else {
+        return SizedBox(
+          width: MediaQuery.of(context).size.width * .1,
+          height: MediaQuery.of(context).size.height * .55,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              foregroundColor: AppColors.white,
+              backgroundColor: AppColors.dark,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: AppRadius.radius,
+                  bottomRight: AppRadius.radius,
                 ),
               ),
             ),
-          ),
-          if (blackKey.isNotEmpty)
-            Positioned(
-              top: 0,
-              right: MediaQuery.of(context).size.width * .095,
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width * .095,
-                height: MediaQuery.of(context).size.height * .55,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: AppColors.white,
-                    backgroundColor: AppColors.dark,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: AppRadius.radius,
-                        bottomRight: AppRadius.radius,
-                      ),
-                    ),
+            onPressed: () async => {
+              await player.stop(),
+              await player.setSource(
+                AssetSource('audio/mixkit-arcade-retro-game-over-213.wav'),
+              ),
+              await player.resume()
+            },
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  AppText(
+                    text: name,
+                    size: MediaQuery.of(context).size.width * .04,
+                    color: AppColors.secondary,
+                    family: AppFonts.secondary,
                   ),
-                  onPressed: () async => {
-                    await player.stop(),
-                    await player.setSource(
-                      AssetSource(
-                          'audio/mixkit-arcade-retro-game-over-213.wav'),
-                    ),
-                    await player.resume()
-                  },
-                  child: Container(
-                    alignment: Alignment.bottomCenter,
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        AppText(
-                          text: blackKey[0],
-                          size: 35,
-                          color: AppColors.secondary,
-                          family: AppFonts.secondary,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        AppText(
-                          text: blackKey[1],
-                          size: 28,
-                          color: AppColors.secondary,
-                          family: AppFonts.secondary,
-                        ),
-                      ],
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  AppText(
+                    text: secondName,
+                    size: MediaQuery.of(context).size.width * .033,
+                    color: AppColors.secondary,
+                    family: AppFonts.secondary,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      }
+    } else {
+      return Expanded(
+        child: Stack(
+          alignment: Alignment.centerRight,
+          clipBehavior: Clip.none,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: AppColors.dark,
+                  backgroundColor: AppColors.white,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: AppRadius.radius,
+                      bottomRight: AppRadius.radius,
                     ),
                   ),
                 ),
+                onPressed: () async => {
+                  await player.stop(),
+                  await player.setSource(
+                    AssetSource('audio/mixkit-arcade-retro-game-over-213.wav'),
+                  ),
+                  await player.resume()
+                },
+                child: Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: const EdgeInsets.only(bottom: 25),
+                  child: AppText(
+                    text: name,
+                    size: 45,
+                    color: AppColors.dark,
+                    family: AppFonts.secondary,
+                  ),
+                ),
               ),
-            )
-        ],
-      ),
-    );
+            ),
+          ],
+        ),
+      );
+    }
   }
 }

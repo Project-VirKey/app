@@ -27,8 +27,17 @@ class AppText extends StatelessWidget {
     return Text(
       text,
       textAlign: textAlign,
+      // overflow ellipsis does not work
+      // https://www.kindacode.com/article/text-overflow-in-flutter/#TextOverflowellipsis
+      // overflow: TextOverflow.ellipsis,
+      // softWrap: false,
       style: TextStyle(
-          fontFamily: family, color: color, fontSize: size, fontWeight: weight, letterSpacing: letterSpacing, decoration: TextDecoration.none),
+          fontFamily: family,
+          color: color,
+          fontSize: size,
+          fontWeight: weight,
+          letterSpacing: letterSpacing,
+          decoration: TextDecoration.none),
     );
   }
 }
