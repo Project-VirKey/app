@@ -15,7 +15,6 @@ import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
-import 'package:virkey/utils/textfield_overlay.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -158,14 +157,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     vsync: this,
     displayText: 'Delete recording "Recording #3"?',
     confirmButtonText: 'Delete',
-    onConfirm: () => {print('Deleted recording #3')},
-  );
-
-  late final AppTextFieldOverlay _editRecordingTitleOverlay =
-      AppTextFieldOverlay(
-    context: context,
-    value: 'Recording #x',
-    vsync: this,
     onConfirm: () => {print('Deleted recording #3')},
   );
 
