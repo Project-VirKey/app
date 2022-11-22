@@ -5,8 +5,8 @@ import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/common_widgets/app_shadow.dart';
 
-class AppCheckbox extends StatefulWidget {
-  AppCheckbox({
+class AppPlayPauseButton extends StatefulWidget {
+  AppPlayPauseButton({
     Key? key,
     this.value = false,
     required this.onChanged,
@@ -16,10 +16,10 @@ class AppCheckbox extends StatefulWidget {
   final ValueChanged<bool> onChanged;
 
   @override
-  State<AppCheckbox> createState() => _AppCheckBoxState();
+  State<AppPlayPauseButton> createState() => _AppPlayPauseButtonState();
 }
 
-class _AppCheckBoxState extends State<AppCheckbox> {
+class _AppPlayPauseButtonState extends State<AppPlayPauseButton> {
   @override
   Widget build(BuildContext context) {
     return AppShadow(
@@ -36,8 +36,8 @@ class _AppCheckBoxState extends State<AppCheckbox> {
             alignment: Alignment.center,
             children: [
               Container(
-                width: 22,
-                height: 22,
+                width: 50,
+                height: 50,
                 decoration: BoxDecoration(
                   color: AppColors.secondary,
                   border: Border.all(color: AppColors.dark),
@@ -47,9 +47,17 @@ class _AppCheckBoxState extends State<AppCheckbox> {
               Visibility(
                 visible: widget.value,
                 child: const AppIcon(
-                  icon: HeroIcons.check,
+                  icon: HeroIcons.play,
                   color: AppColors.dark,
-                  size: 17.5,
+                  size: 30,
+                ),
+              ),
+              Visibility(
+                visible: !widget.value,
+                child: const AppIcon(
+                  icon: HeroIcons.pause,
+                  color: AppColors.dark,
+                  size: 30,
                 ),
               )
             ],

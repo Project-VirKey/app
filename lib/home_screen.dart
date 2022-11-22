@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
+import 'package:virkey/common_widgets/app_play_pause_button.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_shadow.dart';
 import 'package:virkey/common_widgets/app_slider.dart';
@@ -372,6 +373,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   ),
                                   child: Column(
                                     children: [
+                                      AppPlayPauseButton(onChanged: (val) => {}),
                                       AppSlider(
                                           onChanged: (val) => {print(val)}),
                                       PropertyDescriptionActionCombination(

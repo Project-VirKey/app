@@ -18,8 +18,6 @@ class AppSwitch extends StatefulWidget {
 }
 
 class _AppSwitchState extends State<AppSwitch> {
-  Alignment switchControlAlignment = Alignment.centerLeft;
-
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -38,12 +36,12 @@ class _AppSwitchState extends State<AppSwitch> {
               ),
             )),
             AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
+              duration: const Duration(milliseconds: 150),
               curve: Curves.decelerate,
               width: 35,
               height: 20,
               child: AnimatedAlign(
-                duration: const Duration(milliseconds: 250),
+                duration: const Duration(milliseconds: 150),
                 alignment:
                     widget.value ? Alignment.centerRight : Alignment.centerLeft,
                 curve: Curves.decelerate,
