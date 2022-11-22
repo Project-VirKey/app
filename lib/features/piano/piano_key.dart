@@ -58,7 +58,6 @@ class PianoKeysBlack extends StatelessWidget {
     ));
 
     PianoKeys.black.asMap().forEach((index, pianoKey) {
-      print(pianoKey);
       pianoKeys.add(const PianoKey(
         name: '',
         widthMultiplier: multiplierSpacer,
