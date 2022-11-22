@@ -15,6 +15,7 @@ import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
+import 'package:virkey/utils/textfield_overlay.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -160,9 +161,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     onConfirm: () => {print('Deleted recording #3')},
   );
 
+  late final AppTextFieldOverlay _editRecordingTitleOverlay =
+      AppTextFieldOverlay(
+    context: context,
+    value: 'Recording #x',
+    vsync: this,
+    onConfirm: () => {print('Deleted recording #3')},
+  );
+
+  bool _recordingTitleTextFieldVisible = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // ignore resizing due to system-ui elements (e.g. on-screen keyboard)
+      resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.secondary,
       body: Column(
         children: <Widget>[
@@ -285,13 +298,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         _contractRecordingsList()
                     },
                     child: Container(
-                      margin: _edgeInsetsTween
-                          .evaluate(_recordingsAnimationController),
+                      margin: _listExpanded
+                          ? EdgeInsets.zero
+                          : _edgeInsetsTween
+                              .evaluate(_recordingsAnimationController),
                       padding: const EdgeInsets.all(5),
                       decoration: BoxDecoration(
                           color: AppColors.dark,
-                          borderRadius: _borderRadiusTween.evaluate(
-                              CurvedAnimation(
+                          borderRadius: _listExpanded
+                              ? BorderRadius.zero
+                              : _borderRadiusTween.evaluate(CurvedAnimation(
                                   parent: _recordingsAnimationController,
                                   curve: Curves.ease))),
                       child: const AppText(
@@ -434,10 +450,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         onChanged: (val) => {print(val)},
                                       ),
                                       PropertyDescriptionActionCombination(
-                                        title: recordingsList[index],
-                                        child: const AppIcon(
-                                          icon: HeroIcons.pencilSquare,
-                                          color: AppColors.dark,
+                                        title: '',
+                                        child: Expanded(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: [
+                                              Expanded(
+                                                child: TextFormField(
+                                                  onFieldSubmitted: (value) => {
+                                                    recordingsList[index] = value,
+                                                    setState(() {
+                                                      _recordingTitleTextFieldVisible =
+                                                          false;
+                                                    }),
+                                                  },
+                                                  focusNode: FocusNode(),
+                                                  autofocus: true,
+                                                  initialValue:
+                                                      recordingsList[index],
+                                                  enabled:
+                                                      _recordingTitleTextFieldVisible,
+                                                  maxLines: 1,
+                                                  minLines: 1,
+                                                  style: const TextStyle(
+                                                      letterSpacing: 3,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          AppFonts.weightLight),
+                                                  decoration:
+                                                      const InputDecoration(
+                                                    isDense: true,
+                                                    border: InputBorder.none,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (_recordingTitleTextFieldVisible)
+                                                AppIcon(
+                                                  icon: HeroIcons.check,
+                                                  color: AppColors.dark,
+                                                  onPressed: () =>
+                                                  {
+                                                    // TODO: set title value from text field
+                                                    setState(() {
+                                                      _recordingTitleTextFieldVisible =
+                                                          false;
+                                                    })
+                                                  },
+                                                ),
+                                              if (!_recordingTitleTextFieldVisible)
+                                                AppIcon(
+                                                  icon: HeroIcons.pencilSquare,
+                                                  color: AppColors.dark,
+                                                  onPressed: () => {
+                                                    setState(() {
+                                                      _recordingTitleTextFieldVisible =
+                                                          true;
+                                                    }),
+                                                    print(_listExpanded),
+                                                    _expandRecordingsList()
+                                                  },
+                                                ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                       const PropertiesDescriptionTitle(
