@@ -25,7 +25,7 @@ class AppButton extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: backgroundColor ?? AppColors.primary,
             padding: const EdgeInsets.symmetric(
-              vertical: 20,
+              vertical: 13,
               horizontal: 50,
             ),
             shape: const RoundedRectangleBorder(

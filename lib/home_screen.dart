@@ -14,6 +14,7 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
+import 'package:virkey/utils/confirm_overlay.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -140,6 +141,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       begin: const BorderRadius.all(AppRadius.radius), end: BorderRadius.zero);
   late final EdgeInsetsTween _edgeInsetsTween = EdgeInsetsTween(
       begin: const EdgeInsets.symmetric(horizontal: 15), end: EdgeInsets.zero);
+
+  late final AppConfirmOverlay _deletePlaybackConfirmOverlay =
+      AppConfirmOverlay(
+    context: context,
+    vsync: this,
+    displayText: 'Delete playback "File1.mp3"?',
+    confirmButtonText: 'Delete',
+    onConfirm: () => {print('Deleted playback "File1.mp3"')},
+  );
+
+  late final AppConfirmOverlay _deleteRecordingConfirmOverlay =
+      AppConfirmOverlay(
+    context: context,
+    vsync: this,
+    displayText: 'Delete recording "Recording #3"?',
+    confirmButtonText: 'Delete',
+    onConfirm: () => {print('Deleted recording #3')},
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -375,7 +394,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     children: [
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
-                                            vertical: 5),
+                                          vertical: 5,
+                                        ),
                                         child: Stack(
                                           alignment: Alignment.bottomCenter,
                                           children: [
@@ -419,17 +439,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           icon: HeroIcons.pencilSquare,
                                           color: AppColors.dark,
                                         ),
-                                        onPressed: () => {},
                                       ),
                                       const PropertiesDescriptionTitle(
                                           title: 'Audio-Playback'),
-                                      PropertyDescriptionActionCombination(
+                                      const PropertyDescriptionActionCombination(
                                         title: 'Audio',
-                                        child: const AppIcon(
+                                        child: AppIcon(
                                           icon: HeroIcons.arrowDownTray,
                                           color: AppColors.dark,
                                         ),
-                                        onPressed: () => {},
                                       ),
                                       PropertyDescriptionActionCombination(
                                         title: 'File1.mp3',
@@ -443,48 +461,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             const SizedBox(
                                               width: 20,
                                             ),
-                                            const AppIcon(
+                                            AppIcon(
                                               icon: HeroIcons.trash,
                                               color: AppColors.dark,
+                                              onPressed: () =>
+                                                  _deletePlaybackConfirmOverlay
+                                                      .open(),
                                             ),
                                           ],
                                         ),
                                       ),
                                       const PropertiesDescriptionTitle(
                                           title: 'Export'),
-                                      PropertyDescriptionActionCombination(
+                                      const PropertyDescriptionActionCombination(
                                         title: 'Audio',
-                                        child: const AppIcon(
+                                        child: AppIcon(
                                           icon: HeroIcons.arrowUpTray,
                                           color: AppColors.dark,
                                         ),
-                                        onPressed: () => {},
                                       ),
-                                      PropertyDescriptionActionCombination(
+                                      const PropertyDescriptionActionCombination(
                                         title: 'MIDI',
-                                        child: const AppIcon(
+                                        child: AppIcon(
                                           icon: HeroIcons.arrowUpTray,
                                           color: AppColors.dark,
                                         ),
-                                        onPressed: () => {},
                                       ),
-                                      PropertyDescriptionActionCombination(
+                                      const PropertyDescriptionActionCombination(
                                         title: 'Audio & MIDI',
-                                        child: const AppIcon(
+                                        child: AppIcon(
                                           icon: HeroIcons.arrowUpTray,
                                           color: AppColors.dark,
                                         ),
-                                        onPressed: () => {},
                                       ),
                                       const PropertiesDescriptionTitle(
-                                          title: 'Delete'),
+                                        title: 'Delete',
+                                      ),
                                       PropertyDescriptionActionCombination(
                                         title: 'Delete Recording',
-                                        child: const AppIcon(
+                                        child: AppIcon(
                                           icon: HeroIcons.trash,
                                           color: AppColors.dark,
+                                          onPressed: () =>
+                                              _deleteRecordingConfirmOverlay
+                                                  .open(),
                                         ),
-                                        onPressed: () => {},
                                       ),
                                     ],
                                   ),

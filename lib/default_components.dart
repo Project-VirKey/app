@@ -30,7 +30,7 @@ class _DefaultComponentsState extends State<DefaultComponents>
       vsync: this,
       displayText: 'Delete recording "Recording #3"?',
       confirmButtonText: 'Delete',
-      onConfirm: () => {print('Delete recording 1')},
+      onConfirm: () => {print('Deleted recording 3')},
     );
 
     return Column(

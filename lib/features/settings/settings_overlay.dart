@@ -7,6 +7,7 @@ import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
 import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
+import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
@@ -36,6 +37,15 @@ class SettingsOverlay {
       throw 'Could not launch $_url';
     }
   }
+
+  late final AppConfirmOverlay _deleteSoundLibraryConfirmOverlay =
+  AppConfirmOverlay(
+    context: context,
+    vsync: vsync,
+    displayText: 'Delete sound library "Electric"?',
+    confirmButtonText: 'Delete',
+    onConfirm: () => {print('Deleted sound library "Electric"')},
+  );
 
   late final AppOverlay _overlay = AppOverlay(
     context: context,
@@ -98,13 +108,12 @@ class SettingsOverlay {
                         child: AppSlider(value: 10, onChanged: (val) => {print(val)}),
                       ),
                       const PropertiesDescriptionTitle(title: 'Default Folder'),
-                      PropertyDescriptionActionCombination(
+                      const PropertyDescriptionActionCombination(
                         title: '/dfdg/dsdf/folder/',
-                        child: const AppIcon(
+                        child: AppIcon(
                           icon: HeroIcons.folder,
                           color: AppColors.dark,
                         ),
-                        onPressed: () => {},
                       ),
                       const PropertiesDescriptionTitle(
                           title: 'Default saved Files'),
@@ -136,9 +145,21 @@ class SettingsOverlay {
                       ),
                       PropertyDescriptionActionCombination(
                         title: 'Electric',
-                        child: AppCheckbox(
-                            value: false,
-                            onChanged: (bool val) => {print(val)}),
+                        child: Row(
+                          children: [
+                            AppIcon(
+                              icon: HeroIcons.trash,
+                              color: AppColors.dark,
+                              onPressed: () => _deleteSoundLibraryConfirmOverlay.open(),
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            AppCheckbox(
+                                value: false,
+                                onChanged: (bool val) => {print(val)}),
+                          ],
+                        ),
                       ),
                       const SizedBox(
                         height: 20,

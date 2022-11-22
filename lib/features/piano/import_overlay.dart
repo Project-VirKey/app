@@ -7,6 +7,7 @@ import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/overlay.dart';
 
 class ImportOverlay {
@@ -22,6 +23,15 @@ class ImportOverlay {
   void open() {
     _overlay.open();
   }
+
+  late final AppConfirmOverlay _deletePlaybackConfirmOverlay =
+  AppConfirmOverlay(
+    context: context,
+    vsync: vsync,
+    displayText: 'Delete playback "File1.mp3"?',
+    confirmButtonText: 'Delete',
+    onConfirm: () => {print('Deleted playback "File1.mp3"')},
+  );
 
   late final AppOverlay _overlay = AppOverlay(
     context: context,
@@ -78,9 +88,10 @@ class ImportOverlay {
                       const SizedBox(
                         width: 20,
                       ),
-                      const AppIcon(
+                      AppIcon(
                         icon: HeroIcons.trash,
                         color: AppColors.dark,
+                        onPressed: () => _deletePlaybackConfirmOverlay.open(),
                       ),
                     ],
                   ),
@@ -92,13 +103,12 @@ class ImportOverlay {
               ConstrainedBox(
                 constraints: BoxConstraints(
                     maxWidth: MediaQuery.of(context).size.width * .5),
-                child: PropertyDescriptionActionCombination(
+                child: const PropertyDescriptionActionCombination(
                   title: '',
-                  child: const AppIcon(
+                  child: AppIcon(
                     icon: HeroIcons.arrowDownTray,
                     color: AppColors.dark,
                   ),
-                  onPressed: () => {},
                 ),
               ),
             ],

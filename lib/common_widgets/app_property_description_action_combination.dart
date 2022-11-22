@@ -7,20 +7,21 @@ class PropertyDescriptionActionCombination extends StatelessWidget {
     Key? key,
     required this.title,
     required this.child,
-    this.onPressed,
   }) : super(key: key);
 
   final String title;
   final Widget child;
-  final dynamic onPressed;
 
   @override
   Widget build(BuildContext context) {
-    bool emptyChild = child is Container && ((child as Container).child == null);
+    bool emptyChild =
+        child is Container && ((child as Container).child == null);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
-        mainAxisAlignment: title.isEmpty || emptyChild ? MainAxisAlignment.center : MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: title.isEmpty || emptyChild
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.spaceBetween,
         children: [
           if (title.isNotEmpty)
             AppText(
@@ -29,8 +30,7 @@ class PropertyDescriptionActionCombination extends StatelessWidget {
               letterSpacing: 3,
               weight: AppFonts.weightLight,
             ),
-          if (!emptyChild)
-          child,
+          if (!emptyChild) child,
         ],
       ),
     );
