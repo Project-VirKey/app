@@ -15,6 +15,7 @@ import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
+import 'package:virkey/utils/platform_helper.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -110,10 +111,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _expandRecordingsList() {
-    // if the list is not fully expanded
     if (!_listExpanded) {
       setState(() {
-        _recordingsAnimationController.reverse();
         _listExpanded = true;
         _appTitleSize = 40;
       });
@@ -121,10 +120,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _contractRecordingsList() {
-    // if the list is fully expanded
     if (_listExpanded) {
       setState(() {
-        _recordingsAnimationController.forward();
         _listExpanded = false;
         _appTitleSize = 45;
       });
@@ -133,14 +130,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   bool _listExpanded = false;
   double _appTitleSize = 45;
-  late final Duration _expandDuration = const Duration(milliseconds: 250);
-
-  late final AnimationController _recordingsAnimationController =
-      AnimationController(vsync: this, duration: _expandDuration)..forward();
-  late final BorderRadiusTween _borderRadiusTween = BorderRadiusTween(
-      begin: const BorderRadius.all(AppRadius.radius), end: BorderRadius.zero);
-  late final EdgeInsetsTween _edgeInsetsTween = EdgeInsetsTween(
-      begin: const EdgeInsets.symmetric(horizontal: 15), end: EdgeInsets.zero);
 
   late final AppConfirmOverlay _deletePlaybackConfirmOverlay =
       AppConfirmOverlay(
@@ -276,38 +265,43 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Expanded(
-                child: AppShadow(
-                  child: GestureDetector(
-                    onVerticalDragUpdate: (DragUpdateDetails details) => {
-                      if (details.delta.dy < 0)
-                        // if the title has been dragged above y position 0
-                        _expandRecordingsList()
-                      else if (details.delta.dy > 0)
-                        // if the title has been dragged below y position 0
-                        _contractRecordingsList()
-                    },
-                    child: Container(
-                      margin: _listExpanded
-                          ? EdgeInsets.zero
-                          : _edgeInsetsTween
-                              .evaluate(_recordingsAnimationController),
-                      padding: const EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                          color: AppColors.dark,
-                          borderRadius: _listExpanded
-                              ? BorderRadius.zero
-                              : _borderRadiusTween.evaluate(CurvedAnimation(
-                                  parent: _recordingsAnimationController,
-                                  curve: Curves.ease))),
-                      child: const AppText(
-                        text: 'Recordings',
-                        color: AppColors.secondary,
-                        size: 26,
-                        letterSpacing: 3,
-                        weight: AppFonts.weightLight,
-                        textAlign: TextAlign.center,
+              Flexible(
+                // fit: _listExpanded ? FlexFit.tight : FlexFit.loose,
+                fit: FlexFit.loose,
+                child: AnimatedContainer(
+                  width: _listExpanded ? MediaQuery.of(context).size.width : 1100,
+                  duration: const Duration(milliseconds: 250),
+                  child: AppShadow(
+                    child: GestureDetector(
+                      onVerticalDragUpdate: (DragUpdateDetails details) => {
+                        if (details.delta.dy < 0)
+                          // if the title has been dragged above y position 0
+                          _expandRecordingsList()
+                        else if (details.delta.dy > 0)
+                          // if the title has been dragged below y position 0
+                          _contractRecordingsList()
+                      },
+                      child: AnimatedContainer(
+                        margin: _listExpanded
+                            ? EdgeInsets.zero
+                            : const EdgeInsets.symmetric(horizontal: 15),
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                            color: AppColors.dark,
+                            borderRadius: _listExpanded
+                                ? BorderRadius.zero
+                                : const BorderRadius.all(AppRadius.radius)),
+                        duration: const Duration(milliseconds: 250),
+                        child: const AppText(
+                          text: 'Recordings',
+                          color: AppColors.secondary,
+                          size: 26,
+                          letterSpacing: 3,
+                          weight: AppFonts.weightLight,
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
                   ),
@@ -329,6 +323,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 return true;
               },
               child: AnimatedList(
+                padding: EdgeInsets.only(top: PlatformHelper.isDesktop ? 30 : 0, bottom: 30),
                 key: recordingsListKey,
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
@@ -340,243 +335,248 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Container(
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 30),
-                                child: TextButton(
-                                  onPressed: () => {
-                                    if (expandedItem)
-                                      {_contractRecordingItem()}
-                                    else
-                                      {_expandRecordingItem(index)}
-                                  },
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: AppColors.dark,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 14),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      AppShadow(
-                                        child: AppText(
-                                          text: recordingsList[index],
-                                          size: 18,
-                                          letterSpacing: 3,
+                        Flexible(
+                          fit: FlexFit.loose,
+                          child: SizedBox(
+                            width: 1060,
+                            child: Column(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 30),
+                                  child: TextButton(
+                                    onPressed: () => {
+                                      if (expandedItem)
+                                        {_contractRecordingItem()}
+                                      else
+                                        {_expandRecordingItem(index)}
+                                    },
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      foregroundColor: AppColors.dark,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 14),
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        AppShadow(
+                                          child: AppText(
+                                            text: recordingsList[index],
+                                            size: 18,
+                                            letterSpacing: 3,
+                                          ),
                                         ),
-                                      ),
-                                      AppIcon(
-                                        icon: expandedItem
-                                            ? HeroIcons.chevronUp
-                                            : HeroIcons.chevronDown,
-                                        color: AppColors.dark,
-                                      ),
-                                    ],
+                                        AppIcon(
+                                          icon: expandedItem
+                                              ? HeroIcons.chevronUp
+                                              : HeroIcons.chevronDown,
+                                          color: AppColors.dark,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                height: 5,
-                                margin:
-                                    const EdgeInsets.symmetric(horizontal: 30),
-                                decoration: const BoxDecoration(
-                                    color: AppColors.tertiary,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(50))),
-                              ),
-                              if (expandedItem)
                                 Container(
-                                  margin: const EdgeInsets.only(
-                                    left: 50,
-                                    right: 50,
-                                    top: 15,
-                                    bottom: 35,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                          vertical: 5,
-                                        ),
-                                        child: Stack(
-                                          alignment: Alignment.bottomCenter,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: const [
-                                                AppText(
-                                                  text: '0:12',
-                                                  size: 18,
-                                                  letterSpacing: 3,
-                                                ),
-                                                AppText(
-                                                  text: '4:23',
-                                                  size: 18,
-                                                  letterSpacing: 3,
-                                                ),
-                                              ],
-                                            ),
-                                            Positioned(
-                                              child: Padding(
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 7),
-                                                child: AppPlayPauseButton(
-                                                  onChanged: (val) => {},
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      AppSlider(
-                                        value: 20,
-                                        onChanged: (val) => {print(val)},
-                                      ),
-                                      PropertyDescriptionActionCombination(
-                                        title: '',
-                                        child: Expanded(
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
+                                  height: 5,
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 30),
+                                  decoration: const BoxDecoration(
+                                      color: AppColors.tertiary,
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(50))),
+                                ),
+                                if (expandedItem)
+                                  Container(
+                                    margin: const EdgeInsets.only(
+                                      left: 50,
+                                      right: 50,
+                                      top: 15,
+                                      bottom: 35,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 5,
+                                          ),
+                                          child: Stack(
+                                            alignment: Alignment.bottomCenter,
                                             children: [
-                                              Expanded(
-                                                child: TextFormField(
-                                                  onFieldSubmitted: (value) => {
-                                                    recordingsList[index] = value,
-                                                    setState(() {
-                                                      _recordingTitleTextFieldVisible =
-                                                          false;
-                                                    }),
-                                                  },
-                                                  focusNode: FocusNode(),
-                                                  autofocus: true,
-                                                  initialValue:
-                                                      recordingsList[index],
-                                                  enabled:
-                                                      _recordingTitleTextFieldVisible,
-                                                  maxLines: 1,
-                                                  minLines: 1,
-                                                  style: const TextStyle(
-                                                      letterSpacing: 3,
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          AppFonts.weightLight),
-                                                  decoration:
-                                                      const InputDecoration(
-                                                    isDense: true,
-                                                    border: InputBorder.none,
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: const [
+                                                  AppText(
+                                                    text: '0:12',
+                                                    size: 18,
+                                                    letterSpacing: 3,
+                                                  ),
+                                                  AppText(
+                                                    text: '4:23',
+                                                    size: 18,
+                                                    letterSpacing: 3,
+                                                  ),
+                                                ],
+                                              ),
+                                              Positioned(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 7),
+                                                  child: AppPlayPauseButton(
+                                                    onChanged: (val) => {},
                                                   ),
                                                 ),
                                               ),
-                                              if (_recordingTitleTextFieldVisible)
-                                                AppIcon(
-                                                  icon: HeroIcons.check,
-                                                  color: AppColors.dark,
-                                                  onPressed: () =>
-                                                  {
-                                                    // TODO: set title value from text field
-                                                    setState(() {
-                                                      _recordingTitleTextFieldVisible =
-                                                          false;
-                                                    })
-                                                  },
-                                                ),
-                                              if (!_recordingTitleTextFieldVisible)
-                                                AppIcon(
-                                                  icon: HeroIcons.pencilSquare,
-                                                  color: AppColors.dark,
-                                                  onPressed: () => {
-                                                    setState(() {
-                                                      _recordingTitleTextFieldVisible =
-                                                          true;
-                                                    }),
-                                                    print(_listExpanded),
-                                                    _expandRecordingsList()
-                                                  },
-                                                ),
                                             ],
                                           ),
                                         ),
-                                      ),
-                                      const PropertiesDescriptionTitle(
-                                          title: 'Audio-Playback'),
-                                      const PropertyDescriptionActionCombination(
-                                        title: 'Audio',
-                                        child: AppIcon(
-                                          icon: HeroIcons.arrowDownTray,
-                                          color: AppColors.dark,
+                                        AppSlider(
+                                          value: 20,
+                                          onChanged: (val) => {print(val)},
                                         ),
-                                      ),
-                                      PropertyDescriptionActionCombination(
-                                        title: 'File1.mp3',
-                                        child: Row(
-                                          children: [
-                                            AppSwitch(
-                                              value: false,
-                                              onChanged: (bool val) =>
-                                                  {print(val)},
+                                        PropertyDescriptionActionCombination(
+                                          title: '',
+                                          child: Expanded(
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.end,
+                                              children: [
+                                                Expanded(
+                                                  child: TextFormField(
+                                                    onFieldSubmitted: (value) =>
+                                                        {
+                                                      recordingsList[index] =
+                                                          value,
+                                                      setState(() {
+                                                        _recordingTitleTextFieldVisible =
+                                                            false;
+                                                      }),
+                                                    },
+                                                    focusNode: FocusNode(),
+                                                    autofocus: true,
+                                                    initialValue:
+                                                        recordingsList[index],
+                                                    enabled:
+                                                        _recordingTitleTextFieldVisible,
+                                                    maxLines: 1,
+                                                    minLines: 1,
+                                                    style: const TextStyle(
+                                                        letterSpacing: 3,
+                                                        fontSize: 16,
+                                                        fontWeight: AppFonts
+                                                            .weightLight),
+                                                    decoration:
+                                                        const InputDecoration(
+                                                      isDense: true,
+                                                      border: InputBorder.none,
+                                                    ),
+                                                  ),
+                                                ),
+                                                if (_recordingTitleTextFieldVisible)
+                                                  AppIcon(
+                                                    icon: HeroIcons.check,
+                                                    color: AppColors.dark,
+                                                    onPressed: () => {
+                                                      // TODO: set title value from text field
+                                                      setState(() {
+                                                        _recordingTitleTextFieldVisible =
+                                                            false;
+                                                      })
+                                                    },
+                                                  ),
+                                                if (!_recordingTitleTextFieldVisible)
+                                                  AppIcon(
+                                                    icon:
+                                                        HeroIcons.pencilSquare,
+                                                    color: AppColors.dark,
+                                                    onPressed: () => {
+                                                      setState(() {
+                                                        _recordingTitleTextFieldVisible =
+                                                            true;
+                                                      }),
+                                                      print(_listExpanded),
+                                                      _expandRecordingsList()
+                                                    },
+                                                  ),
+                                              ],
                                             ),
-                                            const SizedBox(
-                                              width: 20,
-                                            ),
-                                            AppIcon(
-                                              icon: HeroIcons.trash,
-                                              color: AppColors.dark,
-                                              onPressed: () =>
-                                                  _deletePlaybackConfirmOverlay
-                                                      .open(),
-                                            ),
-                                          ],
+                                          ),
                                         ),
-                                      ),
-                                      const PropertiesDescriptionTitle(
-                                          title: 'Export'),
-                                      const PropertyDescriptionActionCombination(
-                                        title: 'Audio',
-                                        child: AppIcon(
-                                          icon: HeroIcons.arrowUpTray,
-                                          color: AppColors.dark,
+                                        const PropertiesDescriptionTitle(
+                                            title: 'Audio-Playback'),
+                                        const PropertyDescriptionActionCombination(
+                                          title: 'Audio',
+                                          child: AppIcon(
+                                            icon: HeroIcons.arrowDownTray,
+                                            color: AppColors.dark,
+                                          ),
                                         ),
-                                      ),
-                                      const PropertyDescriptionActionCombination(
-                                        title: 'MIDI',
-                                        child: AppIcon(
-                                          icon: HeroIcons.arrowUpTray,
-                                          color: AppColors.dark,
+                                        PropertyDescriptionActionCombination(
+                                          title: 'File1.mp3',
+                                          child: Row(
+                                            children: [
+                                              AppSwitch(
+                                                value: false,
+                                                onChanged: (bool val) =>
+                                                    {print(val)},
+                                              ),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              AppIcon(
+                                                icon: HeroIcons.trash,
+                                                color: AppColors.dark,
+                                                onPressed: () =>
+                                                    _deletePlaybackConfirmOverlay
+                                                        .open(),
+                                              ),
+                                            ],
+                                          ),
                                         ),
-                                      ),
-                                      const PropertyDescriptionActionCombination(
-                                        title: 'Audio & MIDI',
-                                        child: AppIcon(
-                                          icon: HeroIcons.arrowUpTray,
-                                          color: AppColors.dark,
+                                        const PropertiesDescriptionTitle(
+                                            title: 'Export'),
+                                        const PropertyDescriptionActionCombination(
+                                          title: 'Audio',
+                                          child: AppIcon(
+                                            icon: HeroIcons.arrowUpTray,
+                                            color: AppColors.dark,
+                                          ),
                                         ),
-                                      ),
-                                      const PropertiesDescriptionTitle(
-                                        title: 'Delete',
-                                      ),
-                                      PropertyDescriptionActionCombination(
-                                        title: 'Delete Recording',
-                                        child: AppIcon(
-                                          icon: HeroIcons.trash,
-                                          color: AppColors.dark,
-                                          onPressed: () =>
-                                              _deleteRecordingConfirmOverlay
-                                                  .open(),
+                                        const PropertyDescriptionActionCombination(
+                                          title: 'MIDI',
+                                          child: AppIcon(
+                                            icon: HeroIcons.arrowUpTray,
+                                            color: AppColors.dark,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                )
-                            ],
+                                        const PropertyDescriptionActionCombination(
+                                          title: 'Audio & MIDI',
+                                          child: AppIcon(
+                                            icon: HeroIcons.arrowUpTray,
+                                            color: AppColors.dark,
+                                          ),
+                                        ),
+                                        const PropertiesDescriptionTitle(
+                                          title: 'Delete',
+                                        ),
+                                        PropertyDescriptionActionCombination(
+                                          title: 'Delete Recording',
+                                          child: AppIcon(
+                                            icon: HeroIcons.trash,
+                                            color: AppColors.dark,
+                                            onPressed: () =>
+                                                _deleteRecordingConfirmOverlay
+                                                    .open(),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                              ],
+                            ),
                           ),
                         ),
                       ],
