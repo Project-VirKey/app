@@ -5,13 +5,13 @@ import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_play_pause_button.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
-import 'package:virkey/common_widgets/app_shadow.dart';
 import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
+import 'package:virkey/constants/shadows.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
@@ -130,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   bool _listExpanded = false;
   double _appTitleSize = 45;
+  final Duration _expandDuration = const Duration(milliseconds: 200);
 
   late final AppConfirmOverlay _deletePlaybackConfirmOverlay =
       AppConfirmOverlay(
@@ -173,18 +174,66 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.only(top: 5),
-                    child: AppShadow(
-                      child: AnimatedDefaultTextStyle(
-                        style: TextStyle(fontSize: _appTitleSize),
-                        duration: const Duration(milliseconds: 250),
-                        child: const Text(
-                          'ViRKEY',
-                          style: TextStyle(
+                    child: Row(
+                      children: [
+                        if (PlatformHelper.isDesktop)
+                          AnimatedCrossFade(
+                            crossFadeState: _listExpanded
+                                ? CrossFadeState.showSecond
+                                : CrossFadeState.showFirst,
+                            duration: _expandDuration,
+                            firstChild: const SizedBox(
+                              width: 0,
+                              height: 65,
+                            ),
+                            secondChild: Container(
+                              height: 65,
+                              margin: const EdgeInsets.only(right: 35),
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.dark,
+                                  foregroundColor: AppColors.tertiary,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.all(AppRadius.radius)),
+                                ),
+                                onPressed: () => context.go('/piano'),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    SvgPicture.asset(
+                                      'assets/images/VIK_Logo_v2.svg',
+                                      height: 45,
+                                    ),
+                                    const Padding(
+                                      padding: EdgeInsets.only(left: 7.5),
+                                      child: AppText(
+                                        text: 'Play',
+                                        family: AppFonts.secondary,
+                                        color: AppColors.secondary,
+                                        letterSpacing: 6,
+                                        size: 28,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        AnimatedDefaultTextStyle(
+                          style: TextStyle(fontSize: _appTitleSize),
+                          duration: _expandDuration,
+                          child: const Text(
+                            'ViRKEY',
+                            style: TextStyle(
                               fontFamily: AppFonts.secondary,
                               letterSpacing: 4,
-                              color: AppColors.dark),
+                              color: AppColors.dark,
+                              shadows: [AppShadows.title],
+                            ),
+                          ),
                         ),
-                      ),
+                      ],
                     ),
                   ),
                 ),
@@ -205,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             crossFadeState: _listExpanded
                 ? CrossFadeState.showFirst
                 : CrossFadeState.showSecond,
-            duration: const Duration(milliseconds: 250),
+            duration: _expandDuration,
             firstChild: const SizedBox(
               width: 150,
               height: 0,
@@ -215,37 +264,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 const SizedBox(
                   height: 40,
                 ),
-                AppShadow(
-                  child: SizedBox(
-                    width: 150,
-                    height: 150,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.dark,
-                        foregroundColor: AppColors.tertiary,
-                        shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(AppRadius.radius)),
-                      ),
-                      onPressed: () => context.go('/piano'),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          SvgPicture.asset(
-                            'assets/images/VIK_Logo_v2.svg',
-                            height: 73,
+                SizedBox(
+                  width: 150,
+                  height: 150,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.dark,
+                      foregroundColor: AppColors.tertiary,
+                      shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(AppRadius.radius)),
+                    ),
+                    onPressed: () => context.go('/piano'),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        SvgPicture.asset(
+                          'assets/images/VIK_Logo_v2.svg',
+                          height: 73,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(top: 7.5),
+                          child: AppText(
+                            text: 'Play',
+                            family: AppFonts.secondary,
+                            color: AppColors.secondary,
+                            letterSpacing: 6,
+                            size: 28,
                           ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 7.5),
-                            child: AppText(
-                              text: 'Play',
-                              family: AppFonts.secondary,
-                              color: AppColors.secondary,
-                              letterSpacing: 6,
-                              size: 28,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -271,37 +318,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 // fit: _listExpanded ? FlexFit.tight : FlexFit.loose,
                 fit: FlexFit.loose,
                 child: AnimatedContainer(
-                  width: _listExpanded ? MediaQuery.of(context).size.width : 1100,
-                  duration: const Duration(milliseconds: 250),
-                  child: AppShadow(
-                    child: GestureDetector(
-                      onVerticalDragUpdate: (DragUpdateDetails details) => {
-                        if (details.delta.dy < 0)
-                          // if the title has been dragged above y position 0
-                          _expandRecordingsList()
-                        else if (details.delta.dy > 0)
-                          // if the title has been dragged below y position 0
-                          _contractRecordingsList()
-                      },
-                      child: AnimatedContainer(
-                        margin: _listExpanded
-                            ? EdgeInsets.zero
-                            : const EdgeInsets.symmetric(horizontal: 15),
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                            color: AppColors.dark,
-                            borderRadius: _listExpanded
-                                ? BorderRadius.zero
-                                : const BorderRadius.all(AppRadius.radius)),
-                        duration: const Duration(milliseconds: 250),
-                        child: const AppText(
-                          text: 'Recordings',
-                          color: AppColors.secondary,
-                          size: 26,
-                          letterSpacing: 3,
-                          weight: AppFonts.weightLight,
-                          textAlign: TextAlign.center,
-                        ),
+                  width:
+                      _listExpanded ? MediaQuery.of(context).size.width : 1100,
+                  duration: _expandDuration,
+                  child: GestureDetector(
+                    onVerticalDragUpdate: (DragUpdateDetails details) => {
+                      if (details.delta.dy < 0)
+                        // if the title has been dragged above y position 0
+                        _expandRecordingsList()
+                      else if (details.delta.dy > 0)
+                        // if the title has been dragged below y position 0
+                        _contractRecordingsList()
+                    },
+                    child: AnimatedContainer(
+                      margin: _listExpanded
+                          ? EdgeInsets.zero
+                          : const EdgeInsets.symmetric(horizontal: 15),
+                      padding: const EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                          boxShadow: const [AppShadows.boxShadow],
+                          color: AppColors.dark,
+                          borderRadius: _listExpanded
+                              ? BorderRadius.zero
+                              : const BorderRadius.all(AppRadius.radius)),
+                      duration: _expandDuration,
+                      child: const AppText(
+                        text: 'Recordings',
+                        color: AppColors.secondary,
+                        size: 26,
+                        letterSpacing: 3,
+                        weight: AppFonts.weightLight,
+                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
@@ -323,7 +370,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 return true;
               },
               child: AnimatedList(
-                padding: EdgeInsets.only(top: PlatformHelper.isDesktop ? 30 : 0, bottom: 30),
+                padding: EdgeInsets.only(
+                    top: PlatformHelper.isDesktop ? 30 : 0, bottom: 30),
                 key: recordingsListKey,
                 scrollDirection: Axis.vertical,
                 shrinkWrap: true,
@@ -343,7 +391,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               children: [
                                 Container(
                                   margin: const EdgeInsets.symmetric(
-                                      horizontal: 30),
+                                    horizontal: 30,
+                                  ),
                                   child: TextButton(
                                     onPressed: () => {
                                       if (expandedItem)
@@ -354,19 +403,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     style: TextButton.styleFrom(
                                       backgroundColor: Colors.transparent,
                                       foregroundColor: AppColors.dark,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 8, vertical: 14),
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: PlatformHelper.isDesktop
+                                              ? 18
+                                              : 14),
                                     ),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        AppShadow(
-                                          child: AppText(
-                                            text: recordingsList[index],
-                                            size: 18,
-                                            letterSpacing: 3,
-                                          ),
+                                        AppText(
+                                          text: recordingsList[index],
+                                          size: 18,
+                                          letterSpacing: 3,
+                                          shadows: const [AppShadows.text],
                                         ),
                                         AppIcon(
                                           icon: expandedItem

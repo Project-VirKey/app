@@ -9,6 +9,6 @@ class AppColors {
   static const Color white = Color(0xFFFFFFFF);
   static const Color white50 = Color(0x80FFFFFF);
   static const Color black50 = Color(0x80000000);
-  static const Color shadow = Color(0x08000000);
-  // static const Color shadow = Color(0x10000000);
+  static const Color shadow = Color(0x40000000);
+  static const Color shadowDim = Color(0x12000000);
 }

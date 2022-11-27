@@ -10,9 +10,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (PlatformHelper.isDesktop) {
-    // setWindowTitle('My App');
-    // setWindowMaxSize(const Size(max_width, max_height));
-    setWindowMinSize(const Size(650, 550));
+    setWindowMinSize(const Size(830, 580));
   }
 
   runApp(const App());

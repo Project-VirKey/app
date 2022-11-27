@@ -14,8 +14,7 @@ class AppShadow extends StatelessWidget {
         borderRadius: BorderRadius.all(AppRadius.radius),
         boxShadow: [
           BoxShadow(
-              // color: AppColors.shadow, blurRadius: 0, offset: Offset(4, 4)),
-              color: Colors.red, blurRadius: 8, offset: Offset(4, 4)),
+              color: AppColors.shadowDim, blurRadius: 8, offset: Offset(4, 4)),
         ],
       ),
       child: child,

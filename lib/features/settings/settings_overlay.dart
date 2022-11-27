@@ -162,7 +162,7 @@ class SettingsOverlay {
                         ),
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 30,
                       ),
                       GestureDetector(
                         onTap: _launchUrl,

@@ -4,6 +4,7 @@ import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
+import 'package:virkey/utils/platform_helper.dart';
 
 class PianoKeys {
   // C D E F G A B
@@ -25,19 +26,39 @@ class PianoKeys {
 class PianoKeysWhite extends StatelessWidget {
   const PianoKeysWhite({Key? key}) : super(key: key);
 
-  static List<PianoKeyWhite> get keys {
-    List<PianoKeyWhite> pianoKeys = [];
-    PianoKeys.white.asMap().forEach((index, name) {
-      pianoKeys.insert(index, PianoKeyWhite(name: name));
-    });
-
-    return pianoKeys;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [...keys],
+    Size mediaQuerySize = MediaQuery.of(context).size;
+    double maxWidthDesktop = 1450;
+    double maxHeightDesktop = 560;
+
+    List<PianoKeyWhite> pianoKeys = [];
+    PianoKeys.white.asMap().forEach((index, name) {
+      pianoKeys.insert(
+          index,
+          PianoKeyWhite(
+            name: name,
+            parentWidth: maxWidthDesktop,
+            topLeft: index == 0 && (mediaQuerySize.width >= maxWidthDesktop)
+                ? AppRadius.radius
+                : Radius.zero,
+            topRight: index == 6 && (mediaQuerySize.width >= maxWidthDesktop)
+                ? AppRadius.radius
+                : Radius.zero,
+          ));
+    });
+
+    return ConstrainedBox(
+      constraints: BoxConstraints(
+          maxWidth: mediaQuerySize.width >= maxWidthDesktop
+              ? maxWidthDesktop
+              : mediaQuerySize.width,
+          maxHeight: mediaQuerySize.height >= maxHeightDesktop
+              ? maxHeightDesktop
+              : mediaQuerySize.height),
+      child: Row(
+        children: [...pianoKeys],
+      ),
     );
   }
 }
@@ -45,55 +66,74 @@ class PianoKeysWhite extends StatelessWidget {
 class PianoKeysBlack extends StatelessWidget {
   const PianoKeysBlack({Key? key}) : super(key: key);
 
-  static List<PianoKeyBlack> get keys {
+  @override
+  Widget build(BuildContext context) {
+    Size mediaQuerySize = MediaQuery.of(context).size;
+    double maxWidthDesktop = 1450;
+    double maxHeightDesktop = 560;
+
+    double parentWidth = mediaQuerySize.width >= maxWidthDesktop
+        ? maxWidthDesktop
+        : mediaQuerySize.width;
+    double parentHeight = mediaQuerySize.height >= maxHeightDesktop
+        ? maxHeightDesktop
+        : mediaQuerySize.height;
+
     const double multiplierSpacer = .42;
     const double multiplierNoKey = 1.2;
 
     List<PianoKeyBlack> pianoKeys = [];
 
-    pianoKeys.add(const PianoKeyBlack(
+    pianoKeys.add(PianoKeyBlack(
       name: '',
       widthMultiplier: multiplierSpacer * multiplierNoKey,
+      parentWidth: parentWidth,
+      parentHeight: parentHeight,
     ));
 
     PianoKeys.black.asMap().forEach((index, pianoKey) {
-      pianoKeys.add(const PianoKeyBlack(
+      pianoKeys.add(PianoKeyBlack(
         name: '',
         widthMultiplier: multiplierSpacer,
+        parentWidth: parentWidth,
+        parentHeight: parentHeight,
       ));
 
       if (pianoKey.isEmpty) {
-        pianoKeys.add(const PianoKeyBlack(
+        pianoKeys.add(PianoKeyBlack(
           name: '',
           secondName: '',
+          parentWidth: parentWidth,
+          parentHeight: parentHeight,
         ));
       } else {
         pianoKeys.add(PianoKeyBlack(
           name: pianoKey[0],
           secondName: pianoKey[1],
+          parentWidth: parentWidth,
+          parentHeight: parentHeight,
         ));
       }
     });
 
-    pianoKeys.add(const PianoKeyBlack(
+    pianoKeys.add(PianoKeyBlack(
       name: '',
       widthMultiplier: multiplierSpacer,
+      parentWidth: parentWidth,
+      parentHeight: parentHeight,
     ));
 
-    pianoKeys.add(const PianoKeyBlack(
+    pianoKeys.add(PianoKeyBlack(
       name: '',
       widthMultiplier: multiplierSpacer * multiplierNoKey,
+      parentWidth: parentWidth,
+      parentHeight: parentHeight,
     ));
 
-    return pianoKeys;
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [...keys],
+      children: [...pianoKeys],
     );
   }
 }
@@ -102,9 +142,15 @@ class PianoKeyWhite extends StatelessWidget {
   const PianoKeyWhite({
     Key? key,
     required this.name,
+    required this.parentWidth,
+    required this.topLeft,
+    required this.topRight,
   }) : super(key: key);
 
   final String name;
+  final double parentWidth;
+  final Radius topLeft;
+  final Radius topRight;
 
   @override
   Widget build(BuildContext context) {
@@ -122,10 +168,12 @@ class PianoKeyWhite extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 foregroundColor: AppColors.dark,
                 backgroundColor: AppColors.white,
-                shape: const RoundedRectangleBorder(
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     bottomLeft: AppRadius.radius,
                     bottomRight: AppRadius.radius,
+                    topLeft: topLeft,
+                    topRight: topRight,
                   ),
                 ),
               ),
@@ -141,7 +189,7 @@ class PianoKeyWhite extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 25),
                 child: AppText(
                   text: name,
-                  size: 45,
+                  size: parentWidth * .04,
                   color: AppColors.dark,
                   family: AppFonts.secondary,
                 ),
@@ -155,16 +203,20 @@ class PianoKeyWhite extends StatelessWidget {
 }
 
 class PianoKeyBlack extends StatelessWidget {
-  const PianoKeyBlack(
-      {Key? key,
-      required this.name,
-      this.secondName = '',
-      this.widthMultiplier = 1})
-      : super(key: key);
+  const PianoKeyBlack({
+    Key? key,
+    required this.name,
+    this.secondName = '',
+    this.widthMultiplier = 1,
+    required this.parentWidth,
+    required this.parentHeight,
+  }) : super(key: key);
 
   final String name;
   final String secondName;
   final double widthMultiplier;
+  final double parentWidth;
+  final double parentHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -173,12 +225,12 @@ class PianoKeyBlack extends StatelessWidget {
 
     if (name.isEmpty) {
       return Container(
-        width: MediaQuery.of(context).size.width * .1 * widthMultiplier,
+        width: parentWidth * .1 * widthMultiplier,
       );
     } else {
       return SizedBox(
-        width: MediaQuery.of(context).size.width * .1,
-        height: MediaQuery.of(context).size.height * .55,
+        width: parentWidth * .1,
+        height: PlatformHelper.isDesktop ? (parentHeight * .6) : (parentHeight * .54),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             foregroundColor: AppColors.white,
@@ -205,7 +257,7 @@ class PianoKeyBlack extends StatelessWidget {
               children: [
                 AppText(
                   text: name,
-                  size: MediaQuery.of(context).size.width * .04,
+                  size: parentWidth * .04,
                   color: AppColors.secondary,
                   family: AppFonts.secondary,
                 ),
@@ -214,7 +266,7 @@ class PianoKeyBlack extends StatelessWidget {
                 ),
                 AppText(
                   text: secondName,
-                  size: MediaQuery.of(context).size.width * .033,
+                  size: parentWidth * .033,
                   color: AppColors.secondary,
                   family: AppFonts.secondary,
                 ),
