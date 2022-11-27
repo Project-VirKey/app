@@ -39,10 +39,10 @@ class PianoKeysWhite extends StatelessWidget {
           PianoKeyWhite(
             name: name,
             parentWidth: maxWidthDesktop,
-            topLeft: index == 0 && (mediaQuerySize.width >= maxWidthDesktop)
+            topLeft: index == 0 && (mediaQuerySize.height * .9 >= maxHeightDesktop)
                 ? AppRadius.radius
                 : Radius.zero,
-            topRight: index == 6 && (mediaQuerySize.width >= maxWidthDesktop)
+            topRight: index == 6 && (mediaQuerySize.height * .9 >= maxHeightDesktop)
                 ? AppRadius.radius
                 : Radius.zero,
           ));
