@@ -2,35 +2,38 @@ import 'package:flutter/material.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/fonts.dart';
 
+enum PropertyDescriptionActionCombinationType {
+  onlyChild,
+  titleAndChild
+}
+
 class PropertyDescriptionActionCombination extends StatelessWidget {
   const PropertyDescriptionActionCombination({
     Key? key,
-    required this.title,
-    required this.child,
+    this.title = '',
+    this.child,
+    this.type = PropertyDescriptionActionCombinationType.titleAndChild,
   }) : super(key: key);
 
   final String title;
-  final Widget child;
+  final dynamic child;
+  final PropertyDescriptionActionCombinationType type;
 
   @override
   Widget build(BuildContext context) {
-    bool emptyChild =
-        child is Container && ((child as Container).child == null);
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 9),
       child: Row(
-        mainAxisAlignment: title.isEmpty || emptyChild
+        mainAxisAlignment: type != PropertyDescriptionActionCombinationType.titleAndChild
             ? MainAxisAlignment.center
             : MainAxisAlignment.spaceBetween,
         children: [
-          if (title.isNotEmpty)
+          if (type != PropertyDescriptionActionCombinationType.onlyChild)
             AppText(
               text: title,
-              size: 16,
-              letterSpacing: 3,
               weight: AppFonts.weightLight,
             ),
-          if (!emptyChild) child,
+          child,
         ],
       ),
     );

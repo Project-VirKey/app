@@ -112,21 +112,21 @@ class _PianoScreenState extends State<PianoScreen>
               ),
             ),
             Expanded(
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Stack(
-                      // alignment: Alignment.topCenter,
-                      children: const [
-                        PianoKeysWhite(),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          top: 0,
-                              child: PianoKeysBlack(),
-                        )
-                      ],
-                    ),
-                  ),
+              child: Align(
+                alignment: Alignment.center,
+                child: Stack(
+                  // alignment: Alignment.topCenter,
+                  children: const [
+                    PianoKeysWhite(),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      child: PianoKeysBlack(),
+                    )
+                  ],
+                ),
+              ),
             ),
           ],
         ),

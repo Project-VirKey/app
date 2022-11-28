@@ -10,7 +10,8 @@ class AppText extends StatelessWidget {
     this.color = AppColors.dark,
     this.size = AppFonts.sizeDefault,
     this.weight = AppFonts.weightRegular,
-    this.letterSpacing = 0,
+    this.height = 1,
+    this.letterSpacing = 3,
     this.textAlign = TextAlign.left,
     this.shadows = const [],
   }) : super(key: key);
@@ -20,6 +21,7 @@ class AppText extends StatelessWidget {
   final Color color;
   final double size;
   final FontWeight? weight;
+  final double height;
   final double? letterSpacing;
   final TextAlign textAlign;
   final List<Shadow> shadows;
@@ -34,6 +36,7 @@ class AppText extends StatelessWidget {
       // overflow: TextOverflow.ellipsis,
       // softWrap: false,
       style: TextStyle(
+        height: height,
         fontFamily: family,
         color: color,
         fontSize: size,

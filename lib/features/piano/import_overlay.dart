@@ -25,7 +25,7 @@ class ImportOverlay {
   }
 
   late final AppConfirmOverlay _deletePlaybackConfirmOverlay =
-  AppConfirmOverlay(
+      AppConfirmOverlay(
     context: context,
     vsync: vsync,
     displayText: 'Delete playback "File1.mp3"?',
@@ -37,81 +37,87 @@ class ImportOverlay {
     context: context,
     vsync: vsync,
     children: [
-      SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: 40,
-        child: Stack(
-          children: [
-            const Positioned.fill(
+      Padding(
+        padding: const EdgeInsets.all(11),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          height: 40,
+          child: Stack(
+            children: [
+              const Positioned.fill(
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: AppText(
+                        text: 'Import', size: 30, family: AppFonts.secondary),
+                  )),
+              Positioned(
                 left: 0,
-                right: 0,
-                child: Center(
-                  child: AppText(
-                      text: 'Import', size: 30, family: AppFonts.secondary),
-                )),
-            Positioned(
-              left: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: AppIcon(
-                    icon: HeroIcons.arrowUturnLeft,
-                    color: AppColors.dark,
-                    onPressed: () => close()),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: AppIcon(
+                      icon: HeroIcons.arrowUturnLeft,
+                      color: AppColors.dark,
+                      onPressed: () => close()),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       Expanded(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const PropertiesDescriptionTitle(
-                title: 'Audio-Playback',
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).orientation == Orientation.landscape
-                      ? (MediaQuery.of(context).size.width * .5)
-                      : double.infinity,
+          padding: const EdgeInsets.all(11),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const PropertiesDescriptionTitle(
+                  title: 'Audio-Playback',
                 ),
-                child: PropertyDescriptionActionCombination(
-                  title: 'File3.mp3',
-                  child: Row(
-                    children: [
-                      AppSwitch(
-                        value: false,
-                        onChanged: (bool val) => {print(val)},
-                      ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      AppIcon(
-                        icon: HeroIcons.trash,
-                        color: AppColors.dark,
-                        onPressed: () => _deletePlaybackConfirmOverlay.open(),
-                      ),
-                    ],
+                Padding(
+                  padding: MediaQuery.of(context).orientation ==
+                          Orientation.landscape
+                      ? EdgeInsets.symmetric(
+                          horizontal: MediaQuery.of(context).size.width * .15)
+                      : EdgeInsets.zero,
+                  child: PropertyDescriptionActionCombination(
+                    title: 'File3.mp3',
+                    child: Row(
+                      children: [
+                        AppSwitch(
+                          value: false,
+                          onChanged: (bool val) => {print(val)},
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        AppIcon(
+                          icon: HeroIcons.trash,
+                          color: AppColors.dark,
+                          onPressed: () => _deletePlaybackConfirmOverlay.open(),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              const PropertiesDescriptionTitle(
-                title: 'MIDI',
-              ),
-              ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * .5),
-                child: const PropertyDescriptionActionCombination(
-                  title: '',
-                  child: AppIcon(
-                    icon: HeroIcons.arrowDownTray,
-                    color: AppColors.dark,
+                const PropertiesDescriptionTitle(
+                  title: 'MIDI',
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * .5),
+                  child: const PropertyDescriptionActionCombination(
+                    type: PropertyDescriptionActionCombinationType.onlyChild,
+                    child: AppIcon(
+                      icon: HeroIcons.arrowDownTray,
+                      color: AppColors.dark,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       )

@@ -233,6 +233,7 @@ class PianoKeyBlack extends StatelessWidget {
         height: PlatformHelper.isDesktop ? (parentHeight * .6) : (parentHeight * .54),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.zero,
             foregroundColor: AppColors.white,
             backgroundColor: AppColors.dark,
             shape: const RoundedRectangleBorder(
@@ -257,7 +258,7 @@ class PianoKeyBlack extends StatelessWidget {
               children: [
                 AppText(
                   text: name,
-                  size: parentWidth * .04,
+                  size: parentWidth * .045,
                   color: AppColors.secondary,
                   family: AppFonts.secondary,
                 ),
