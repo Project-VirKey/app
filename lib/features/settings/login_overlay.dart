@@ -30,6 +30,8 @@ class LoginOverlay {
       SignupOverlay(context: context, vsync: vsync);
 
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+  final FocusNode _loginEmailFocusNode = FocusNode();
+  final FocusNode _loginPasswordFocusNode = FocusNode();
 
   late final AppOverlay _overlay = AppOverlay(
     context: context,
@@ -95,7 +97,7 @@ class LoginOverlay {
                                 child: Column(
                                   children: [
                                     AppTextFormField(
-                                      parentContext: context,
+                                      focusNode: _loginEmailFocusNode,
                                       labelText: 'E-Mail',
                                       onSaved: (value) =>
                                           {print('onSaved: $value')},
@@ -105,12 +107,14 @@ class LoginOverlay {
                                         }
                                         return null;
                                       },
+                                      textInputAction: TextInputAction.next,
+                                      nextFieldFocusNode: _loginPasswordFocusNode,
                                     ),
                                     AppTextFormField(
-                                      parentContext: context,
+                                      focusNode: _loginPasswordFocusNode,
                                       labelText: 'Password',
                                       onFieldSubmitted: (value) =>
-                                          {print(value)},
+                                          {print('onSubmit: $value')},
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
                                           return 'Please enter some text';
@@ -119,6 +123,7 @@ class LoginOverlay {
                                       },
                                       onSaved: (value) =>
                                           {print('onSaved: $value')},
+                                      textInputAction: TextInputAction.done,
                                     ),
                                   ],
                                 ),
@@ -130,8 +135,14 @@ class LoginOverlay {
                                   size: 22,
                                   letterSpacing: 5,
                                 ),
-                                onPressed: () =>
-                                    {_loginFormKey.currentState?.validate()},
+                                onPressed: () {
+                                  // call the validate function defined in the form fields
+                                  // if the validation was successful -> returns true
+                                  if (_loginFormKey.currentState!.validate()) {
+                                    // call the onSave function defined in the form fields
+                                    _loginFormKey.currentState!.save();
+                                  }
+                                },
                               ),
                             ],
                           ),
@@ -172,39 +183,47 @@ class LoginOverlay {
 class AppTextFormField extends StatelessWidget {
   const AppTextFormField({
     Key? key,
-    required this.parentContext,
     required this.labelText,
     this.onFieldSubmitted,
     required this.onSaved,
     required this.validator,
+    required this.textInputAction,
+    required this.focusNode,
+    this.nextFieldFocusNode,
   }) : super(key: key);
 
-  final BuildContext parentContext;
   final String labelText;
   final dynamic onFieldSubmitted;
   final Function(String?) onSaved;
   final Function(String?) validator;
+  final TextInputAction textInputAction;
+  final FocusNode focusNode;
+  final FocusNode? nextFieldFocusNode;
 
   @override
   Widget build(BuildContext context) {
-    final FocusNode focusNode = FocusNode();
-
     return GestureDetector(
       onTap: () => {
-        FocusScope.of(parentContext).requestFocus(focusNode),
+        FocusScope.of(context).requestFocus(focusNode),
       },
       child: TextFormField(
+        focusNode: focusNode,
         validator: (value) {
-          String? validation = validator(value);
-          if (validation == null) {
-            onSaved(value);
-          }
-          return validation;
+          return validator(value);
         },
-        onFieldSubmitted: (value) => onFieldSubmitted,
+        onSaved: (value) {
+          onSaved(value);
+        },
+        onFieldSubmitted: (value) {
+          // if true -> there is a following field
+          if (textInputAction == TextInputAction.next) {
+            // set the focus to the following field through the passed focus node
+            FocusScope.of(context).requestFocus(nextFieldFocusNode);
+          }
+        },
+        textInputAction: textInputAction,
         maxLines: 1,
         minLines: 1,
-        focusNode: focusNode,
         style: const TextStyle(
             letterSpacing: 3, fontSize: 16, fontWeight: AppFonts.weightLight),
         decoration: InputDecoration(
