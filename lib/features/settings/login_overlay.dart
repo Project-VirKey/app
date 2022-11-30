@@ -29,6 +29,8 @@ class LoginOverlay {
   late final SignupOverlay _signupOverlay =
       SignupOverlay(context: context, vsync: vsync);
 
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
+
   late final AppOverlay _overlay = AppOverlay(
     context: context,
     vsync: vsync,
@@ -81,28 +83,59 @@ class LoginOverlay {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.all(10),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: AppTextField(
-                                parentContext: context,
+                      Material(
+                        color: Colors.transparent,
+                        child: Form(
+                          key: _loginFormKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.all(10),
+                                child: Column(
+                                  children: [
+                                    AppTextFormField(
+                                      parentContext: context,
+                                      labelText: 'E-Mail',
+                                      onSaved: (value) =>
+                                          {print('onSaved: $value')},
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter some text';
+                                        }
+                                        return null;
+                                      },
+                                    ),
+                                    AppTextFormField(
+                                      parentContext: context,
+                                      labelText: 'Password',
+                                      onFieldSubmitted: (value) =>
+                                          {print(value)},
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty) {
+                                          return 'Please enter some text';
+                                        }
+                                        return null;
+                                      },
+                                      onSaved: (value) =>
+                                          {print('onSaved: $value')},
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
+                              AppButton(
+                                appText: const AppText(
+                                  text: 'Log in',
+                                  color: AppColors.white,
+                                  size: 22,
+                                  letterSpacing: 5,
+                                ),
+                                onPressed: () =>
+                                    {_loginFormKey.currentState?.validate()},
+                              ),
+                            ],
                           ),
-                          AppButton(
-                            appText: const AppText(
-                              text: 'Log in',
-                              color: AppColors.white,
-                              size: 22,
-                              letterSpacing: 5,
-                            ),
-                            onPressed: () => {print('Log in')},
-                          ),
-                        ],
+                        ),
                       ),
                       GestureDetector(
                         onTap: () => {},
@@ -136,13 +169,21 @@ class LoginOverlay {
   );
 }
 
-class AppTextField extends StatelessWidget {
-  const AppTextField({
+class AppTextFormField extends StatelessWidget {
+  const AppTextFormField({
     Key? key,
     required this.parentContext,
+    required this.labelText,
+    this.onFieldSubmitted,
+    required this.onSaved,
+    required this.validator,
   }) : super(key: key);
 
   final BuildContext parentContext;
+  final String labelText;
+  final dynamic onFieldSubmitted;
+  final Function(String?) onSaved;
+  final Function(String?) validator;
 
   @override
   Widget build(BuildContext context) {
@@ -150,28 +191,30 @@ class AppTextField extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => {
-        // FocusManager.instance.primaryFocus?.unfocus(),
         FocusScope.of(parentContext).requestFocus(focusNode),
-
-        // FocusManager.instance.primaryFocus?.unfocus(),
-        // FocusManager.instance.primaryFocus?.requestFocus(focusNode)
       },
       child: TextFormField(
-        onTap: () => {},
-        onFieldSubmitted: (value) => {print('submitted')},
+        validator: (value) {
+          String? validation = validator(value);
+          if (validation == null) {
+            onSaved(value);
+          }
+          return validation;
+        },
+        onFieldSubmitted: (value) => onFieldSubmitted,
         maxLines: 1,
         minLines: 1,
         focusNode: focusNode,
         style: const TextStyle(
             letterSpacing: 3, fontSize: 16, fontWeight: AppFonts.weightLight),
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           isDense: true,
-          labelText: 'Password',
-          enabledBorder: OutlineInputBorder(
+          labelText: labelText,
+          enabledBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(AppRadius.radius),
             borderSide: BorderSide(color: AppColors.dark),
           ),
-          focusedBorder: OutlineInputBorder(
+          focusedBorder: const OutlineInputBorder(
             borderRadius: BorderRadius.all(AppRadius.radius),
             borderSide: BorderSide(color: AppColors.dark),
           ),

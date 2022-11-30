@@ -87,14 +87,6 @@ class SignupOverlay {
                         ),
                         onPressed: () => {print('Sign up')},
                       ),
-                      GestureDetector(
-                        onTap: () => {},
-                        child: const AppText(
-                          textAlign: TextAlign.center,
-                          text: 'Forgot Password?',
-                          letterSpacing: 3,
-                        ),
-                      ),
                       const AppText(
                         text: 'Have an account already?',
                         weight: AppFonts.weightLight,
