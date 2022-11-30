@@ -30,28 +30,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       SettingsOverlay(context: context, vsync: this);
 
   static const _itemsRep = [
-    'Rec1',
-    'Rec2',
-    'Rec3',
-    'Rec4',
-    'Rec5',
-    'Rec6',
-    'Rec7',
-    'Rec8',
-    'Rec9',
-    'Rec10',
-    'Rec11',
-    'Rec12',
-    'Rec13',
-    'Rec14',
-    'Rec15',
-    'Rec16',
-    'Rec17',
-    'Rec18',
-    'Rec19',
-    'Rec20',
-    'Rec21',
-    'Rec22',
+    'Recording #1',
+    'Recording #2',
+    'Recording #3',
+    'Recording #4',
+    'Recording #5',
+    'Recording #6',
+    'Recording #7',
+    'Recording #8',
+    'Recording #9',
+    'Recording #10',
+    'Recording #11',
+    'Recording #12',
+    'Recording #13',
+    'Recording #14',
+    'Recording #15',
+    'Recording #16',
+    'Recording #17',
+    'Recording #18',
+    'Recording #19',
+    'Recording #20',
+    'Recording #21',
+    'Recording #22',
   ];
 
   final recordingsList = List.of(_itemsRep);
@@ -151,6 +151,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   );
 
   bool _recordingTitleTextFieldVisible = false;
+
+  @override
+  void initState() {
+    _settingsOverlay.loadData();
+    setState(() {});
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

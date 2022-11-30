@@ -18,10 +18,17 @@ class PianoScreen extends StatefulWidget {
 
 class _PianoScreenState extends State<PianoScreen>
     with TickerProviderStateMixin {
-  late SettingsOverlay settingsOverlay =
+  late final SettingsOverlay _settingsOverlay =
       SettingsOverlay(context: context, vsync: this);
-  late ImportOverlay importOverlay =
+  late final ImportOverlay _importOverlay =
       ImportOverlay(context: context, vsync: this);
+
+  @override
+  void initState() {
+    _settingsOverlay.loadData();
+    setState(() {});
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -53,13 +60,13 @@ class _PianoScreenState extends State<PianoScreen>
                             AppIcon(
                               icon: HeroIcons.arrowDownTray,
                               color: AppColors.secondary,
-                              onPressed: () => importOverlay.open(),
+                              onPressed: () => _importOverlay.open(),
                               size: 30,
                             ),
                             AppIcon(
                               icon: HeroIcons.cog6Tooth,
                               color: AppColors.secondary,
-                              onPressed: () => settingsOverlay.open(),
+                              onPressed: () => _settingsOverlay.open(),
                               size: 30,
                             ),
                           ],

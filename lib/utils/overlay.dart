@@ -41,16 +41,6 @@ class AppOverlay {
 
   final FocusNode _focusNode = FocusNode();
 
-  // void preventKeyboardShortcutFocus() {
-  //   print(focusKeyboardShortcut);
-  //   focusKeyboardShortcut = false;
-  //   print(focusKeyboardShortcut);
-  // }
-  //
-  // void permitKeyboardShortcutFocus() {
-  //   focusKeyboardShortcut = true;
-  // }
-
   late final OverlayEntry _overlay = OverlayEntry(builder: (context) {
     return AppKeyboardShortcut(
       focusNode: _focusNode,
