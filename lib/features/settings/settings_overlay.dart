@@ -79,9 +79,9 @@ class SettingsOverlay {
     final prefs = await SharedPreferences.getInstance();
 
     if (prefs.containsKey('settings')) {
-      _settings = settingsFromJson(prefs.getString('settings') ?? '');
+      settings = settingsFromJson(prefs.getString('settings') ?? '');
     } else {
-      prefs.setString('settings', settingsToJson(_settings));
+      prefs.setString('settings', settingsToJson(settings));
     }
 
     // print(prefs.getString('settings'));
@@ -92,10 +92,10 @@ class SettingsOverlay {
 
   void saveData() async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('settings', settingsToJson(_settings));
+    prefs.setString('settings', settingsToJson(settings));
   }
 
-  Settings _settings = Settings(
+  Settings settings = Settings(
     audioVolume: AudioVolume(soundLibrary: 0, audioPlayback: 0),
     defaultFolder: DefaultFolder(displayName: '/dfdg/dsdf/folder/', path: ''),
     defaultSavedFiles: DefaultSavedFiles(mp3: false, mp3AndPlayback: false),
@@ -169,10 +169,10 @@ class SettingsOverlay {
                           color: Colors.transparent,
                           child: AppSlider(
                               value:
-                                  _settings.audioVolume.soundLibrary.toDouble(),
+                                  settings.audioVolume.soundLibrary.toDouble(),
                               onChanged: (val) {
-                                if (_settings.audioVolume.soundLibrary != val.toInt()) {
-                                  _settings.audioVolume.soundLibrary = val.toInt();
+                                if (settings.audioVolume.soundLibrary != val.toInt()) {
+                                  settings.audioVolume.soundLibrary = val.toInt();
                                   saveData();
                                 }
                               }),
@@ -187,11 +187,11 @@ class SettingsOverlay {
                         Material(
                           color: Colors.transparent,
                           child: AppSlider(
-                              value: _settings.audioVolume.audioPlayback
+                              value: settings.audioVolume.audioPlayback
                                   .toDouble(),
                               onChanged: (val) {
-                                if (_settings.audioVolume.audioPlayback != val.toInt()) {
-                                  _settings.audioVolume.audioPlayback = val.toInt();
+                                if (settings.audioVolume.audioPlayback != val.toInt()) {
+                                  settings.audioVolume.audioPlayback = val.toInt();
                                   saveData();
                                 }
                               }),
@@ -199,7 +199,7 @@ class SettingsOverlay {
                         const PropertiesDescriptionTitle(
                             title: 'Default Folder'),
                         PropertyDescriptionActionCombination(
-                          title: _settings.defaultFolder.displayName,
+                          title: settings.defaultFolder.displayName,
                           child: const AppIcon(
                             icon: HeroIcons.folder,
                             color: AppColors.dark,
@@ -210,9 +210,9 @@ class SettingsOverlay {
                         PropertyDescriptionActionCombination(
                           title: 'MP3',
                           child: AppSwitch(
-                            value: _settings.defaultSavedFiles.mp3,
+                            value: settings.defaultSavedFiles.mp3,
                             onChanged: (bool val) {
-                              _settings.defaultSavedFiles.mp3 = val;
+                              settings.defaultSavedFiles.mp3 = val;
                               saveData();
                             },
                           ),
@@ -220,9 +220,9 @@ class SettingsOverlay {
                         PropertyDescriptionActionCombination(
                             title: 'MP3 + Audio-Playback',
                             child: AppSwitch(
-                              value: _settings.defaultSavedFiles.mp3AndPlayback,
+                              value: settings.defaultSavedFiles.mp3AndPlayback,
                               onChanged: (bool val) {
-                                _settings.defaultSavedFiles.mp3AndPlayback =
+                                settings.defaultSavedFiles.mp3AndPlayback =
                                     val;
                                 saveData();
                               },
@@ -265,7 +265,7 @@ class SettingsOverlay {
                         const PropertiesDescriptionTitle(
                             title: 'Account Settings'),
                         Visibility(
-                          visible: _settings.account.loggedIn,
+                          visible: settings.account.loggedIn,
                           child: Column(
                             children: [
                               const SizedBox(
@@ -428,7 +428,7 @@ class SettingsOverlay {
                             ],
                           ),
                         ),
-                        if (!_settings.account.loggedIn)
+                        if (!settings.account.loggedIn)
                           PropertyDescriptionActionCombination(
                             title: 'Login / Sign up',
                             child: AppIcon(
