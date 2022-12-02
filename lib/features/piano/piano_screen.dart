@@ -26,6 +26,8 @@ class _PianoScreenState extends State<PianoScreen>
   @override
   void initState() {
     _settingsOverlay.loadData();
+    //PianoKeys().loadLibrary('assets/sound_libraries/Grand-Piano.sf2');
+    PianoKeys().loadLibrary('assets/sound_libraries/Guitar.sf2');
     setState(() {});
     super.initState();
   }

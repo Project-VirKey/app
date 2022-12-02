@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_play_pause_button.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
@@ -167,6 +168,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       backgroundColor: AppColors.secondary,
       body: Column(
         children: <Widget>[
+          AppButton(appText: const AppText(text: 'Play Note',), onPressed: (() => {})),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 20),
             child: Row(

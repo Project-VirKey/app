@@ -147,7 +147,7 @@ packages:
       name: ffi
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.1"
+    version: "1.2.1"
   file:
     dependency: transitive
     description:
@@ -174,6 +174,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.1"
+  flutter_midi:
+    dependency: "direct main"
+    description:
+      name: flutter_midi
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   flutter_svg:
     dependency: "direct main"
     description:
@@ -344,7 +351,7 @@ packages:
       name: path_provider_windows
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.3"
+    version: "2.0.7"
   petitparser:
     dependency: transitive
     description:
@@ -483,6 +490,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.12"
+  tonic:
+    dependency: transitive
+    description:
+      name: tonic
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.4"
   typed_data:
     dependency: transitive
     description:
@@ -566,7 +580,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.1.2"
+    version: "2.6.1"
   window_size:
     dependency: "direct main"
     description:

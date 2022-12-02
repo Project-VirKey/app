@@ -1,5 +1,9 @@
+import 'dart:typed_data';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_midi/flutter_midi.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
@@ -11,16 +15,38 @@ class PianoKeys {
 
   // C# D# F# G# A#
   // Db Eb Gb Ab Bb
-  static const List<String> white = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
 
-  static const List<List<String>> black = [
-    ['C#', 'Db'],
-    ['D#', 'Eb'],
-    [],
-    ['F#', 'Gb'],
-    ['G#', 'Ab'],
-    ['A#', 'Bb']
+  // C5
+  static const midiOffset = 72;
+
+  static const List white = [
+    ['C', 0],
+    ['D', 2],
+    ['E', 4],
+    ['F', 5],
+    ['G', 7],
+    ['A', 9],
+    ['B', 11]
   ];
+
+  static const List black = [
+    ['C#', 'Db', 1],
+    ['D#', 'Eb', 3],
+    [],
+    ['F#', 'Gb', 6],
+    ['G#', 'Ab', 8],
+    ['A#', 'Bb', 10]
+  ];
+
+  // {flutterMidi.playMidiNote(midi: 65)}
+
+  late FlutterMidi flutterMidi = FlutterMidi();
+
+  void loadLibrary(String asset) async {
+    flutterMidi.unmute(); // Optionally Unmute
+    ByteData byte = await rootBundle.load(asset);
+    flutterMidi.prepare(sf2: byte);
+  }
 }
 
 class PianoKeysWhite extends StatelessWidget {
@@ -33,18 +59,21 @@ class PianoKeysWhite extends StatelessWidget {
     double maxHeightDesktop = 560;
 
     List<PianoKeyWhite> pianoKeys = [];
-    PianoKeys.white.asMap().forEach((index, name) {
+    PianoKeys.white.asMap().forEach((index, pianoKeyInfo) {
       pianoKeys.insert(
           index,
           PianoKeyWhite(
-            name: name,
+            name: pianoKeyInfo[0],
+            midiNoteNumber: pianoKeyInfo[1] + PianoKeys.midiOffset,
             parentWidth: maxWidthDesktop,
-            topLeft: index == 0 && (mediaQuerySize.height * .9 >= maxHeightDesktop)
-                ? AppRadius.radius
-                : Radius.zero,
-            topRight: index == 6 && (mediaQuerySize.height * .9 >= maxHeightDesktop)
-                ? AppRadius.radius
-                : Radius.zero,
+            topLeft:
+                index == 0 && (mediaQuerySize.height * .9 >= maxHeightDesktop)
+                    ? AppRadius.radius
+                    : Radius.zero,
+            topRight:
+                index == 6 && (mediaQuerySize.height * .9 >= maxHeightDesktop)
+                    ? AppRadius.radius
+                    : Radius.zero,
           ));
     });
 
@@ -110,6 +139,7 @@ class PianoKeysBlack extends StatelessWidget {
         pianoKeys.add(PianoKeyBlack(
           name: pianoKey[0],
           secondName: pianoKey[1],
+          midiNoteNumber: pianoKey[2] + PianoKeys.midiOffset,
           parentWidth: parentWidth,
           parentHeight: parentHeight,
         ));
@@ -145,12 +175,14 @@ class PianoKeyWhite extends StatelessWidget {
     required this.parentWidth,
     required this.topLeft,
     required this.topRight,
+    required this.midiNoteNumber,
   }) : super(key: key);
 
   final String name;
   final double parentWidth;
   final Radius topLeft;
   final Radius topRight;
+  final int midiNoteNumber;
 
   @override
   Widget build(BuildContext context) {
@@ -177,12 +209,15 @@ class PianoKeyWhite extends StatelessWidget {
                   ),
                 ),
               ),
-              onPressed: () async => {
-                await player.stop(),
+              onPressed: () async {
+                /*
+                await player.stop();
                 await player.setSource(
-                  AssetSource('audio/mixkit-arcade-retro-game-over-213.wav'),
-                ),
-                await player.resume()
+                  AssetSource('audio/mixkit-arcade-retro-game-over-213.wav');
+                );
+                await player.resume();
+                 */
+                FlutterMidi().playMidiNote(midi: midiNoteNumber);
               },
               child: Container(
                 alignment: Alignment.bottomCenter,
@@ -206,6 +241,7 @@ class PianoKeyBlack extends StatelessWidget {
   const PianoKeyBlack({
     Key? key,
     required this.name,
+    this.midiNoteNumber = 0,
     this.secondName = '',
     this.widthMultiplier = 1,
     required this.parentWidth,
@@ -213,6 +249,7 @@ class PianoKeyBlack extends StatelessWidget {
   }) : super(key: key);
 
   final String name;
+  final int midiNoteNumber;
   final String secondName;
   final double widthMultiplier;
   final double parentWidth;
@@ -230,7 +267,9 @@ class PianoKeyBlack extends StatelessWidget {
     } else {
       return SizedBox(
         width: parentWidth * .1,
-        height: PlatformHelper.isDesktop ? (parentHeight * .6) : (parentHeight * .54),
+        height: PlatformHelper.isDesktop
+            ? (parentHeight * .6)
+            : (parentHeight * .54),
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.zero,
@@ -243,13 +282,7 @@ class PianoKeyBlack extends StatelessWidget {
               ),
             ),
           ),
-          onPressed: () async => {
-            await player.stop(),
-            await player.setSource(
-              AssetSource('audio/mixkit-arcade-retro-game-over-213.wav'),
-            ),
-            await player.resume()
-          },
+          onPressed: () => FlutterMidi().playMidiNote(midi: midiNoteNumber),
           child: Container(
             alignment: Alignment.bottomCenter,
             padding: const EdgeInsets.only(bottom: 20),
