@@ -1,4 +1,4 @@
-package com.example.virkey
+package at.virkey.app
 
 import io.flutter.embedding.android.FlutterActivity
 
