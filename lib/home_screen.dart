@@ -557,7 +557,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                         _recordingTitleTextFieldVisible =
                                                             true;
                                                       }),
-                                                      print(_listExpanded),
                                                       _expandRecordingsList()
                                                     },
                                                   ),

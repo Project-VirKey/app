@@ -47,7 +47,8 @@ dependencies:
       url: https://github.com/google/flutter-desktop-embedding
       path: plugins/window_size
   shared_preferences: ^2.0.15
-  flutter_midi: ^1.1.0
+  permission_handler: ^10.2.0
+  dart_melty_soundfont: ^1.1.5
 
 dev_dependencies:
   flutter_test:

@@ -1,9 +1,10 @@
-import 'dart:typed_data';
-
 import 'package:audioplayers/audioplayers.dart';
+import 'package:dart_melty_soundfont/array_int16.dart';
+import 'package:dart_melty_soundfont/audio_renderer_ex.dart';
+import 'package:dart_melty_soundfont/synthesizer.dart';
+import 'package:dart_melty_soundfont/synthesizer_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_midi/flutter_midi.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
@@ -40,12 +41,43 @@ class PianoKeys {
 
   // {flutterMidi.playMidiNote(midi: 65)}
 
-  late FlutterMidi flutterMidi = FlutterMidi();
+  // late FlutterMidi flutterMidi = FlutterMidi();
+  late ByteData bytes;
+  late Synthesizer synth;
 
   void loadLibrary(String asset) async {
-    flutterMidi.unmute(); // Optionally Unmute
-    ByteData byte = await rootBundle.load(asset);
-    flutterMidi.prepare(sf2: byte);
+    // flutterMidi.unmute(); // Optionally Unmute
+    // ByteData byte = await rootBundle.load(asset);
+    // flutterMidi.prepare(sf2: byte);
+
+    // Create the synthesizer.
+    bytes = await rootBundle.load(asset);
+
+    synth = Synthesizer.loadByteData(
+        bytes,
+        SynthesizerSettings(
+          sampleRate: 44100,
+          blockSize: 64,
+          maximumPolyphony: 64,
+          enableReverbAndChorus: true,
+        ));
+
+    synth.noteOn(channel: 0, key: 76, velocity: 120);
+
+    // Render the waveform (3 seconds)
+    ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: 44100 * 1);
+    synth.renderMonoInt16(buf16);
+    // List<double> wave = List.filled(44100 * 3, 0);
+    // synth.renderMono(wave);
+
+
+    final player = AudioPlayer();
+    // player.setPlayerMode(PlayerMode.lowLatency);
+
+    await player.stop();
+    // await player.setSourceBytes(buf16.bytes.buffer.asUint8List());
+    // await player.setSourceBytes(buf16.bytes.buffer.asByteData().buffer.asUint8List());
+    await player.resume();
   }
 }
 
@@ -210,14 +242,14 @@ class PianoKeyWhite extends StatelessWidget {
                 ),
               ),
               onPressed: () async {
-                /*
-                await player.stop();
-                await player.setSource(
-                  AssetSource('audio/mixkit-arcade-retro-game-over-213.wav');
-                );
-                await player.resume();
-                 */
-                FlutterMidi().playMidiNote(midi: midiNoteNumber);
+                // await player.stop();
+                // await player.setSource(
+                //     AssetSource('audio/mixkit-arcade-retro-game-over-213.wav');
+                // );
+                // await player.setSourceBytes(PianoKeys().synth);
+                // await player.resume();
+                // FlutterMidi().playMidiNote(midi: midiNoteNumber);
+                // PianoKeys().synth.noteOn(channel: 0, key: 72, velocity: 10);
               },
               child: Container(
                 alignment: Alignment.bottomCenter,
@@ -257,9 +289,6 @@ class PianoKeyBlack extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final player = AudioPlayer();
-    player.setPlayerMode(PlayerMode.lowLatency);
-
     if (name.isEmpty) {
       return Container(
         width: parentWidth * .1 * widthMultiplier,
@@ -282,7 +311,8 @@ class PianoKeyBlack extends StatelessWidget {
               ),
             ),
           ),
-          onPressed: () => FlutterMidi().playMidiNote(midi: midiNoteNumber),
+          // onPressed: () => FlutterMidi().playMidiNote(midi: midiNoteNumber),
+          onPressed: () => {},
           child: Container(
             alignment: Alignment.bottomCenter,
             padding: const EdgeInsets.only(bottom: 20),

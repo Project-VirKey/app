@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter/services.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/routing/router.dart';
@@ -15,6 +15,24 @@ void main() {
 
   runApp(const App());
 }
+//
+// Future<String> createFolder(String cow) async {
+//   final dir = Directory((Platform.isAndroid
+//       ? await getExternalStorageDirectory() //FOR ANDROID
+//       : await getApplicationSupportDirectory() //FOR IOS
+//   )!
+//       .path + '/$cow');
+//   var status = await Permission.storage.status;
+//   if (!status.isGranted) {
+//     await Permission.storage.request();
+//   }
+//   if ((await dir.exists())) {
+//     return dir.path;
+//   } else {
+//     dir.create();
+//     return dir.path;
+//   }
+// }
 
 class App extends StatelessWidget {
   const App({super.key});

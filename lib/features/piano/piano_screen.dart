@@ -8,6 +8,7 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/piano/import_overlay.dart';
 import 'package:virkey/features/piano/piano_key.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
+import 'package:virkey/utils/platform_helper.dart';
 
 class PianoScreen extends StatefulWidget {
   const PianoScreen({Key? key}) : super(key: key);
@@ -26,11 +27,13 @@ class _PianoScreenState extends State<PianoScreen>
   @override
   void initState() {
     _settingsOverlay.loadData();
-    //PianoKeys().loadLibrary('assets/sound_libraries/Grand-Piano.sf2');
-    PianoKeys().loadLibrary('assets/sound_libraries/Guitar.sf2');
+    PianoKeys().loadLibrary('assets/sound_libraries/Grand-Piano.sf2');
+    // PianoKeys().loadLibrary('assets/sound_libraries/Guitar.sf2');
     setState(() {});
     super.initState();
   }
+
+  int prevVal = -1;
 
   @override
   Widget build(BuildContext context) {
@@ -123,17 +126,37 @@ class _PianoScreenState extends State<PianoScreen>
             Expanded(
               child: Align(
                 alignment: Alignment.center,
-                child: Stack(
-                  // alignment: Alignment.topCenter,
-                  children: const [
-                    PianoKeysWhite(),
-                    Positioned(
-                      left: 0,
-                      right: 0,
-                      top: 0,
-                      child: PianoKeysBlack(),
-                    )
-                  ],
+                child: GestureDetector(
+                  onVerticalDragUpdate: (DragUpdateDetails details) {
+                    if (PlatformHelper.isDesktop) {
+                      return;
+                    }
+
+                    int keyIndex = (details.globalPosition.dx /
+                            (MediaQuery.of(context).size.width) *
+                            7)
+                        .floor();
+
+                    if (keyIndex != prevVal) {
+                      // FlutterMidi().playMidiNote(
+                      //     midi: PianoKeys.white[keyIndex][1] +
+                      //         PianoKeys.midiOffset);
+                      prevVal = keyIndex;
+                    }
+                  },
+                  onVerticalDragEnd: (DragEndDetails details) => {prevVal = -1},
+                  child: Stack(
+                    // alignment: Alignment.topCenter,
+                    children: const [
+                      PianoKeysWhite(),
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        child: PianoKeysBlack(),
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
