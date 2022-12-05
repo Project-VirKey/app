@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/features/settings/authentication.dart';
 import 'package:virkey/routing/router.dart';
 import 'package:virkey/utils/platform_helper.dart';
 import 'package:window_size/window_size.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (PlatformHelper.isDesktop) {
@@ -14,6 +16,12 @@ void main() {
   }
 
   runApp(const App());
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  AppAuthentication.checkAuthStatus();
 }
 //
 // Future<String> createFolder(String cow) async {

@@ -3,6 +3,7 @@ import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/constants/radius.dart';
+import 'package:virkey/features/settings/authentication.dart';
 import 'package:virkey/features/settings/signup_overlay.dart';
 import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
@@ -27,11 +28,14 @@ class LoginOverlay {
   }
 
   late final SignupOverlay _signupOverlay =
-  SignupOverlay(context: context, vsync: vsync);
+      SignupOverlay(context: context, vsync: vsync);
 
   final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
   final FocusNode _loginEmailFocusNode = FocusNode();
   final FocusNode _loginPasswordFocusNode = FocusNode();
+
+  String _email = '';
+  String _password = '';
 
   late final AppOverlay _overlay = AppOverlay(
     context: context,
@@ -70,129 +74,142 @@ class LoginOverlay {
       ),
       Flexible(
         fit: FlexFit.loose,
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(11),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: MediaQuery.of(context).orientation ==
-                      Orientation.landscape
-                      ? EdgeInsets.symmetric(
-                      horizontal: MediaQuery.of(context).size.width * .16)
-                      : EdgeInsets.zero,
-                  child: Container(
-                    color: Colors.green,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Material(
-                          color: Colors.transparent,
-                          child: Form(
-                            key: _loginFormKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(10.0),
-                                  child: Column(
-                                    children: [
-                                      AppTextFormField(
-                                        focusNode: _loginEmailFocusNode,
-                                        labelText: 'E-Mail',
-                                        onSaved: (value) =>
-                                        {print('onSaved: $value')},
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please enter some text';
-                                          }
-                                          return null;
-                                        },
-                                        textInputAction: TextInputAction.next,
-                                        nextFieldFocusNode: _loginPasswordFocusNode,
-                                      ),
-                                      const SizedBox(
-                                        height: 15,
-                                      ),
-                                      AppTextFormField(
-                                        focusNode: _loginPasswordFocusNode,
-                                        labelText: 'Password',
-                                        onFieldSubmitted: (value) =>
-                                        {print('onSubmit: $value')},
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Please enter some text';
-                                          }
-                                          return null;
-                                        },
-                                        onSaved: (value) =>
-                                        {print('onSaved: $value')},
-                                        textInputAction: TextInputAction.done,
-                                      ),
-                                    ],
+        child: CustomScrollView(
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: const EdgeInsets.all(11),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Padding(
+                      padding: MediaQuery.of(context).orientation ==
+                              Orientation.landscape
+                          ? EdgeInsets.symmetric(
+                              horizontal:
+                                  MediaQuery.of(context).size.width * .16)
+                          : EdgeInsets.zero,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Material(
+                            color: Colors.transparent,
+                            child: Form(
+                              key: _loginFormKey,
+                              child: Column(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.stretch,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Column(
+                                      children: [
+                                        AppTextFormField(
+                                          focusNode: _loginEmailFocusNode,
+                                          labelText: 'E-Mail',
+                                          onSaved: (value) =>
+                                              {_email = value ?? ''},
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please enter some text';
+                                            }
+                                            return null;
+                                          },
+                                          textInputAction:
+                                              TextInputAction.next,
+                                          nextFieldFocusNode:
+                                              _loginPasswordFocusNode,
+                                        ),
+                                        const SizedBox(
+                                          height: 15,
+                                        ),
+                                        AppTextFormField(
+                                          focusNode: _loginPasswordFocusNode,
+                                          labelText: 'Password',
+                                          onFieldSubmitted: (value) =>
+                                              {print('onSubmit: $value')},
+                                          validator: (value) {
+                                            if (value == null ||
+                                                value.isEmpty) {
+                                              return 'Please enter some text';
+                                            }
+                                            return null;
+                                          },
+                                          onSaved: (value) =>
+                                              {_password = value ?? ''},
+                                          textInputAction:
+                                              TextInputAction.done,
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  height: 30,
-                                ),
-                                AppButton(
-                                  appText: const AppText(
-                                    text: 'Log in',
-                                    color: AppColors.white,
-                                    size: 22,
-                                    letterSpacing: 5,
+                                  const SizedBox(
+                                    height: 30,
                                   ),
-                                  onPressed: () {
-                                    // call the validate function defined in the form fields
-                                    // if the validation was successful -> returns true
-                                    if (_loginFormKey.currentState!.validate()) {
-                                      // call the onSave function defined in the form fields
-                                      _loginFormKey.currentState!.save();
-                                    }
-                                  },
-                                ),
-                              ],
+                                  AppButton(
+                                    appText: const AppText(
+                                      text: 'Log in',
+                                      color: AppColors.white,
+                                      size: 22,
+                                      letterSpacing: 5,
+                                    ),
+                                    onPressed: () {
+                                      // call the validate function defined in the form fields
+                                      // if the validation was successful -> returns true
+                                      if (_loginFormKey.currentState!
+                                          .validate()) {
+                                        // call the onSave function defined in the form fields
+                                        _loginFormKey.currentState!.save();
+
+                                        AppAuthentication.logIn(
+                                            _email, _password);
+                                      }
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        GestureDetector(
-                          onTap: () => {},
-                          child: const AppText(
-                            textAlign: TextAlign.center,
-                            text: 'Forgot Password?',
-                            letterSpacing: 3,
+                          const SizedBox(
+                            height: 10,
                           ),
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        const AppText(
-                          text: 'Don\'t have an account?',
-                          weight: AppFonts.weightLight,
-                        ),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        GestureDetector(
-                          onTap: () => {_signupOverlay.open(), close()},
-                          child: const AppText(
-                            textAlign: TextAlign.center,
-                            text: 'Sign up',
-                            letterSpacing: 3,
+                          GestureDetector(
+                            onTap: () => {},
+                            child: const AppText(
+                              textAlign: TextAlign.center,
+                              text: 'Forgot Password?',
+                              letterSpacing: 3,
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(
+                            height: 30,
+                          ),
+                          const AppText(
+                            text: 'Don\'t have an account?',
+                            weight: AppFonts.weightLight,
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          GestureDetector(
+                            onTap: () => {_signupOverlay.open(), close()},
+                            child: const AppText(
+                              textAlign: TextAlign.center,
+                              text: 'Sign up',
+                              letterSpacing: 3,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            )
+          ],
         ),
       ),
     ],

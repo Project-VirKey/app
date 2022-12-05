@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "575085457027",
+    "project_id": "virkey-app",
+    "storage_bucket": "virkey-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:575085457027:android:e28de86bcdf0bec0b235b6",
+        "android_client_info": {
+          "package_name": "at.virkey.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "575085457027-e766m4levjeop451avvifqhmejn312r2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYkRj16peZCHLaNvDkclcqczvefF_3-as"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "575085457027-e766m4levjeop451avvifqhmejn312r2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "575085457027-22lvt6iajurudu263aqqqgu3nb3uu67g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "at.virkey.app.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -72,8 +72,6 @@ class SettingsOverlay {
   late final LoginOverlay _loginOverlay =
       LoginOverlay(context: context, vsync: vsync);
 
-  late final bool loggedIn = false;
-
   void loadData() async {
     // Obtain shared preferences.
     final prefs = await SharedPreferences.getInstance();

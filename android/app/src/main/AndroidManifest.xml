@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.virkey">
+    package="at.virkey.app">
    <application
         android:label="VirKey"
         android:name="${applicationName}"
