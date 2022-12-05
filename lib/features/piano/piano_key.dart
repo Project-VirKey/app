@@ -65,18 +65,22 @@ class PianoKeys {
     synth.noteOn(channel: 0, key: 76, velocity: 120);
 
     // Render the waveform (3 seconds)
-    ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: 44100 * 1);
-    synth.renderMonoInt16(buf16);
-    // List<double> wave = List.filled(44100 * 3, 0);
-    // synth.renderMono(wave);
+    // ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: 44100 * 1);
+    // synth.renderMonoInt16(buf16);
+    List<double> wave = List.filled(44100 * 3, 0);
+    synth.renderMono(wave);
 
+    //Uint8List waveUint8List = Uint8List.fromList(wave.map((e) => (e.abs() * 255)).toList());
+
+    print(wave.getRange(2000, 2100));
 
     final player = AudioPlayer();
     // player.setPlayerMode(PlayerMode.lowLatency);
 
+
     await player.stop();
+    //await player.setSourceBytes(waveUint8List);
     // await player.setSourceBytes(buf16.bytes.buffer.asUint8List());
-    // await player.setSourceBytes(buf16.bytes.buffer.asByteData().buffer.asUint8List());
     await player.resume();
   }
 }

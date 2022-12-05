@@ -168,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       backgroundColor: AppColors.secondary,
       body: Column(
         children: <Widget>[
-          AppButton(appText: const AppText(text: 'Play Note',), onPressed: (() => {})),
+          // AppButton(appText: const AppText(text: 'Play Note',), onPressed: (() => {})),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 20),
             child: Row(
