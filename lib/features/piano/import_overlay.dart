@@ -24,15 +24,6 @@ class ImportOverlay {
     _overlay.open();
   }
 
-  late final AppConfirmOverlay _deletePlaybackConfirmOverlay =
-      AppConfirmOverlay(
-    context: context,
-    vsync: vsync,
-    displayText: 'Delete playback "File1.mp3"?',
-    confirmButtonText: 'Delete',
-    onConfirm: () => {print('Deleted playback "File1.mp3"')},
-  );
-
   late final AppOverlay _overlay = AppOverlay(
     context: context,
     vsync: vsync,
@@ -96,7 +87,14 @@ class ImportOverlay {
                         AppIcon(
                           icon: HeroIcons.trash,
                           color: AppColors.dark,
-                          onPressed: () => _deletePlaybackConfirmOverlay.open(),
+                          onPressed: () => AppConfirmOverlay(
+                              vsync: vsync,
+                              context: context,
+                              displayText: 'Delete playback "File1.mp3"?',
+                              confirmButtonText: 'Delete',
+                              onConfirm: () => {
+                                    print('Deleted playback "File1.mp3"')
+                                  }).open(),
                         ),
                       ],
                     ),

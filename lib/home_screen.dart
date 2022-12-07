@@ -132,32 +132,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   double _appTitleSize = 45;
   final Duration _expandDuration = const Duration(milliseconds: 200);
 
-  late final AppConfirmOverlay _deletePlaybackConfirmOverlay =
-      AppConfirmOverlay(
-    context: context,
-    vsync: this,
-    displayText: 'Delete playback "File1.mp3"?',
-    confirmButtonText: 'Delete',
-    onConfirm: () => {print('Deleted playback "File1.mp3"')},
-  );
-
-  late final AppConfirmOverlay _deleteRecordingConfirmOverlay =
-      AppConfirmOverlay(
-    context: context,
-    vsync: this,
-    displayText: 'Delete recording "Recording #3"?',
-    confirmButtonText: 'Delete',
-    onConfirm: () => {print('Deleted recording #3')},
-  );
-
   bool _recordingTitleTextFieldVisible = false;
-
-  @override
-  void initState() {
-    _settingsOverlay.loadData();
-    setState(() {});
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -587,9 +562,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               AppIcon(
                                                 icon: HeroIcons.trash,
                                                 color: AppColors.dark,
-                                                onPressed: () =>
-                                                    _deletePlaybackConfirmOverlay
-                                                        .open(),
+                                                onPressed: () => AppConfirmOverlay(
+                                                    vsync: this,
+                                                    context: context,
+                                                    displayText:
+                                                        'Delete playback "File1.mp3"?',
+                                                    confirmButtonText: 'Delete',
+                                                    onConfirm: () => {
+                                                          print(
+                                                              'Deleted playback "File1.mp3"')
+                                                        }).open(),
                                               ),
                                             ],
                                           ),
@@ -625,9 +607,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           child: AppIcon(
                                             icon: HeroIcons.trash,
                                             color: AppColors.dark,
-                                            onPressed: () =>
-                                                _deleteRecordingConfirmOverlay
-                                                    .open(),
+                                            onPressed: () => AppConfirmOverlay(
+                                                vsync: this,
+                                                context: context,
+                                                displayText:
+                                                    'Delete recording "Recording #3"?',
+                                                confirmButtonText: 'Delete',
+                                                onConfirm: () => {
+                                                      print(
+                                                          'Deleted recording #3')
+                                                    }).open(),
                                           ),
                                         ),
                                       ],

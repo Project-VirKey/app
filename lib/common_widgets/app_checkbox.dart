@@ -27,10 +27,7 @@ class _AppCheckBoxState extends State<AppCheckbox> {
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
           onTap: () {
-            setState(() {
-              widget.value = !widget.value;
-              widget.onChanged(widget.value);
-            });
+            widget.onChanged(widget.value);
           },
           child: Stack(
             alignment: Alignment.center,

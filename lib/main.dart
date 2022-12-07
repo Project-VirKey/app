@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/settings/authentication.dart';
+import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/routing/router.dart';
 import 'package:virkey/utils/platform_helper.dart';
 import 'package:window_size/window_size.dart';
@@ -9,21 +11,27 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
+  // define minimal window size for desktop
   WidgetsFlutterBinding.ensureInitialized();
 
   if (PlatformHelper.isDesktop) {
     setWindowMinSize(const Size(830, 580));
   }
 
-  runApp(const App());
+  // run the app
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider(create: (_) => SettingsProvider())],
+    child: const App(),
+  ));
 
+  // cloud-synchronization
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
   AppAuthentication.checkAuthStatus();
 }
-//
+
 // Future<String> createFolder(String cow) async {
 //   final dir = Directory((Platform.isAndroid
 //       ? await getExternalStorageDirectory() //FOR ANDROID
