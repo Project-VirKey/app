@@ -38,6 +38,7 @@ class AppConfirmOverlay {
         color: blue ? AppColors.white : AppColors.secondary,
         size: 22,
         letterSpacing: 5,
+        textAlign: TextAlign.center,
       ),
       backgroundColor: blue ? null : AppColors.dark,
       onPressed: () => onPressed(),

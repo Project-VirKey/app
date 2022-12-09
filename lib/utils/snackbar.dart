@@ -73,6 +73,7 @@ class AppSnackBar {
                         color: AppColors.secondary,
                         size: 20,
                         letterSpacing: 5,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     AppIcon(
