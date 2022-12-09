@@ -45,7 +45,10 @@ class AppConfirmOverlay {
   }
 
   late final Widget _confirmButton =
-      _button(confirmButtonText, true, onConfirm);
+      _button(confirmButtonText, true, () {
+        onConfirm();
+        close();
+      });
   late final Widget _cancelButton = _button('Cancel', false, close);
 
   List<Widget> _buttons() {

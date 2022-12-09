@@ -28,4 +28,8 @@ class AppAuthentication {
       }
     }
   }
+
+  static void logout() {
+    FirebaseAuth.instance.signOut();
+  }
 }

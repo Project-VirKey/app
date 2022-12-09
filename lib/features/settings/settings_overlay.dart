@@ -8,7 +8,8 @@ import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
 import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
-import 'package:virkey/features/settings/login_overlay.dart';
+import 'package:virkey/features/cloud_synchronisation/authentication.dart';
+import 'package:virkey/features/cloud_synchronisation/login_overlay.dart';
 import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
@@ -16,6 +17,7 @@ import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 
 class SettingsOverlay {
   final BuildContext context;
@@ -87,9 +89,9 @@ class SettingsOverlay {
             child: Column(
               children: [
                 Consumer<SettingsProvider>(
-                  builder:
-                      (BuildContext context, SettingsProvider settingsProvider, Widget? child) =>
-                          Padding(
+                  builder: (BuildContext context,
+                          SettingsProvider settingsProvider, Widget? child) =>
+                      Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Padding(
                       padding: MediaQuery.of(context).orientation ==
@@ -229,196 +231,214 @@ class SettingsOverlay {
                           ),
                           const PropertiesDescriptionTitle(
                               title: 'Account Settings'),
-                          Visibility(
-                            visible: settingsProvider.settings.account.loggedIn,
-                            child: Column(
+                          Consumer(
+                            builder: (BuildContext context,
+                                    CloudProvider cloudProvider,
+                                    Widget? child) =>
+                                Column(
                               children: [
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                const AppText(
-                                  text: 'Logged in as',
-                                  weight: AppFonts.weightLight,
-                                ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                const AppText(
-                                  text: 'Richard Krikler',
-                                  weight: AppFonts.weightLight,
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                PropertyDescriptionActionCombination(
-                                  title: 'Log out',
-                                  child: AppIcon(
-                                    icon: HeroIcons.arrowRightOnRectangle,
-                                    color: AppColors.dark,
-                                    onPressed: () => AppConfirmOverlay(
-                                        vsync: vsync,
-                                        context: context,
-                                        displayText:
-                                            'Are you sure you want to log out?',
-                                        additionalText:
-                                            'Your files and settings will no longer be synchronised.',
-                                        confirmButtonText: 'Log out',
-                                        onConfirm: () =>
-                                            {print('Logged out')}).open(),
-                                  ),
-                                ),
-                                PropertyDescriptionActionCombination(
-                                    title: 'Last synced',
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: const [
-                                        AppText(
-                                          text: '16:45',
-                                          weight: AppFonts.weightLight,
-                                        ),
-                                        SizedBox(
-                                          height: 5,
-                                        ),
-                                        AppText(
-                                          text: '27.11.2022',
-                                          weight: AppFonts.weightLight,
-                                        ),
-                                      ],
-                                    )),
-                                PropertyDescriptionActionCombination(
-                                  title: 'Synchronise now',
-                                  child: AppIcon(
-                                    icon: HeroIcons.arrowPathRoundedSquare,
-                                    color: AppColors.dark,
-                                    onPressed: () => {print('Synchronise now')},
-                                  ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 9),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                Visibility(
+                                  visible: cloudProvider.cloud.loggedIn,
+                                  child: Column(
                                     children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: const [
-                                          AppText(
-                                            text: 'Firstname',
-                                            weight: AppFonts.weightLight,
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          AppText(
-                                            text: 'Richard',
-                                            weight: AppFonts.weightLight,
-                                          ),
-                                        ],
+                                      const SizedBox(
+                                        height: 10,
                                       ),
-                                      AppIcon(
-                                        icon: HeroIcons.pencilSquare,
-                                        color: AppColors.dark,
-                                        onPressed: () => {print('Firstname')},
+                                      const AppText(
+                                        text: 'Logged in as',
+                                        weight: AppFonts.weightLight,
+                                      ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      const AppText(
+                                        text: 'Richard Krikler',
+                                        weight: AppFonts.weightLight,
+                                      ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      PropertyDescriptionActionCombination(
+                                        title: 'Log out',
+                                        child: AppIcon(
+                                          icon: HeroIcons.arrowRightOnRectangle,
+                                          color: AppColors.dark,
+                                          onPressed: () => AppConfirmOverlay(
+                                              vsync: vsync,
+                                              context: context,
+                                              displayText:
+                                                  'Are you sure you want to log out?',
+                                              additionalText:
+                                                  'Your files and settings will no longer be synchronised.',
+                                              confirmButtonText: 'Log out',
+                                              onConfirm: () {
+                                                AppAuthentication.logout();
+                                              }).open(),
+                                        ),
+                                      ),
+                                      PropertyDescriptionActionCombination(
+                                          title: 'Last synced',
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: const [
+                                              AppText(
+                                                text: '16:45',
+                                                weight: AppFonts.weightLight,
+                                              ),
+                                              SizedBox(
+                                                height: 5,
+                                              ),
+                                              AppText(
+                                                text: '27.11.2022',
+                                                weight: AppFonts.weightLight,
+                                              ),
+                                            ],
+                                          )),
+                                      PropertyDescriptionActionCombination(
+                                        title: 'Synchronise now',
+                                        child: AppIcon(
+                                          icon:
+                                              HeroIcons.arrowPathRoundedSquare,
+                                          color: AppColors.dark,
+                                          onPressed: () =>
+                                              {print('Synchronise now')},
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 9),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: const [
+                                                AppText(
+                                                  text: 'Firstname',
+                                                  weight: AppFonts.weightLight,
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                AppText(
+                                                  text: 'Richard',
+                                                  weight: AppFonts.weightLight,
+                                                ),
+                                              ],
+                                            ),
+                                            AppIcon(
+                                              icon: HeroIcons.pencilSquare,
+                                              color: AppColors.dark,
+                                              onPressed: () =>
+                                                  {print('Firstname')},
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 9),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: const [
+                                                AppText(
+                                                  text: 'Lastname',
+                                                  weight: AppFonts.weightLight,
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                AppText(
+                                                  text: 'Krikler',
+                                                  weight: AppFonts.weightLight,
+                                                ),
+                                              ],
+                                            ),
+                                            AppIcon(
+                                              icon: HeroIcons.pencilSquare,
+                                              color: AppColors.dark,
+                                              onPressed: () =>
+                                                  {print('Lastname')},
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 9),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: const [
+                                                AppText(
+                                                  text: 'E-Mail',
+                                                  weight: AppFonts.weightLight,
+                                                ),
+                                                SizedBox(
+                                                  height: 5,
+                                                ),
+                                                AppText(
+                                                  text:
+                                                      'richard.krikler@virke..',
+                                                  weight: AppFonts.weightLight,
+                                                ),
+                                              ],
+                                            ),
+                                            AppIcon(
+                                              icon: HeroIcons.pencilSquare,
+                                              color: AppColors.dark,
+                                              onPressed: () =>
+                                                  {print('E-Mail')},
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      PropertyDescriptionActionCombination(
+                                        title: 'Delete Account',
+                                        child: AppIcon(
+                                          icon: HeroIcons.trash,
+                                          color: AppColors.dark,
+                                          onPressed: () => AppConfirmOverlay(
+                                              vsync: vsync,
+                                              context: context,
+                                              displayText:
+                                                  'Are you sure you want to delete your account?',
+                                              additionalText:
+                                                  'Your files, settings and account information will be deleted from the database but are still available locally.',
+                                              confirmButtonText:
+                                                  'Delete Account',
+                                              onConfirm: () => {
+                                                    print('Deleted Account')
+                                                  }).open(),
+                                        ),
                                       ),
                                     ],
                                   ),
                                 ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 9),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: const [
-                                          AppText(
-                                            text: 'Lastname',
-                                            weight: AppFonts.weightLight,
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          AppText(
-                                            text: 'Krikler',
-                                            weight: AppFonts.weightLight,
-                                          ),
-                                        ],
-                                      ),
-                                      AppIcon(
-                                        icon: HeroIcons.pencilSquare,
-                                        color: AppColors.dark,
-                                        onPressed: () => {print('Lastname')},
-                                      ),
-                                    ],
+                                if (!cloudProvider.cloud.loggedIn)
+                                  PropertyDescriptionActionCombination(
+                                    title: 'Login / Sign up',
+                                    child: AppIcon(
+                                      icon: HeroIcons.arrowLeftOnRectangle,
+                                      color: AppColors.dark,
+                                      onPressed: () => {_loginOverlay.open()},
+                                    ),
                                   ),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 9),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: const [
-                                          AppText(
-                                            text: 'E-Mail',
-                                            weight: AppFonts.weightLight,
-                                          ),
-                                          SizedBox(
-                                            height: 5,
-                                          ),
-                                          AppText(
-                                            text: 'richard.krikler@virke..',
-                                            weight: AppFonts.weightLight,
-                                          ),
-                                        ],
-                                      ),
-                                      AppIcon(
-                                        icon: HeroIcons.pencilSquare,
-                                        color: AppColors.dark,
-                                        onPressed: () => {print('E-Mail')},
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                PropertyDescriptionActionCombination(
-                                  title: 'Delete Account',
-                                  child: AppIcon(
-                                    icon: HeroIcons.trash,
-                                    color: AppColors.dark,
-                                    onPressed: () => AppConfirmOverlay(
-                                        vsync: vsync,
-                                        context: context,
-                                        displayText:
-                                            'Are you sure you want to delete your account?',
-                                        additionalText:
-                                            'Your files, settings and account information will be deleted from the database but are still available locally.',
-                                        confirmButtonText: 'Delete Account',
-                                        onConfirm: () =>
-                                            {print('Deleted Account')}).open(),
-                                  ),
-                                ),
                               ],
                             ),
                           ),
-                          if (!settingsProvider.settings.account.loggedIn)
-                            PropertyDescriptionActionCombination(
-                              title: 'Login / Sign up',
-                              child: AppIcon(
-                                icon: HeroIcons.arrowLeftOnRectangle,
-                                color: AppColors.dark,
-                                onPressed: () => {_loginOverlay.open()},
-                              ),
-                            ),
                           const SizedBox(
                             height: 25,
                           ),
