@@ -31,10 +31,9 @@ class AppText extends StatelessWidget {
     return Text(
       text,
       textAlign: textAlign,
-      // overflow ellipsis does not work
       // https://www.kindacode.com/article/text-overflow-in-flutter/#TextOverflowellipsis
-      // overflow: TextOverflow.ellipsis,
-      // softWrap: false,
+      // https://stackoverflow.com/a/58470417/17399214 -> for overflow inside of Row, put AppText inside of Expanded-Widget
+      overflow: TextOverflow.ellipsis,
       style: TextStyle(
         height: height,
         fontFamily: family,
