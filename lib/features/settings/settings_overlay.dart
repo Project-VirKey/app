@@ -88,7 +88,7 @@ class SettingsOverlay {
               children: [
                 Consumer<SettingsProvider>(
                   builder:
-                      (BuildContext context, settingsProvider, Widget? child) =>
+                      (BuildContext context, SettingsProvider settingsProvider, Widget? child) =>
                           Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 15),
                     child: Padding(

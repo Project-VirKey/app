@@ -15,6 +15,7 @@ class SettingsProvider extends ChangeNotifier {
   );
 
   SettingsProvider() {
+    // load the data from SharedPreferences when the Provider is placed
     loadData();
   }
 
