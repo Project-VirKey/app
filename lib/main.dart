@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
@@ -30,25 +34,31 @@ Future<void> main() async {
   );
 
   AppAuthentication.checkAuthStatus();
+
+  // create & retrieve application directory for user generated files
+  print(await createFolder());
 }
 
-// Future<String> createFolder(String cow) async {
-//   final dir = Directory((Platform.isAndroid
-//       ? await getExternalStorageDirectory() //FOR ANDROID
-//       : await getApplicationSupportDirectory() //FOR IOS
-//   )!
-//       .path + '/$cow');
-//   var status = await Permission.storage.status;
-//   if (!status.isGranted) {
-//     await Permission.storage.request();
-//   }
-//   if ((await dir.exists())) {
-//     return dir.path;
-//   } else {
-//     dir.create();
-//     return dir.path;
-//   }
-// }
+Future<String> createFolder() async {
+  var status = await Permission.storage.status;
+  if (!status.isGranted) {
+    await Permission.storage.request();
+  }
+
+  // final dir = Directory(
+  //     '${(Platform.isAndroid ? (await getExternalStorageDirectories(type: StorageDirectory.documents)) //FOR ANDROID
+  //             : await getApplicationSupportDirectory() //FOR IOS
+  //         )}/$cow');
+
+  final Directory dir = Directory('/storage/emulated/0/Documents/VirKey');
+
+  if ((await dir.exists())) {
+    return dir.path;
+  } else {
+    dir.create();
+    return dir.path;
+  }
+}
 
 class App extends StatelessWidget {
   const App({super.key});

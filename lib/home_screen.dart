@@ -611,11 +611,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 vsync: this,
                                                 context: context,
                                                 displayText:
-                                                    'Delete recording "Recording #3"?',
+                                                    'Delete recording "${recordingsList[index]}"?',
                                                 confirmButtonText: 'Delete',
                                                 onConfirm: () => {
                                                       print(
-                                                          'Deleted recording #3')
+                                                          'Deleted ${recordingsList[index]}')
                                                     }).open(),
                                           ),
                                         ),
