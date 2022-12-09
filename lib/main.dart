@@ -5,7 +5,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
-import 'package:virkey/features/cloud_synchronisation/authentication.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/routing/router.dart';
@@ -35,8 +34,6 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-  AppAuthentication.checkAuthStatus();
 
   // create & retrieve application directory for user generated files
   print(await createFolder());

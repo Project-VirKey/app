@@ -4,13 +4,13 @@ import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_text_form_field.dart';
-import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/cloud_synchronisation/authentication.dart';
 import 'package:virkey/features/cloud_synchronisation/signup_overlay.dart';
 import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/utils/snackbar.dart';
 
 class LoginOverlay {
   final BuildContext context;
@@ -101,8 +101,7 @@ class LoginOverlay {
                             child: Form(
                               key: _loginFormKey,
                               child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.stretch,
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Padding(
                                     padding: const EdgeInsets.all(10.0),
@@ -117,13 +116,13 @@ class LoginOverlay {
                                             if (value == null ||
                                                 value.isEmpty) {
                                               return 'Please enter your email address!';
-                                            } else if (!EmailValidator.validate(value)) {
+                                            } else if (!EmailValidator.validate(
+                                                value)) {
                                               return 'Incorrect email address!';
                                             }
                                             return null;
                                           },
-                                          textInputAction:
-                                              TextInputAction.next,
+                                          textInputAction: TextInputAction.next,
                                           nextFieldFocusNode:
                                               _loginPasswordFocusNode,
                                         ),
@@ -144,8 +143,7 @@ class LoginOverlay {
                                           },
                                           onSaved: (value) =>
                                               {_password = value ?? ''},
-                                          textInputAction:
-                                              TextInputAction.done,
+                                          textInputAction: TextInputAction.done,
                                         ),
                                       ],
                                     ),
@@ -160,7 +158,11 @@ class LoginOverlay {
                                       size: 22,
                                       letterSpacing: 5,
                                     ),
-                                    onPressed: () {
+                                    onPressed: () async {
+                                      // close the onscreen keyboard (on mobile) -> un-focus
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
+
                                       // call the validate function defined in the form fields
                                       // if the validation was successful -> returns true
                                       if (_loginFormKey.currentState!
@@ -168,9 +170,19 @@ class LoginOverlay {
                                         // call the onSave function defined in the form fields
                                         _loginFormKey.currentState!.save();
 
-                                        AppAuthentication.logIn(
-                                            _email, _password);
-                                        close();
+                                        List response =
+                                            await AppAuthentication.logIn(
+                                                _email, _password);
+
+                                        AppSnackBar(
+                                                message: response[1],
+                                                context: context,
+                                                vsync: vsync)
+                                            .open();
+
+                                        if (response[0]) {
+                                          close();
+                                        }
                                       }
                                     },
                                   ),

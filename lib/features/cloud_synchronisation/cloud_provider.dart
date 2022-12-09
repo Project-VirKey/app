@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
 class CloudProvider extends ChangeNotifier {
-  Cloud _cloud = Cloud(loggedIn: false);
+  final Cloud _cloud = Cloud(loggedIn: false);
 
   Cloud get cloud => _cloud;
 
