@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
-import 'package:virkey/features/settings/authentication.dart';
+import 'package:virkey/features/cloud_synchronisation/authentication.dart';
+import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/routing/router.dart';
 import 'package:virkey/utils/platform_helper.dart';
@@ -24,7 +24,10 @@ Future<void> main() async {
 
   // run the app
   runApp(MultiProvider(
-    providers: [ChangeNotifierProvider(create: (_) => SettingsProvider())],
+    providers: [
+      ChangeNotifierProvider(create: (_) => SettingsProvider()),
+      ChangeNotifierProvider(create: (_) => CloudProvider())
+    ],
     child: const App(),
   ));
 
