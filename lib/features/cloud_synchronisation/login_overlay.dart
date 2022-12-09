@@ -1,7 +1,9 @@
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
+import 'package:virkey/common_widgets/app_text_form_field.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/cloud_synchronisation/authentication.dart';
 import 'package:virkey/features/cloud_synchronisation/signup_overlay.dart';
@@ -114,7 +116,9 @@ class LoginOverlay {
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
-                                              return 'Please enter some text';
+                                              return 'Please enter your email address!';
+                                            } else if (!EmailValidator.validate(value)) {
+                                              return 'Incorrect email address!';
                                             }
                                             return null;
                                           },
@@ -134,7 +138,7 @@ class LoginOverlay {
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
-                                              return 'Please enter some text';
+                                              return 'Please enter your Password!';
                                             }
                                             return null;
                                           },
@@ -215,67 +219,4 @@ class LoginOverlay {
       ),
     ],
   );
-}
-
-class AppTextFormField extends StatelessWidget {
-  const AppTextFormField({
-    Key? key,
-    required this.labelText,
-    this.onFieldSubmitted,
-    required this.onSaved,
-    required this.validator,
-    required this.textInputAction,
-    required this.focusNode,
-    this.nextFieldFocusNode,
-  }) : super(key: key);
-
-  final String labelText;
-  final dynamic onFieldSubmitted;
-  final Function(String?) onSaved;
-  final Function(String?) validator;
-  final TextInputAction textInputAction;
-  final FocusNode focusNode;
-  final FocusNode? nextFieldFocusNode;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => {
-        FocusScope.of(context).requestFocus(focusNode),
-      },
-      child: TextFormField(
-        focusNode: focusNode,
-        validator: (value) {
-          return validator(value);
-        },
-        onSaved: (value) {
-          onSaved(value);
-        },
-        onFieldSubmitted: (value) {
-          // if true -> there is a following field
-          if (textInputAction == TextInputAction.next) {
-            // set the focus to the following field through the passed focus node
-            FocusScope.of(context).requestFocus(nextFieldFocusNode);
-          }
-        },
-        textInputAction: textInputAction,
-        maxLines: 1,
-        minLines: 1,
-        style: const TextStyle(
-            letterSpacing: 3, fontSize: 16, fontWeight: AppFonts.weightLight),
-        decoration: InputDecoration(
-          isDense: true,
-          labelText: labelText,
-          enabledBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(AppRadius.radius),
-            borderSide: BorderSide(color: AppColors.dark),
-          ),
-          focusedBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(AppRadius.radius),
-            borderSide: BorderSide(color: AppColors.dark),
-          ),
-        ),
-      ),
-    );
-  }
 }
