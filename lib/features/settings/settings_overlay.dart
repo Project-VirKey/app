@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
@@ -18,6 +19,7 @@ import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
+import 'dart:io';
 
 class SettingsOverlay {
   final BuildContext context;
@@ -191,7 +193,21 @@ class SettingsOverlay {
                             child: AppIcon(
                               icon: HeroIcons.arrowDownTray,
                               color: AppColors.dark,
-                              onPressed: () => {},
+                              onPressed: () async {
+                                FilePickerResult? result =
+                                    await FilePicker.platform.pickFiles(
+                                      // specifying allowedExtensions not possible -> 'sf2' not allowed
+                                        dialogTitle:
+                                            'Select Sound-Library (SF2)');
+
+                                if (result != null &&
+                                    result.files.single.path != null) {
+                                  File file =
+                                      File(result.files.single.path as String);
+                                } else {
+                                  // User canceled the picker
+                                }
+                              },
                             ),
                           ),
                           Column(
