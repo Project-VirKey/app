@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class CloudProvider extends ChangeNotifier {
   final Cloud _cloud = Cloud(loggedIn: false);
@@ -28,5 +28,5 @@ class CloudProvider extends ChangeNotifier {
 class Cloud {
   Cloud({required this.loggedIn});
 
-  bool loggedIn = false;
+  bool loggedIn;
 }
