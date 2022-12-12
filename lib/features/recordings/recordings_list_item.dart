@@ -12,6 +12,7 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/shadows.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
+import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
 class RecordingsListItem extends StatelessWidget {
@@ -193,11 +194,14 @@ class RecordingsListItem extends StatelessWidget {
                         ),
                         const PropertiesDescriptionTitle(
                             title: 'Audio-Playback'),
-                        const PropertyDescriptionActionCombination(
+                        PropertyDescriptionActionCombination(
                           title: 'Audio',
                           child: AppIcon(
                             icon: HeroIcons.arrowDownTray,
                             color: AppColors.dark,
+                            onPressed: () async {
+                              AppFileSystem.filePicker(title: 'Select Audio Playback (MP3)');
+                            },
                           ),
                         ),
                         PropertyDescriptionActionCombination(
