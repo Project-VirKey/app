@@ -9,6 +9,7 @@ import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/utils/platform_helper.dart';
 import 'package:virkey/utils/snackbar.dart';
 
 class UpdateEmailOverlay {
@@ -38,6 +39,7 @@ class UpdateEmailOverlay {
   late final AppOverlay _overlay = AppOverlay(
     context: context,
     vsync: vsync,
+    fillDesktopScreen: false,
     children: [
       Padding(
         padding: const EdgeInsets.all(11),
@@ -79,11 +81,10 @@ class UpdateEmailOverlay {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Padding(
-                padding:
-                    MediaQuery.of(context).orientation == Orientation.landscape
-                        ? EdgeInsets.symmetric(
-                            horizontal: MediaQuery.of(context).size.width * .16)
-                        : EdgeInsets.zero,
+                padding: EdgeInsets.symmetric(
+                    horizontal: PlatformHelper.isDesktop
+                        ? (MediaQuery.of(context).size.width * 0.05)
+                        : 0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -136,9 +137,6 @@ class UpdateEmailOverlay {
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(
-                              height: 30,
                             ),
                           ],
                         ),
