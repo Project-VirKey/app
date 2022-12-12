@@ -8,6 +8,7 @@ class CloudProvider extends ChangeNotifier {
 
   CloudProvider() {
     checkAuthStatus();
+    reload();
   }
 
   void checkAuthStatus() {
@@ -19,9 +20,15 @@ class CloudProvider extends ChangeNotifier {
         print(user);
         print('User is signed in!');
         _cloud.loggedIn = true;
+        _cloud.user = user;
       }
       notifyListeners();
     });
+  }
+
+  void reload() async {
+    FirebaseAuth.instance.currentUser?.reload();
+    notifyListeners();
   }
 }
 
@@ -29,4 +36,5 @@ class Cloud {
   Cloud({required this.loggedIn});
 
   bool loggedIn;
+  User? user;
 }

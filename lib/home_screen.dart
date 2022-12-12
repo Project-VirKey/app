@@ -9,6 +9,7 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/constants/shadows.dart';
+import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/features/recordings/recordings_list.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/recordings/recordings_title_bar.dart';
@@ -26,6 +27,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // https://medium.flutterdevs.com/implemented-overlay-in-flutter-fe60d2b33a04
   late final SettingsOverlay _settingsOverlay =
       SettingsOverlay(context: context, vsync: this);
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

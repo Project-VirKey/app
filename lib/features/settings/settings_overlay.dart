@@ -9,7 +9,11 @@ import 'package:virkey/common_widgets/app_property_description_action_combinatio
 import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/features/cloud_synchronisation/authentication.dart';
+import 'package:virkey/features/cloud_synchronisation/delete_account_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/login_overlay.dart';
+import 'package:virkey/features/cloud_synchronisation/update_email_overlay.dart';
+import 'package:virkey/features/cloud_synchronisation/update_password_overlay.dart';
+import 'package:virkey/features/cloud_synchronisation/update_username_overlay.dart';
 import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
@@ -19,6 +23,7 @@ import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
+import 'package:virkey/utils/snackbar.dart';
 
 class SettingsOverlay {
   final BuildContext context;
@@ -194,7 +199,8 @@ class SettingsOverlay {
                               color: AppColors.dark,
                               onPressed: () async {
                                 // specifying allowedExtensions not possible -> 'sf2' not allowed as allowed extension
-                                AppFileSystem.filePicker(title: 'Select Sound-Library (SF2)');
+                                AppFileSystem.filePicker(
+                                    title: 'Select Sound-Library (SF2)');
                               },
                             ),
                           ),
@@ -255,13 +261,62 @@ class SettingsOverlay {
                                       const SizedBox(
                                         height: 10,
                                       ),
-                                      const AppText(
-                                        text: 'Richard Krikler',
+                                      AppText(
+                                        text: AppAuthentication.user()
+                                                ?.displayName ??
+                                            'User',
                                         weight: AppFonts.weightLight,
                                       ),
                                       const SizedBox(
                                         height: 5,
                                       ),
+                                      if (!(cloudProvider
+                                              .cloud.user?.emailVerified ??
+                                          false))
+                                        Column(
+                                          children: [
+                                            PropertyDescriptionActionCombination(
+                                              title: 'Not verified',
+                                              child: AppIcon(
+                                                icon:
+                                                    HeroIcons.exclamationCircle,
+                                                color: AppColors.dark,
+                                                onPressed: () =>
+                                                    AppConfirmOverlay(
+                                                        vsync: vsync,
+                                                        context: context,
+                                                        displayText:
+                                                            'Resend verification E-Mail?',
+                                                        additionalText:
+                                                            'The verification E-Mail will be sent to your registered address.',
+                                                        confirmButtonText:
+                                                            'Send',
+                                                        onConfirm: () async {
+                                                          List response =
+                                                              await AppAuthentication
+                                                                  .sendVerificationEmail();
+
+                                                          AppSnackBar(
+                                                                  message:
+                                                                      response[
+                                                                          1],
+                                                                  context:
+                                                                      context,
+                                                                  vsync: vsync)
+                                                              .open();
+
+                                                          if (response[0]) {
+                                                            cloudProvider
+                                                                .reload();
+                                                          }
+                                                        }).open(),
+                                              ),
+                                            ),
+                                            const SizedBox(
+                                              height: 5,
+                                            ),
+                                          ],
+                                        ),
                                       PropertyDescriptionActionCombination(
                                         title: 'Log out',
                                         child: AppIcon(
@@ -319,16 +374,18 @@ class SettingsOverlay {
                                             Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
-                                              children: const [
-                                                AppText(
-                                                  text: 'Firstname',
+                                              children: [
+                                                const AppText(
+                                                  text: 'Username',
                                                   weight: AppFonts.weightLight,
                                                 ),
-                                                SizedBox(
+                                                const SizedBox(
                                                   height: 5,
                                                 ),
                                                 AppText(
-                                                  text: 'Richard',
+                                                  text: AppAuthentication.user()
+                                                          ?.displayName ??
+                                                      'User',
                                                   weight: AppFonts.weightLight,
                                                 ),
                                               ],
@@ -336,8 +393,12 @@ class SettingsOverlay {
                                             AppIcon(
                                               icon: HeroIcons.pencilSquare,
                                               color: AppColors.dark,
-                                              onPressed: () =>
-                                                  {print('Firstname')},
+                                              onPressed: () {
+                                                UpdateUsernameOverlay(
+                                                        context: context,
+                                                        vsync: vsync)
+                                                    .open();
+                                              },
                                             ),
                                           ],
                                         ),
@@ -352,50 +413,20 @@ class SettingsOverlay {
                                             Column(
                                               crossAxisAlignment:
                                                   CrossAxisAlignment.start,
-                                              children: const [
-                                                AppText(
-                                                  text: 'Lastname',
-                                                  weight: AppFonts.weightLight,
-                                                ),
-                                                SizedBox(
-                                                  height: 5,
-                                                ),
-                                                AppText(
-                                                  text: 'Krikler',
-                                                  weight: AppFonts.weightLight,
-                                                ),
-                                              ],
-                                            ),
-                                            AppIcon(
-                                              icon: HeroIcons.pencilSquare,
-                                              color: AppColors.dark,
-                                              onPressed: () =>
-                                                  {print('Lastname')},
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 9),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: const [
-                                                AppText(
+                                              children: [
+                                                const AppText(
                                                   text: 'E-Mail',
                                                   weight: AppFonts.weightLight,
                                                 ),
-                                                SizedBox(
+                                                const SizedBox(
                                                   height: 5,
                                                 ),
                                                 AppText(
-                                                  text:
-                                                      'richard.krikler@virke..',
+                                                  text: AppAuthentication.user()
+                                                          ?.email ??
+                                                      'user@example.com',
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   weight: AppFonts.weightLight,
                                                 ),
                                               ],
@@ -403,10 +434,27 @@ class SettingsOverlay {
                                             AppIcon(
                                               icon: HeroIcons.pencilSquare,
                                               color: AppColors.dark,
-                                              onPressed: () =>
-                                                  {print('E-Mail')},
+                                              onPressed: () {
+                                                UpdateEmailOverlay(
+                                                        context: context,
+                                                        vsync: vsync)
+                                                    .open();
+                                              },
                                             ),
                                           ],
+                                        ),
+                                      ),
+                                      PropertyDescriptionActionCombination(
+                                        title: 'Password',
+                                        child: AppIcon(
+                                          icon: HeroIcons.pencilSquare,
+                                          color: AppColors.dark,
+                                          onPressed: () {
+                                            UpdatePasswordOverlay(
+                                                    context: context,
+                                                    vsync: vsync)
+                                                .open();
+                                          },
                                         ),
                                       ),
                                       PropertyDescriptionActionCombination(
@@ -423,9 +471,12 @@ class SettingsOverlay {
                                                   'Your files, settings and account information will be deleted from the database but are still available locally.',
                                               confirmButtonText:
                                                   'Delete Account',
-                                              onConfirm: () => {
-                                                    print('Deleted Account')
-                                                  }).open(),
+                                              onConfirm: () async {
+                                                DeleteAccountOverlay(
+                                                        context: context,
+                                                        vsync: vsync)
+                                                    .open();
+                                              }).open(),
                                         ),
                                       ),
                                     ],

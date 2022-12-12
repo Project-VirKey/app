@@ -6,6 +6,7 @@ import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_text_form_field.dart';
 import 'package:virkey/features/cloud_synchronisation/authentication.dart';
 import 'package:virkey/features/cloud_synchronisation/signup_overlay.dart';
+import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
@@ -110,6 +111,8 @@ class LoginOverlay {
                                         AppTextFormField(
                                           focusNode: _loginEmailFocusNode,
                                           labelText: 'E-Mail',
+                                          onChanged: (value) =>
+                                              {_email = value ?? ''},
                                           onSaved: (value) =>
                                               {_email = value ?? ''},
                                           validator: (value) {
@@ -194,7 +197,23 @@ class LoginOverlay {
                             height: 10,
                           ),
                           GestureDetector(
-                            onTap: () => {},
+                            onTap: () {
+                              AppConfirmOverlay(
+                                  vsync: vsync,
+                                  context: context,
+                                  displayText: 'Send password reset E-Mail?',
+                                  confirmButtonText: 'Send',
+                                  onConfirm: () async {
+                                    List response = await AppAuthentication
+                                        .sendResetPasswordEmail(_email);
+
+                                    AppSnackBar(
+                                            message: response[1],
+                                            context: context,
+                                            vsync: vsync)
+                                        .open();
+                                  }).open();
+                            },
                             child: const AppText(
                               textAlign: TextAlign.center,
                               text: 'Forgot Password?',

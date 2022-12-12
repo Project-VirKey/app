@@ -12,6 +12,7 @@ class AppTextFormField extends StatelessWidget {
     required this.validator,
     required this.textInputAction,
     required this.focusNode,
+    this.onChanged,
     this.nextFieldFocusNode,
   }) : super(key: key);
 
@@ -21,6 +22,7 @@ class AppTextFormField extends StatelessWidget {
   final Function(String?) validator;
   final TextInputAction textInputAction;
   final FocusNode focusNode;
+  final Function(String?)? onChanged;
   final FocusNode? nextFieldFocusNode;
 
   @override
@@ -31,6 +33,7 @@ class AppTextFormField extends StatelessWidget {
       },
       child: TextFormField(
         focusNode: focusNode,
+        onChanged: onChanged,
         validator: (value) {
           return validator(value);
         },
