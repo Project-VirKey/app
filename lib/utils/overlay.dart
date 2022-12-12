@@ -62,7 +62,7 @@ class AppOverlay {
               ).animate(_animationController),
               child: Container(
                 height:
-                    !fillDesktopScreen && PlatformHelper.isDesktop ? 300 : null,
+                    !fillDesktopScreen && PlatformHelper.isDesktop ? 320 : null,
                 width:
                     !fillDesktopScreen && PlatformHelper.isDesktop ? 650 : null,
                 margin: const EdgeInsets.all(11),
