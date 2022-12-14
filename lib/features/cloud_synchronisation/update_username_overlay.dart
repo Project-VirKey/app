@@ -1,12 +1,9 @@
-import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:provider/provider.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_text_form_field.dart';
 import 'package:virkey/features/cloud_synchronisation/authentication.dart';
-import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';

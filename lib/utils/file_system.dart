@@ -34,8 +34,7 @@ class AppFileSystem {
       // https://stackoverflow.com/a/74457977/17399214, 11.12.2022
       return (await getApplicationDocumentsDirectory()).path;
     } else if (Platform.isWindows) {
-      // TODO: check correct path
-      return '/storage/emulated/0/Documents/$folderName';
+      return '${(await getApplicationDocumentsDirectory()).path}$platformDirectorySlash$folderName';
     } else if (Platform.isMacOS) {
       // TODO: check correct path
       return (await getApplicationDocumentsDirectory()).path;
@@ -47,14 +46,20 @@ class AppFileSystem {
   static String? basePath;
   static String recordingsFolder = 'Recordings';
   static String soundLibrariesFolder = 'Sound-Libraries';
+  static String platformDirectorySlash = Platform.isWindows ? '\\' : '/';
 
   static Future<void> initFolders() async {
     basePath = await getBasePath();
+
+    if (basePath != null && Platform.isWindows) {
+      await createFolder('');
+    }
 
     await createFolder(recordingsFolder);
     await createFolder(soundLibrariesFolder);
 
     // print(await createFile('recordings.txt', recordingsFolder, 'Test Content'));
+    // print(await listFilesInFolder(recordingsFolder));
   }
 
   // check permission for accessing device storage
@@ -77,7 +82,7 @@ class AppFileSystem {
       return null;
     }
 
-    Directory? dir = Directory('$basePath/$folderName');
+    Directory? dir = Directory('$basePath$platformDirectorySlash$folderName');
 
     if ((await dir.exists())) {
       return dir.path;
@@ -93,7 +98,8 @@ class AppFileSystem {
       return null;
     }
 
-    File? file = File('$basePath/$path/$fileName');
+    File? file = File(
+        '$basePath$platformDirectorySlash$path$platformDirectorySlash$fileName');
 
     if ((await file.exists())) {
       return file.path;
@@ -104,5 +110,15 @@ class AppFileSystem {
       }
       return file.path;
     }
+  }
+
+  static Future<List<FileSystemEntity>?> listFilesInFolder(
+      String folderName) async {
+    if (!(checkBasePath() && await checkPermission())) {
+      return null;
+    }
+
+    Directory? dir = Directory('$basePath$platformDirectorySlash$folderName');
+    return dir.listSync();
   }
 }
