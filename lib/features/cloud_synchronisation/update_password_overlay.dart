@@ -29,7 +29,7 @@ class UpdatePasswordOverlay {
     _overlay.open();
   }
 
-  final GlobalKey<FormState> _updateEmailFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _updatePasswordFormKey = GlobalKey<FormState>();
   final FocusNode _updatePasswordFocusNode = FocusNode();
   final FocusNode _updateNewPasswordFocusNode = FocusNode();
 
@@ -91,7 +91,7 @@ class UpdatePasswordOverlay {
                     Material(
                       color: Colors.transparent,
                       child: Form(
-                        key: _updateEmailFormKey,
+                        key: _updatePasswordFormKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
@@ -127,6 +127,8 @@ class UpdatePasswordOverlay {
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your new Password!';
+                                      } else if (value.length < 6) {
+                                        return 'Please enter at least 6 characters!';
                                       }
                                       return null;
                                     },
@@ -163,8 +165,8 @@ class UpdatePasswordOverlay {
                 onPressed: () async {
                   FocusManager.instance.primaryFocus?.unfocus();
 
-                  if (_updateEmailFormKey.currentState!.validate()) {
-                    _updateEmailFormKey.currentState!.save();
+                  if (_updatePasswordFormKey.currentState!.validate()) {
+                    _updatePasswordFormKey.currentState!.save();
 
                     List response = await AppAuthentication.updatePassword(
                         _password, _newPassword);

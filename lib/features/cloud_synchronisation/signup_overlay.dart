@@ -118,6 +118,8 @@ class SignupOverlay {
                                             if (value == null ||
                                                 value.isEmpty) {
                                               return 'Please enter a Username!';
+                                            } else if (value.length < 2) {
+                                              return 'Please enter at least 2 characters!';
                                             }
                                             return null;
                                           },
@@ -159,6 +161,8 @@ class SignupOverlay {
                                             if (value == null ||
                                                 value.isEmpty) {
                                               return 'Please enter a Password!';
+                                            } else if (value.length < 6) {
+                                              return 'Please enter at least 6 characters!';
                                             }
                                             return null;
                                           },
