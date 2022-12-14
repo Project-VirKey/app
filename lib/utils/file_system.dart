@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:virkey/utils/platform_helper.dart';
 
 class AppFileSystem {
   static Future<File?> filePicker(
@@ -28,16 +29,27 @@ class AppFileSystem {
   static Future<String?> getBasePath() async {
     const folderName = 'VirKey';
     if (Platform.isAndroid) {
-      // TODO: check correct path
+      // folder: [Phone]/Documents/VirKey/
       return '/storage/emulated/0/Documents/$folderName';
     } else if (Platform.isIOS) {
+      // folder: [Application]/Data/Application/[...]/Documents/VirKey
+
+      // add key/value in Info.plist to view application folder in files app on iOS
+      // key: UISupportsDocumentBrowser | value: true
+      // ./ios/Runner/Info.plist
       // https://stackoverflow.com/a/74457977/17399214, 11.12.2022
       return (await getApplicationDocumentsDirectory()).path;
     } else if (Platform.isWindows) {
-      return '${(await getApplicationDocumentsDirectory()).path}$platformDirectorySlash$folderName';
+      // folder: Documents\VirKey\
+      return '${(await getApplicationDocumentsDirectory()).path}${Platform.pathSeparator}$folderName';
     } else if (Platform.isMacOS) {
-      // TODO: check correct path
-      return (await getApplicationDocumentsDirectory()).path;
+      // folder: /Applications/VirKey/
+
+      // remove standard app-sandbox security option to create folders/files outside of application folder
+      // ./macos/Runner/: DebugProfile.entitlements & Release.entitlements
+      // https://stackoverflow.com/a/70557520/17399214, 14.12.2022
+      // https://developer.apple.com/documentation/security/app_sandbox, 14.12.2022
+      return '/Applications/$folderName';
     } else {
       return null;
     }
@@ -46,12 +58,11 @@ class AppFileSystem {
   static String? basePath;
   static String recordingsFolder = 'Recordings';
   static String soundLibrariesFolder = 'Sound-Libraries';
-  static String platformDirectorySlash = Platform.isWindows ? '\\' : '/';
 
   static Future<void> initFolders() async {
     basePath = await getBasePath();
 
-    if (basePath != null && Platform.isWindows) {
+    if (basePath != null && (PlatformHelper.isDesktop || Platform.isAndroid)) {
       await createFolder('');
     }
 
@@ -64,6 +75,12 @@ class AppFileSystem {
 
   // check permission for accessing device storage
   static Future<bool> checkPermission() async {
+    if (PlatformHelper.isDesktop) {
+      return true;
+    }
+
+    // check Permission for storage (iOS) or for manageExternalStorage (android)
+    // var status = Platform.isIOS ? await Permission.storage.status : await Permission.manageExternalStorage.status;
     var status = await Permission.storage.status;
     if (status.isGranted) {
       return true;
@@ -82,7 +99,7 @@ class AppFileSystem {
       return null;
     }
 
-    Directory? dir = Directory('$basePath$platformDirectorySlash$folderName');
+    Directory? dir = Directory('$basePath${Platform.pathSeparator}$folderName');
 
     if ((await dir.exists())) {
       return dir.path;
@@ -99,7 +116,7 @@ class AppFileSystem {
     }
 
     File? file = File(
-        '$basePath$platformDirectorySlash$path$platformDirectorySlash$fileName');
+        '$basePath${Platform.pathSeparator}$path${Platform.pathSeparator}$fileName');
 
     if ((await file.exists())) {
       return file.path;
@@ -118,7 +135,7 @@ class AppFileSystem {
       return null;
     }
 
-    Directory? dir = Directory('$basePath$platformDirectorySlash$folderName');
+    Directory? dir = Directory('$basePath${Platform.pathSeparator}$folderName');
     return dir.listSync();
   }
 }
