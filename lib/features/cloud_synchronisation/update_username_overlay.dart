@@ -109,6 +109,8 @@ class UpdateUsernameOverlay {
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter a username!';
+                                      } else if (value.length < 2) {
+                                        return 'Please enter at least 2 characters!';
                                       }
                                       return null;
                                     },
