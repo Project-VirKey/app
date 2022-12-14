@@ -25,7 +25,7 @@ class AppFileSystem {
     }
   }
 
-  static Future<String?> basePath() async {
+  static Future<String?> getBasePath() async {
     const folderName = 'VirKey';
     if (Platform.isAndroid) {
       // TODO: check correct path
@@ -44,25 +44,65 @@ class AppFileSystem {
     }
   }
 
-  static Future<String?> createFolder() async {
+  static String? basePath;
+  static String recordingsFolder = 'Recordings';
+  static String soundLibrariesFolder = 'Sound-Libraries';
+
+  static Future<void> initFolders() async {
+    basePath = await getBasePath();
+
+    await createFolder(recordingsFolder);
+    await createFolder(soundLibrariesFolder);
+
+    // print(await createFile('recordings.txt', recordingsFolder, 'Test Content'));
+  }
+
+  // check permission for accessing device storage
+  static Future<bool> checkPermission() async {
     var status = await Permission.storage.status;
-    if (!status.isGranted) {
-      await Permission.storage.request();
+    if (status.isGranted) {
+      return true;
+    } else {
+      return (await Permission.storage.request()).isGranted;
     }
+  }
 
-    String? path = await basePath();
+  // check if base path is set (/exists)
+  static bool checkBasePath() {
+    return basePath != null;
+  }
 
-    if (path == null) {
+  static Future<String?> createFolder(String folderName) async {
+    if (!(checkBasePath() && await checkPermission())) {
       return null;
     }
 
-    Directory? dir = Directory(path);
+    Directory? dir = Directory('$basePath/$folderName');
 
     if ((await dir.exists())) {
       return dir.path;
     } else {
       dir.create();
       return dir.path;
+    }
+  }
+
+  static Future<String?> createFile(String fileName, String path,
+      [String? content]) async {
+    if (!(checkBasePath() && await checkPermission())) {
+      return null;
+    }
+
+    File? file = File('$basePath/$path/$fileName');
+
+    if ((await file.exists())) {
+      return file.path;
+    } else {
+      file.create();
+      if (content != null) {
+        file.writeAsString(content);
+      }
+      return file.path;
     }
   }
 }

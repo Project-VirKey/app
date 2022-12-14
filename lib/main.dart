@@ -35,8 +35,8 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // create & retrieve application directory for user generated files
-  print(await AppFileSystem.createFolder());
+  // initialize folders for user content (recordings, ...)
+  AppFileSystem.initFolders();
 }
 
 class App extends StatelessWidget {
