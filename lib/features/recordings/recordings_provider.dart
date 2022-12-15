@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:virkey/constants/colors.dart';
 
@@ -119,4 +121,6 @@ class Recording {
   Recording({required this.title});
 
   String title;
+  File? playback;
+  String? playbackTitle;
 }

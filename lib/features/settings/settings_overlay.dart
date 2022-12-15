@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
@@ -199,8 +201,14 @@ class SettingsOverlay {
                               color: AppColors.dark,
                               onPressed: () async {
                                 // specifying allowedExtensions not possible -> 'sf2' not allowed as allowed extension
-                                AppFileSystem.filePicker(
-                                    title: 'Select Sound-Library (SF2)');
+                                File? soundFontFile =
+                                    await AppFileSystem.filePicker(
+                                        title: 'Select Sound-Library (SF2)');
+
+                                if (soundFontFile != null) {
+                                  AppFileSystem.copyFileToFolder(soundFontFile,
+                                      AppFileSystem.soundLibrariesFolder);
+                                }
                               },
                             ),
                           ),
@@ -421,13 +429,23 @@ class SettingsOverlay {
                                                 const SizedBox(
                                                   height: 5,
                                                 ),
-                                                AppText(
-                                                  text: AppAuthentication.user()
-                                                          ?.email ??
-                                                      'user@example.com',
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  weight: AppFonts.weightLight,
+                                                ConstrainedBox(
+                                                  constraints: BoxConstraints(
+                                                      maxWidth:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .width *
+                                                              .7),
+                                                  child: AppText(
+                                                    text:
+                                                        AppAuthentication.user()
+                                                                ?.email ??
+                                                            'user@example.com',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    weight:
+                                                        AppFonts.weightLight,
+                                                  ),
                                                 ),
                                               ],
                                             ),
