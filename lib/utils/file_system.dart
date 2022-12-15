@@ -69,6 +69,11 @@ class AppFileSystem {
     await createFolder(recordingsFolder);
     await createFolder(soundLibrariesFolder);
 
+    List<FileSystemEntity>? folderSoundLibraries =
+        (await AppFileSystem.listFilesInFolder(
+            AppFileSystem.soundLibrariesFolder));
+    print(folderSoundLibraries);
+
     // print(await createFile('recordings.txt', recordingsFolder, 'Test Content'));
     // print(await listFilesInFolder(recordingsFolder));
   }
@@ -137,5 +142,49 @@ class AppFileSystem {
 
     Directory? dir = Directory('$basePath${Platform.pathSeparator}$folderName');
     return dir.listSync();
+  }
+
+  static void copyFileToFolder(File file, String folderName,
+      [String? newFilename]) async {
+    // if newFilename is set -> use it with the file extension from the original file
+    // else use the original filename
+    await file.copy(
+        '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}${newFilename == null ? getFilenameFromPath(file.path) : '$newFilename.${getFileExtensionFromPath(file.path)}'}');
+  }
+
+  static String getFilenameFromPath(String path) {
+    return path.split(Platform.pathSeparator).last;
+  }
+
+  static String? getFilenameWithoutExtension(String? path) {
+    return path?.split(Platform.pathSeparator).last.split('.').first;
+  }
+
+  static String getFileExtensionFromPath(String path) {
+    return path.split('.').last;
+  }
+
+  static Future<File?> getPlaybackFromRecording(String recordingTitle) async {
+    List<FileSystemEntity>? folderSoundLibraries =
+        (await AppFileSystem.listFilesInFolder(AppFileSystem.recordingsFolder));
+
+    File? playback;
+
+    folderSoundLibraries?.forEach((element) {
+      String? filename = getFilenameWithoutExtension(element.path);
+      if (filename == null) {
+        return;
+      }
+
+      List<String> filenameSeparated = filename.split('_');
+      if (filenameSeparated.length >= 2) {
+        if (filenameSeparated[0] == recordingTitle &&
+            filenameSeparated.last == 'Playback') {
+          playback = File(element.path);
+        }
+      }
+    });
+
+    return playback;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
@@ -43,11 +45,27 @@ class RecordingsListItem extends StatelessWidget {
                     horizontal: 30,
                   ),
                   child: TextButton(
-                    onPressed: () => {
-                      if (recordingsProvider.expandedItem)
-                        {recordingsProvider.contractRecordingItem()}
-                      else
-                        {recordingsProvider.expandRecordingItem(index)}
+                    onPressed: () async {
+                      if (recordingsProvider.expandedItem) {
+                        recordingsProvider.contractRecordingItem();
+                      } else {
+                        // load playback for recording
+                        recordingsProvider.recordings[index].playback =
+                            await AppFileSystem.getPlaybackFromRecording(
+                                recordingsProvider.recordings[index].title);
+
+                        // get title of playback and save
+                        recordingsProvider.recordings[index].playbackTitle =
+                            (AppFileSystem.getFilenameWithoutExtension(
+                                        recordingsProvider
+                                            .recordings[index].playback?.path)
+                                    ?.split('_')
+                                  ?..removeAt(0)
+                                  ..removeLast())
+                                ?.join('_');
+
+                        recordingsProvider.expandRecordingItem(index);
+                      }
                     },
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.transparent,
@@ -133,9 +151,11 @@ class RecordingsListItem extends StatelessWidget {
                         ),
                         PropertyDescriptionActionCombination(
                           title: '',
+                          type: PropertyDescriptionActionCombinationType
+                              .onlyChild,
                           child: Expanded(
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
                                   child: TextFormField(
@@ -200,36 +220,55 @@ class RecordingsListItem extends StatelessWidget {
                             icon: HeroIcons.arrowDownTray,
                             color: AppColors.dark,
                             onPressed: () async {
-                              AppFileSystem.filePicker(title: 'Select Audio Playback (MP3)');
+                              // open file picker
+                              File? playbackFile =
+                                  await AppFileSystem.filePicker(
+                                      title: 'Select Audio Playback (MP3/WAV)',
+                                      allowedExtensions: ['mp3', 'wav']);
+
+                              // if file has been selected -> store in recordings folder
+                              if (playbackFile != null) {
+                                AppFileSystem.copyFileToFolder(
+                                    playbackFile,
+                                    AppFileSystem.recordingsFolder,
+                                    '${recordingsProvider.recordings[index].title}_${AppFileSystem.getFilenameWithoutExtension(playbackFile.path)}_Playback');
+                              }
                             },
                           ),
                         ),
-                        PropertyDescriptionActionCombination(
-                          title: 'File1.mp3',
-                          child: Row(
-                            children: [
-                              AppSwitch(
-                                value: false,
-                                onChanged: (bool val) => {print(val)},
-                              ),
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              AppIcon(
-                                icon: HeroIcons.trash,
-                                color: AppColors.dark,
-                                onPressed: () => AppConfirmOverlay(
-                                    vsync: vsync,
-                                    context: context,
-                                    displayText: 'Delete playback "File1.mp3"?',
-                                    confirmButtonText: 'Delete',
-                                    onConfirm: () => {
-                                          print('Deleted playback "File1.mp3"')
-                                        }).open(),
-                              ),
-                            ],
+                        if (recordingsProvider.recordings[index].playback !=
+                            null)
+                          PropertyDescriptionActionCombination(
+                            title: recordingsProvider
+                                    .recordings[index].playbackTitle ??
+                                '',
+                            child: Row(
+                              children: [
+                                AppSwitch(
+                                  value: false,
+                                  onChanged: (bool val) => {print(val)},
+                                ),
+                                const SizedBox(
+                                  width: 20,
+                                ),
+                                AppIcon(
+                                  icon: HeroIcons.trash,
+                                  color: AppColors.dark,
+                                  onPressed: () => AppConfirmOverlay(
+                                      vsync: vsync,
+                                      context: context,
+                                      displayText:
+                                          'Delete playback "${recordingsProvider.recordings[index].playbackTitle}"?',
+                                      confirmButtonText: 'Delete',
+                                      onConfirm: () {
+                                        recordingsProvider
+                                            .recordings[index].playback
+                                            ?.delete();
+                                      }).open(),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
                         const PropertiesDescriptionTitle(title: 'Export'),
                         const PropertyDescriptionActionCombination(
                           title: 'Audio',

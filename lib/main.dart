@@ -31,6 +31,7 @@ Future<void> main() async {
   ));
 
   // cloud-synchronization
+  // TODO: cloud synchronization for windows
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );

@@ -29,9 +29,14 @@ class PropertyDescriptionActionCombination extends StatelessWidget {
             : MainAxisAlignment.spaceBetween,
         children: [
           if (type != PropertyDescriptionActionCombinationType.onlyChild)
-            AppText(
-              text: title,
-              weight: AppFonts.weightLight,
+            Expanded(
+              child: ClipRect(
+                child: AppText(
+                  text: title,
+                  weight: AppFonts.weightLight,
+                  overflow: TextOverflow.fade,
+                ),
+              ),
             ),
           child,
         ],
