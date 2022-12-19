@@ -31,6 +31,8 @@ class RecordingsListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String? recordingsTitleField;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -49,20 +51,8 @@ class RecordingsListItem extends StatelessWidget {
                       if (recordingsProvider.expandedItem) {
                         recordingsProvider.contractRecordingItem();
                       } else {
-                        // load playback for recording
-                        recordingsProvider.recordings[index].playback =
-                            await AppFileSystem.getPlaybackFromRecording(
-                                recordingsProvider.recordings[index].title);
-
-                        // get title of playback and save
-                        recordingsProvider.recordings[index].playbackTitle =
-                            (AppFileSystem.getFilenameWithoutExtension(
-                                        recordingsProvider
-                                            .recordings[index].playback?.path)
-                                    ?.split('_')
-                                  ?..removeAt(0)
-                                  ..removeLast())
-                                ?.join('_');
+                        await recordingsProvider
+                            .loadPlayback(recordingsProvider.recordings[index]);
 
                         recordingsProvider.expandRecordingItem(index);
                       }
@@ -77,11 +67,15 @@ class RecordingsListItem extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        AppText(
-                          text: recordingsProvider.recordings[index].title,
-                          size: 18,
-                          letterSpacing: 3,
-                          shadows: const [AppShadows.text],
+                        Expanded(
+                          child: AppText(
+                            text: recordingsProvider.recordings[index].title,
+                            size: 18,
+                            letterSpacing: 3,
+                            shadows: const [AppShadows.text],
+                            overflow: TextOverflow.fade,
+                            softWrap: false,
+                          ),
                         ),
                         AppIcon(
                           icon: recordingsProvider.expandedItem
@@ -159,12 +153,15 @@ class RecordingsListItem extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: TextFormField(
+                                    onChanged: (value) {
+                                      recordingsTitleField = value;
+                                    },
                                     onFieldSubmitted: (value) {
-                                      recordingsProvider.recordings[index] =
-                                          Recording(title: value);
+                                      recordingsProvider.updateRecordingTitle(
+                                          recordingsProvider.recordings[index],
+                                          value);
                                       recordingsProvider
-                                              .recordingTitleTextFieldVisible =
-                                          false;
+                                          .disableRecordingTitleTextField();
                                     },
                                     focusNode: FocusNode(),
                                     autofocus: true,
@@ -190,10 +187,13 @@ class RecordingsListItem extends StatelessWidget {
                                     icon: HeroIcons.check,
                                     color: AppColors.dark,
                                     onPressed: () {
-                                      // TODO: set title value from text field
+                                      recordingsProvider.updateRecordingTitle(
+                                          recordingsProvider.recordings[index],
+                                          recordingsTitleField ??
+                                              recordingsProvider
+                                                  .recordings[index].title);
                                       recordingsProvider
-                                              .recordingTitleTextFieldVisible =
-                                          false;
+                                          .disableRecordingTitleTextField();
                                     },
                                   ),
                                 if (!recordingsProvider
@@ -228,10 +228,14 @@ class RecordingsListItem extends StatelessWidget {
 
                               // if file has been selected -> store in recordings folder
                               if (playbackFile != null) {
-                                AppFileSystem.copyFileToFolder(
-                                    playbackFile,
-                                    AppFileSystem.recordingsFolder,
-                                    '${recordingsProvider.recordings[index].title}_${AppFileSystem.getFilenameWithoutExtension(playbackFile.path)}_Playback');
+                                if (await AppFileSystem.savePlaybackFile(
+                                        playbackFile,
+                                        recordingsProvider
+                                            .recordings[index].title) !=
+                                    null) {
+                                  await recordingsProvider.loadPlayback(
+                                      recordingsProvider.recordings[index]);
+                                }
                               }
                             },
                           ),
@@ -245,8 +249,13 @@ class RecordingsListItem extends StatelessWidget {
                             child: Row(
                               children: [
                                 AppSwitch(
-                                  value: false,
-                                  onChanged: (bool val) => {print(val)},
+                                  value: recordingsProvider
+                                      .recordings[index].playbackActive,
+                                  onChanged: (bool val) {
+                                    recordingsProvider.setPlaybackStatus(
+                                        recordingsProvider.recordings[index],
+                                        val);
+                                  },
                                 ),
                                 const SizedBox(
                                   width: 20,
@@ -263,7 +272,12 @@ class RecordingsListItem extends StatelessWidget {
                                       onConfirm: () {
                                         recordingsProvider
                                             .recordings[index].playback
-                                            ?.delete();
+                                            ?.delete()
+                                            .whenComplete(() async {
+                                          await recordingsProvider.loadPlayback(
+                                              recordingsProvider
+                                                  .recordings[index]);
+                                        });
                                       }).open(),
                                 ),
                               ],
@@ -305,10 +319,10 @@ class RecordingsListItem extends StatelessWidget {
                                 displayText:
                                     'Delete recording "${recordingsProvider.recordings[index].title}"?',
                                 confirmButtonText: 'Delete',
-                                onConfirm: () => {
-                                      print(
-                                          'Deleted ${recordingsProvider.recordings[index].title}')
-                                    }).open(),
+                                onConfirm: () {
+                                  recordingsProvider.deleteRecording(
+                                      recordingsProvider.recordings[index]);
+                                }).open(),
                           ),
                         ),
                       ],

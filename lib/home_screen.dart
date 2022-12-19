@@ -9,6 +9,7 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/constants/shadows.dart';
+import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/features/recordings/recordings_list.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/recordings/recordings_title_bar.dart';
@@ -126,7 +127,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   AppIcon(
                     icon: HeroIcons.arrowPathRoundedSquare,
                     color: AppColors.dark,
-                    onPressed: () => {},
+                    onPressed: () {
+                      if (Provider.of<CloudProvider>(context).cloud.loggedIn) {
+
+                      } else {
+
+                      }
+                    },
                     size: 30,
                   ),
                 ],
