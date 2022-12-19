@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:virkey/constants/colors.dart';
+import 'package:virkey/utils/file_system.dart';
 
 class RecordingsProvider extends ChangeNotifier {
   final List<Recording> _recordings = [];
@@ -12,37 +13,41 @@ class RecordingsProvider extends ChangeNotifier {
   bool expandedItem = false;
   bool recordingTitleTextFieldVisible = false;
 
-  static const _itemsRep = [
-    'Recording #1',
-    'Recording #2',
-    'Recording #3',
-    'Recording #4',
-    'Recording #5',
-    'Recording #6',
-    'Recording #7',
-    'Recording #8',
-    'Recording #9',
-    'Recording #10',
-    'Recording #11',
-    'Recording #12',
-    'Recording #13',
-    'Recording #14',
-    'Recording #15',
-    'Recording #16',
-    'Recording #17',
-    'Recording #18',
-    'Recording #19',
-    'Recording #20',
-    'Recording #21',
-    'Recording #22',
-  ];
+  static List<FileSystemEntity> _recordingsFileList = [];
 
   List<Recording> get recordings => _recordings;
 
   RecordingsProvider() {
-    for (var title in _itemsRep) {
-      _recordings.add(Recording(title: title));
+    loadRecordings();
+  }
+
+  Future<void> loadRecordings() async {
+    await AppFileSystem.loadBasePath();
+
+    // get files in recordings folder & filter (with where) for only recordings
+    List<FileSystemEntity>? recordingsFileList =
+        (await AppFileSystem.listFilesInFolder(AppFileSystem.recordingsFolder))
+            ?.where((file) =>
+                AppFileSystem.getFileExtensionFromPath(file.path) == 'mid')
+            .toList();
+
+    print(recordingsFileList);
+
+    _recordingsFileList = recordingsFileList!;
+
+    // add files recordings list as Recording objects
+    for (var recordingFile in recordingsFileList.reversed) {
+      addRecordingItem(
+        Recording(
+          title:
+              AppFileSystem.getFilenameWithoutExtension(recordingFile.path) ??
+                  '',
+          recording: recordingFile as File,
+        ),
+      );
     }
+
+    notifyListeners();
   }
 
   void addRecordingItem(Recording recording) {
@@ -95,8 +100,10 @@ class RecordingsProvider extends ChangeNotifier {
 
   void contractRecordingItem() {
     removeAllRecordingItems();
-    for (var element in _itemsRep.reversed) {
-      addRecordingItem(Recording(title: element));
+    for (var element in _recordingsFileList.reversed) {
+      addRecordingItem(Recording(
+          title:
+              AppFileSystem.getFilenameWithoutExtension(element.path) ?? ''));
     }
     expandedItem = false;
     notifyListeners();
@@ -115,12 +122,63 @@ class RecordingsProvider extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void disableRecordingTitleTextField() {
+    recordingTitleTextFieldVisible = false;
+    notifyListeners();
+  }
+
+  void updateRecordingTitle(Recording recording, String title) {
+    if (recording.recording == null) {
+      return;
+    }
+    recording.title = title;
+    AppFileSystem.renameFile(recording.recording as File, title);
+    if (recording.playback != null) {
+      AppFileSystem.renameFile(recording.playback as File,
+          '${title}_${recording.playbackTitle}_Playback');
+    }
+    notifyListeners();
+  }
+
+  Future<void> loadPlayback(Recording recording) async {
+    // load playback for recording
+    List? playbackAndTitle =
+        (await AppFileSystem.getPlaybackFromRecording(recording.title));
+
+    if (playbackAndTitle == null) {
+      recording.playback = null;
+      recording.playbackTitle = null;
+    } else {
+      recording.playback = playbackAndTitle[0];
+      recording.playbackTitle = playbackAndTitle[1];
+    }
+
+    notifyListeners();
+  }
+
+  void setPlaybackStatus(Recording recording, bool status) {
+    recording.playbackActive = status;
+  }
+
+  Future<void> deleteRecording(Recording recording) async {
+    if (recording.recording != null) {
+      print(await FileStat.stat(recording.recording?.path as String));
+    }
+
+    await recording.recording?.delete().whenComplete(() {
+      notifyListeners();
+    });
+  }
 }
 
 class Recording {
-  Recording({required this.title});
+  Recording(
+      {required this.title, this.recording, this.playback, this.playbackTitle});
 
   String title;
+  File? recording;
   File? playback;
   String? playbackTitle;
+  bool playbackActive = true;
 }

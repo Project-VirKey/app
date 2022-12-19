@@ -15,6 +15,7 @@ class AppText extends StatelessWidget {
     this.textAlign = TextAlign.left,
     this.shadows = const [],
     this.overflow,
+    this.softWrap,
   }) : super(key: key);
 
   final String text;
@@ -27,6 +28,7 @@ class AppText extends StatelessWidget {
   final TextAlign textAlign;
   final List<Shadow> shadows;
   final TextOverflow? overflow;
+  final bool? softWrap;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class AppText extends StatelessWidget {
       // https://www.kindacode.com/article/text-overflow-in-flutter/#TextOverflowellipsis
       // https://stackoverflow.com/a/58470417/17399214 -> for overflow inside of Row, put AppText inside of Expanded-Widget
       overflow: overflow,
+      softWrap: softWrap,
       style: TextStyle(
         height: height,
         fontFamily: family,

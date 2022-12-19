@@ -60,7 +60,7 @@ class AppFileSystem {
   static String soundLibrariesFolder = 'Sound-Libraries';
 
   static Future<void> initFolders() async {
-    basePath = await getBasePath();
+    await loadBasePath();
 
     if (basePath != null && (PlatformHelper.isDesktop || Platform.isAndroid)) {
       await createFolder('');
@@ -76,6 +76,10 @@ class AppFileSystem {
 
     // print(await createFile('recordings.txt', recordingsFolder, 'Test Content'));
     // print(await listFilesInFolder(recordingsFolder));
+  }
+
+  static Future<void> loadBasePath() async {
+    basePath = await getBasePath();
   }
 
   // check permission for accessing device storage
@@ -114,14 +118,14 @@ class AppFileSystem {
     }
   }
 
-  static Future<String?> createFile(String fileName, String path,
+  static Future<String?> createFile(String fileName, String folderName,
       [String? content]) async {
     if (!(checkBasePath() && await checkPermission())) {
       return null;
     }
 
     File? file = File(
-        '$basePath${Platform.pathSeparator}$path${Platform.pathSeparator}$fileName');
+        '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}$fileName');
 
     if ((await file.exists())) {
       return file.path;
@@ -134,6 +138,26 @@ class AppFileSystem {
     }
   }
 
+  static Future<FileSystemEntity> deleteFile(
+      String fileName, String folderName) async {
+    return await File(
+            '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}$fileName')
+        .delete();
+  }
+
+  static Future<File> renameFile(File file, String fileName) async {
+    List<String> pathFilename = file.path.split(Platform.pathSeparator);
+    pathFilename.removeLast();
+    String path = pathFilename.join(Platform.pathSeparator);
+
+    print(file.path);
+    print(
+        '$path${Platform.pathSeparator}$fileName.${getFileExtensionFromPath(file.path)}');
+
+    return await file.rename(
+        '$path${Platform.pathSeparator}$fileName.${getFileExtensionFromPath(file.path)}');
+  }
+
   static Future<List<FileSystemEntity>?> listFilesInFolder(
       String folderName) async {
     if (!(checkBasePath() && await checkPermission())) {
@@ -141,15 +165,21 @@ class AppFileSystem {
     }
 
     Directory? dir = Directory('$basePath${Platform.pathSeparator}$folderName');
+
+    if (Platform.isMacOS) {
+      return dir.listSync().where((file) => getFilenameFromPath(file.path) != '.DS_Store').toList();
+    }
+
     return dir.listSync();
   }
 
-  static void copyFileToFolder(File file, String folderName,
+  static Future<String> copyFileToFolder(File file, String folderName,
       [String? newFilename]) async {
     // if newFilename is set -> use it with the file extension from the original file
     // else use the original filename
-    await file.copy(
-        '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}${newFilename == null ? getFilenameFromPath(file.path) : '$newFilename.${getFileExtensionFromPath(file.path)}'}');
+    return (await file.copy(
+            '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}${newFilename == null ? getFilenameFromPath(file.path) : '$newFilename.${getFileExtensionFromPath(file.path)}'}'))
+        .path;
   }
 
   static String getFilenameFromPath(String path) {
@@ -164,11 +194,11 @@ class AppFileSystem {
     return path.split('.').last;
   }
 
-  static Future<File?> getPlaybackFromRecording(String recordingTitle) async {
+  static Future<List?> getPlaybackFromRecording(String recordingTitle) async {
     List<FileSystemEntity>? folderSoundLibraries =
         (await AppFileSystem.listFilesInFolder(AppFileSystem.recordingsFolder));
 
-    File? playback;
+    List? playbackAndTitle;
 
     folderSoundLibraries?.forEach((element) {
       String? filename = getFilenameWithoutExtension(element.path);
@@ -176,15 +206,35 @@ class AppFileSystem {
         return;
       }
 
-      List<String> filenameSeparated = filename.split('_');
-      if (filenameSeparated.length >= 2) {
-        if (filenameSeparated[0] == recordingTitle &&
-            filenameSeparated.last == 'Playback') {
-          playback = File(element.path);
+      List<String> filenameSeparated = filename.split('${recordingTitle}_');
+
+      // if title of recording will be found (at first position -> empty string)
+      if (filenameSeparated[0].isEmpty) {
+        if (filenameSeparated.length == 2) {
+          // if playback title is not equal to the recording title
+          // -> recording title found once (+ rest) -> array of 2 positions & last position equals to playback title + 'Playback'
+          List<String> titlePlayback = filenameSeparated[1].split('_');
+          if (titlePlayback.last == 'Playback') {
+            // if separated playback + Playback title has 'Playback' at last position
+            titlePlayback.removeLast();
+            playbackAndTitle = [File(element.path), titlePlayback.join('_')];
+          }
+        } else if (filenameSeparated.length == 3) {
+          // if playback title is equal to the title of the recording
+          // title of recording will be found twice (+ rest) -> array of 3 positions & last position equals to 'Playback'
+          if (filenameSeparated.last == 'Playback') {
+            playbackAndTitle = [File(element.path), recordingTitle];
+          }
         }
       }
     });
 
-    return playback;
+    return playbackAndTitle;
+  }
+
+  static Future<String?> savePlaybackFile(
+      File playback, String recordingTitle) async {
+    return await copyFileToFolder(playback, recordingsFolder,
+        '${recordingTitle}_${getFilenameWithoutExtension(playback.path)}_Playback');
   }
 }
