@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:virkey/constants/colors.dart';
 
 class AppSlider extends StatefulWidget {
-  AppSlider({Key? key, this.value = 0, required this.onChanged})
+  AppSlider({Key? key, this.value = 0, required this.onChanged, this.onChangedEnd})
       : super(key: key);
 
   double value;
   final ValueChanged<double> onChanged;
+  final ValueChanged<double>? onChangedEnd;
 
   @override
   State<AppSlider> createState() => _AppSliderState();
@@ -34,6 +35,9 @@ class _AppSliderState extends State<AppSlider> {
             widget.value = value;
             widget.onChanged(widget.value);
           });
+        },
+        onChangeEnd: (value) {
+          widget.onChangedEnd!(widget.value);
         },
       ),
     );

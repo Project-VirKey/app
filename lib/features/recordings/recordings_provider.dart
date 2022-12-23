@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:virkey/constants/colors.dart';
+import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/file_system.dart';
 
 class RecordingsProvider extends ChangeNotifier {
@@ -21,30 +22,35 @@ class RecordingsProvider extends ChangeNotifier {
     loadRecordings();
   }
 
+  void notifyProviderListeners() {
+    notifyListeners();
+  }
+
   Future<void> loadRecordings() async {
-    await AppFileSystem.loadBasePath();
+    AppFileSystem.basePath = (await AppSharedPreferences.loadData())?.defaultFolder.path;
+    if (AppFileSystem.basePath == null || AppFileSystem.basePath == '') {
+      await AppFileSystem.loadBasePath();
+    }
 
     // get files in recordings folder & filter (with where) for only recordings
     List<FileSystemEntity>? recordingsFileList =
-        (await AppFileSystem.listFilesInFolder(AppFileSystem.recordingsFolder))
-            ?.where((file) =>
-                AppFileSystem.getFileExtensionFromPath(file.path) == 'mid')
-            .toList();
+        (await AppFileSystem.listFilesInFolder(
+            AppFileSystem.recordingsFolder, ['mid']));
 
-    print(recordingsFileList);
+    // print(recordingsFileList);
 
     _recordingsFileList = recordingsFileList!;
+    removeAllRecordingItems();
 
     // add files recordings list as Recording objects
     for (var recordingFile in recordingsFileList.reversed) {
-      addRecordingItem(
-        Recording(
-          title:
-              AppFileSystem.getFilenameWithoutExtension(recordingFile.path) ??
-                  '',
-          recording: recordingFile as File,
-        ),
+      Recording recording = Recording(
+        title: AppFileSystem.getFilenameWithoutExtension(recordingFile.path),
+        path: recordingFile.path,
       );
+
+      addRecordingItem(recording);
+      loadPlayback(recording);
     }
 
     notifyListeners();
@@ -90,10 +96,9 @@ class RecordingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void expandRecordingItem(int index) {
-    Recording item = recordings[index];
+  void expandRecordingItem(Recording recording) {
     removeAllRecordingItems();
-    addRecordingItem(item);
+    addRecordingItem(recording);
     expandedItem = true;
     notifyListeners();
   }
@@ -101,9 +106,11 @@ class RecordingsProvider extends ChangeNotifier {
   void contractRecordingItem() {
     removeAllRecordingItems();
     for (var element in _recordingsFileList.reversed) {
-      addRecordingItem(Recording(
-          title:
-              AppFileSystem.getFilenameWithoutExtension(element.path) ?? ''));
+      addRecordingItem(
+        Recording(
+            title: AppFileSystem.getFilenameWithoutExtension(element.path),
+            path: element.path),
+      );
     }
     expandedItem = false;
     notifyListeners();
@@ -112,15 +119,15 @@ class RecordingsProvider extends ChangeNotifier {
   void expandRecordingsList() {
     if (!listExpanded) {
       listExpanded = true;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   void contractRecordingsList() {
     if (listExpanded) {
       listExpanded = false;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   void disableRecordingTitleTextField() {
@@ -128,17 +135,19 @@ class RecordingsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void updateRecordingTitle(Recording recording, String title) {
-    if (recording.recording == null) {
-      return;
-    }
+  Future<void> updateRecordingTitle(Recording recording, String title) async {
     recording.title = title;
-    AppFileSystem.renameFile(recording.recording as File, title);
-    if (recording.playback != null) {
-      AppFileSystem.renameFile(recording.playback as File,
-          '${title}_${recording.playbackTitle}_Playback');
-    }
-    notifyListeners();
+
+    recording.path = await AppFileSystem.renameFile(recording.path, title)
+        .whenComplete(() async {
+      if (recording.playbackPath != null) {
+        recording.playbackPath = await AppFileSystem.renameFile(
+            recording.playbackPath as String,
+            '${title}_${recording.playbackTitle}_Playback');
+      }
+    });
+
+    loadRecordings();
   }
 
   Future<void> loadPlayback(Recording recording) async {
@@ -147,10 +156,10 @@ class RecordingsProvider extends ChangeNotifier {
         (await AppFileSystem.getPlaybackFromRecording(recording.title));
 
     if (playbackAndTitle == null) {
-      recording.playback = null;
+      recording.playbackPath = null;
       recording.playbackTitle = null;
     } else {
-      recording.playback = playbackAndTitle[0];
+      recording.playbackPath = playbackAndTitle[0];
       recording.playbackTitle = playbackAndTitle[1];
     }
 
@@ -162,11 +171,9 @@ class RecordingsProvider extends ChangeNotifier {
   }
 
   Future<void> deleteRecording(Recording recording) async {
-    if (recording.recording != null) {
-      print(await FileStat.stat(recording.recording?.path as String));
-    }
+    print(await FileStat.stat(recording.path));
 
-    await recording.recording?.delete().whenComplete(() {
+    await File(recording.path).delete().whenComplete(() {
       notifyListeners();
     });
   }
@@ -174,11 +181,14 @@ class RecordingsProvider extends ChangeNotifier {
 
 class Recording {
   Recording(
-      {required this.title, this.recording, this.playback, this.playbackTitle});
+      {required this.title,
+      required this.path,
+      this.playbackPath,
+      this.playbackTitle});
 
   String title;
-  File? recording;
-  File? playback;
+  String path;
+  String? playbackPath;
   String? playbackTitle;
   bool playbackActive = true;
 }

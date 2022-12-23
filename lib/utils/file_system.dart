@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
 class AppFileSystem {
@@ -26,11 +27,14 @@ class AppFileSystem {
     }
   }
 
+  static Future<String?> directoryPicker({required String title}) async {
+    return await FilePicker.platform.getDirectoryPath(dialogTitle: title);
+  }
+
   static Future<String?> getBasePath() async {
-    const folderName = 'VirKey';
     if (Platform.isAndroid) {
       // folder: [Phone]/Documents/VirKey/
-      return '/storage/emulated/0/Documents/$folderName';
+      return '/storage/emulated/0/Documents/$rootFolderName';
     } else if (Platform.isIOS) {
       // folder: [Application]/Data/Application/[...]/Documents/VirKey
 
@@ -41,7 +45,7 @@ class AppFileSystem {
       return (await getApplicationDocumentsDirectory()).path;
     } else if (Platform.isWindows) {
       // folder: Documents\VirKey\
-      return '${(await getApplicationDocumentsDirectory()).path}${Platform.pathSeparator}$folderName';
+      return '${(await getApplicationDocumentsDirectory()).path}${Platform.pathSeparator}$rootFolderName';
     } else if (Platform.isMacOS) {
       // folder: /Applications/VirKey/
 
@@ -49,18 +53,24 @@ class AppFileSystem {
       // ./macos/Runner/: DebugProfile.entitlements & Release.entitlements
       // https://stackoverflow.com/a/70557520/17399214, 14.12.2022
       // https://developer.apple.com/documentation/security/app_sandbox, 14.12.2022
-      return '/Applications/$folderName';
+      return '/Applications/$rootFolderName';
     } else {
       return null;
     }
   }
 
   static String? basePath;
-  static String recordingsFolder = 'Recordings';
-  static String soundLibrariesFolder = 'Sound-Libraries';
+  static const rootFolderName = 'VirKey';
+  static const String recordingsFolder = 'Recordings';
+  static const String soundLibrariesFolder = 'Sound-Libraries';
 
   static Future<void> initFolders() async {
-    await loadBasePath();
+    print((await AppSharedPreferences.loadData())?.defaultFolder.path);
+    basePath = (await AppSharedPreferences.loadData())?.defaultFolder.path;
+    if (basePath == null || basePath == '') {
+      await loadBasePath();
+    }
+    print('basePath $basePath');
 
     if (basePath != null && (PlatformHelper.isDesktop || Platform.isAndroid)) {
       await createFolder('');
@@ -68,11 +78,6 @@ class AppFileSystem {
 
     await createFolder(recordingsFolder);
     await createFolder(soundLibrariesFolder);
-
-    List<FileSystemEntity>? folderSoundLibraries =
-        (await AppFileSystem.listFilesInFolder(
-            AppFileSystem.soundLibrariesFolder));
-    print(folderSoundLibraries);
 
     // print(await createFile('recordings.txt', recordingsFolder, 'Test Content'));
     // print(await listFilesInFolder(recordingsFolder));
@@ -145,21 +150,22 @@ class AppFileSystem {
         .delete();
   }
 
-  static Future<File> renameFile(File file, String fileName) async {
-    List<String> pathFilename = file.path.split(Platform.pathSeparator);
+  static Future<String> renameFile(String path, String fileName) async {
+    List<String> pathFilename = path.split(Platform.pathSeparator);
     pathFilename.removeLast();
-    String path = pathFilename.join(Platform.pathSeparator);
+    String pathWithoutFileName = pathFilename.join(Platform.pathSeparator);
 
-    print(file.path);
-    print(
-        '$path${Platform.pathSeparator}$fileName.${getFileExtensionFromPath(file.path)}');
+    // print(path);
+    // print(
+    //     '$pathWithoutFileName${Platform.pathSeparator}$fileName.${getFileExtensionFromPath(path)}');
 
-    return await file.rename(
-        '$path${Platform.pathSeparator}$fileName.${getFileExtensionFromPath(file.path)}');
+    return (await File(path).rename(
+            '$pathWithoutFileName${Platform.pathSeparator}$fileName.${getFileExtensionFromPath(path)}'))
+        .path;
   }
 
   static Future<List<FileSystemEntity>?> listFilesInFolder(
-      String folderName) async {
+      String folderName, List<String> fileExtensions) async {
     if (!(checkBasePath() && await checkPermission())) {
       return null;
     }
@@ -167,7 +173,12 @@ class AppFileSystem {
     Directory? dir = Directory('$basePath${Platform.pathSeparator}$folderName');
 
     if (Platform.isMacOS) {
-      return dir.listSync().where((file) => getFilenameFromPath(file.path) != '.DS_Store').toList();
+      return dir
+          .listSync()
+          .where((file) => getFilenameFromPath(file.path) != '.DS_Store')
+          .where((file) => fileExtensions
+              .contains(getFileExtensionFromPath(file.path).toLowerCase()))
+          .toList();
     }
 
     return dir.listSync();
@@ -182,12 +193,17 @@ class AppFileSystem {
         .path;
   }
 
+  static File getFileFromNameAndFolder(String fileName, String folderName) {
+    return File(
+        '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}$fileName');
+  }
+
   static String getFilenameFromPath(String path) {
     return path.split(Platform.pathSeparator).last;
   }
 
-  static String? getFilenameWithoutExtension(String? path) {
-    return path?.split(Platform.pathSeparator).last.split('.').first;
+  static String getFilenameWithoutExtension(String path) {
+    return path.split(Platform.pathSeparator).last.split('.').first;
   }
 
   static String getFileExtensionFromPath(String path) {
@@ -196,16 +212,13 @@ class AppFileSystem {
 
   static Future<List?> getPlaybackFromRecording(String recordingTitle) async {
     List<FileSystemEntity>? folderSoundLibraries =
-        (await AppFileSystem.listFilesInFolder(AppFileSystem.recordingsFolder));
+        (await AppFileSystem.listFilesInFolder(
+            AppFileSystem.recordingsFolder, ['mp3', 'wav']));
 
     List? playbackAndTitle;
 
     folderSoundLibraries?.forEach((element) {
-      String? filename = getFilenameWithoutExtension(element.path);
-      if (filename == null) {
-        return;
-      }
-
+      String filename = getFilenameWithoutExtension(element.path);
       List<String> filenameSeparated = filename.split('${recordingTitle}_');
 
       // if title of recording will be found (at first position -> empty string)
@@ -217,13 +230,13 @@ class AppFileSystem {
           if (titlePlayback.last == 'Playback') {
             // if separated playback + Playback title has 'Playback' at last position
             titlePlayback.removeLast();
-            playbackAndTitle = [File(element.path), titlePlayback.join('_')];
+            playbackAndTitle = [element.path, titlePlayback.join('_')];
           }
         } else if (filenameSeparated.length == 3) {
           // if playback title is equal to the title of the recording
           // title of recording will be found twice (+ rest) -> array of 3 positions & last position equals to 'Playback'
           if (filenameSeparated.last == 'Playback') {
-            playbackAndTitle = [File(element.path), recordingTitle];
+            playbackAndTitle = [element.path, recordingTitle];
           }
         }
       }
