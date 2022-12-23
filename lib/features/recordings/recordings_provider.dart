@@ -171,8 +171,6 @@ class RecordingsProvider extends ChangeNotifier {
   }
 
   Future<void> deleteRecording(Recording recording) async {
-    print(await FileStat.stat(recording.path));
-
     await File(recording.path).delete().whenComplete(() {
       notifyListeners();
     });

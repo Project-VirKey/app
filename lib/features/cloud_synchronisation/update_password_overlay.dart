@@ -121,8 +121,6 @@ class UpdatePasswordOverlay {
                                   AppTextFormField(
                                     focusNode: _updateNewPasswordFocusNode,
                                     labelText: 'New Password',
-                                    onFieldSubmitted: (value) =>
-                                        {print('onSubmit: $value')},
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your new Password!';

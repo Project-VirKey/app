@@ -438,8 +438,7 @@ class SettingsOverlay {
                                           icon:
                                               HeroIcons.arrowPathRoundedSquare,
                                           color: AppColors.dark,
-                                          onPressed: () =>
-                                              {print('Synchronise now')},
+                                          onPressed: () {},
                                         ),
                                       ),
                                       Padding(

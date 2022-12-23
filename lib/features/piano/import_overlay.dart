@@ -79,7 +79,7 @@ class ImportOverlay {
                       children: [
                         AppSwitch(
                           value: false,
-                          onChanged: (bool val) => {print(val)},
+                          onChanged: (bool val) => {},
                         ),
                         const SizedBox(
                           width: 20,
@@ -92,9 +92,7 @@ class ImportOverlay {
                               context: context,
                               displayText: 'Delete playback "File1.mp3"?',
                               confirmButtonText: 'Delete',
-                              onConfirm: () => {
-                                    print('Deleted playback "File1.mp3"')
-                                  }).open(),
+                              onConfirm: () => {}).open(),
                         ),
                       ],
                     ),
