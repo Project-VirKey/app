@@ -48,7 +48,6 @@ class AppFirestore {
   }
 
   static Future<void> test() async {
-    print('test firestore');
     if (await checkUserDocumentExists()) {
       print(await getDocument());
     } else {

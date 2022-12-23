@@ -99,8 +99,6 @@ class DeleteAccountOverlay {
                                   AppTextFormField(
                                     focusNode: _deletePasswordFocusNode,
                                     labelText: 'Password',
-                                    onFieldSubmitted: (value) =>
-                                        {print('onSubmit: $value')},
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter your Password!';

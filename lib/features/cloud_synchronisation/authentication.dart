@@ -15,10 +15,8 @@ class AppAuthentication {
       ];
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        print('No user found for that email.');
         return [false, 'No user found for that email.'];
       } else if (e.code == 'wrong-password') {
-        print('Wrong password provided for that user.');
         return [false, 'Wrong password provided for that user.'];
       }
       return [false, e.code];
@@ -42,15 +40,12 @@ class AppAuthentication {
       return await sendVerificationEmail();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
         return [false, 'The password provided is too weak.'];
       } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
         return [false, 'The account already exists for that email.'];
       }
       return [false, e.code];
     } catch (e) {
-      print(e);
       return [false, e];
     }
   }
@@ -60,10 +55,8 @@ class AppAuthentication {
       await FirebaseAuth.instance.currentUser?.sendEmailVerification();
       return [true, 'Verify E-Mail sent!'];
     } on FirebaseAuthException catch (e) {
-      print(e.code);
       return [false, e.code];
     } catch (e) {
-      print(e);
       return [false, e];
     }
   }
@@ -77,10 +70,8 @@ class AppAuthentication {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: emailAddress);
       return [true, 'Rest E-mail sent!'];
     } on FirebaseAuthException catch (e) {
-      print(e.code);
       return [false, e.code];
     } catch (e) {
-      print(e);
       return [false, e];
     }
   }
@@ -91,10 +82,8 @@ class AppAuthentication {
       await FirebaseAuth.instance.currentUser?.delete();
       return [true, 'Account deleted!'];
     } on FirebaseAuthException catch (e) {
-      print(e.code);
       return [false, e.code];
     } catch (e) {
-      print(e);
       return [false, e];
     }
   }
@@ -114,10 +103,8 @@ class AppAuthentication {
       logout();
       return [true, 'Password updated!'];
     } on FirebaseAuthException catch (e) {
-      print(e.code);
       return [false, e.code];
     } catch (e) {
-      print(e);
       return [false, e];
     }
   }
@@ -129,10 +116,8 @@ class AppAuthentication {
       logout();
       return [true, 'E-Mail updated!'];
     } on FirebaseAuthException catch (e) {
-      print(e.code);
       return [false, e.code];
     } catch (e) {
-      print(e);
       return [false, e];
     }
   }
@@ -142,10 +127,8 @@ class AppAuthentication {
       await FirebaseAuth.instance.currentUser?.updateDisplayName(newUsername);
       return [true, 'Username updated!'];
     } on FirebaseAuthException catch (e) {
-      print(e.code);
       return [false, e.code];
     } catch (e) {
-      print(e);
       return [false, e];
     }
   }

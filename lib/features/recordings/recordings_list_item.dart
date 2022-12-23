@@ -138,7 +138,7 @@ class RecordingsListItem extends StatelessWidget {
                         ),
                         AppSlider(
                           value: 20,
-                          onChanged: (val) => {print(val)},
+                          onChanged: (val) {},
                         ),
                         PropertyDescriptionActionCombination(
                           title: '',

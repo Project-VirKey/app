@@ -65,12 +65,10 @@ class AppFileSystem {
   static const String soundLibrariesFolder = 'Sound-Libraries';
 
   static Future<void> initFolders() async {
-    print((await AppSharedPreferences.loadData())?.defaultFolder.path);
     basePath = (await AppSharedPreferences.loadData())?.defaultFolder.path;
     if (basePath == null || basePath == '') {
       await loadBasePath();
     }
-    print('basePath $basePath');
 
     if (basePath != null && (PlatformHelper.isDesktop || Platform.isAndroid)) {
       await createFolder('');

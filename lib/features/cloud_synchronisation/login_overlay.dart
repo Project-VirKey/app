@@ -135,8 +135,6 @@ class LoginOverlay {
                                         AppTextFormField(
                                           focusNode: _loginPasswordFocusNode,
                                           labelText: 'Password',
-                                          onFieldSubmitted: (value) =>
-                                              {print('onSubmit: $value')},
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {

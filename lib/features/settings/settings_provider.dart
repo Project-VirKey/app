@@ -69,8 +69,6 @@ class SettingsProvider extends ChangeNotifier {
         (await AppFileSystem.listFilesInFolder(
             AppFileSystem.soundLibrariesFolder, ['sf2']));
 
-    print(folderSoundLibraries);
-
     folderSoundLibraries?.forEach((element) {
       _settings.soundLibraries.add(SoundLibrary(
           name: AppFileSystem.getFilenameWithoutExtension(element.path),

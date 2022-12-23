@@ -155,8 +155,6 @@ class SignupOverlay {
                                         AppTextFormField(
                                           focusNode: _signupPasswordFocusNode,
                                           labelText: 'Password',
-                                          onFieldSubmitted: (value) =>
-                                              {print('onSubmit: $value')},
                                           validator: (value) {
                                             if (value == null ||
                                                 value.isEmpty) {
@@ -184,7 +182,8 @@ class SignupOverlay {
                                       letterSpacing: 5,
                                     ),
                                     onPressed: () async {
-                                      FocusManager.instance.primaryFocus?.unfocus();
+                                      FocusManager.instance.primaryFocus
+                                          ?.unfocus();
 
                                       if (_signupFormKey.currentState!
                                           .validate()) {
@@ -192,13 +191,13 @@ class SignupOverlay {
                                         _signupFormKey.currentState!.save();
 
                                         List response =
-                                        await AppAuthentication.signUp(
-                                            _username, _email, _password);
+                                            await AppAuthentication.signUp(
+                                                _username, _email, _password);
 
                                         AppSnackBar(
-                                            message: response[1],
-                                            context: context,
-                                            vsync: vsync)
+                                                message: response[1],
+                                                context: context,
+                                                vsync: vsync)
                                             .open();
 
                                         if (response[0]) {
