@@ -16,8 +16,10 @@ import 'package:virkey/features/cloud_synchronisation/login_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/update_email_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/update_password_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/update_username_overlay.dart';
+import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
+import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/overlay.dart';
@@ -25,6 +27,7 @@ import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
+import 'package:virkey/utils/platform_helper.dart';
 import 'package:virkey/utils/snackbar.dart';
 
 class SettingsOverlay {
@@ -121,18 +124,24 @@ class SettingsOverlay {
                           Material(
                             color: Colors.transparent,
                             child: AppSlider(
-                                value: settingsProvider
-                                    .settings.audioVolume.soundLibrary
-                                    .toDouble(),
-                                onChanged: (val) {
-                                  if (settingsProvider
-                                          .settings.audioVolume.soundLibrary !=
-                                      val.toInt()) {
-                                    settingsProvider.settings.audioVolume
-                                        .soundLibrary = val.toInt();
-                                    settingsProvider.saveData();
-                                  }
-                                }),
+                              value: settingsProvider
+                                  .settings.audioVolume.soundLibrary
+                                  .toDouble(),
+                              onChanged: (val) {
+                                int valInt = val.toInt();
+
+                                if (settingsProvider
+                                        .settings.audioVolume.soundLibrary !=
+                                    valInt) {
+                                  settingsProvider.settings.audioVolume
+                                      .soundLibrary = valInt;
+                                }
+                              },
+                              onChangedEnd: (value) => {
+                                AppSharedPreferences.saveData(
+                                    settingsProvider.settings)
+                              },
+                            ),
                           ),
                           const Padding(
                             padding: EdgeInsets.only(top: 9, bottom: 6),
@@ -144,28 +153,79 @@ class SettingsOverlay {
                           Material(
                             color: Colors.transparent,
                             child: AppSlider(
-                                value: settingsProvider
-                                    .settings.audioVolume.audioPlayback
-                                    .toDouble(),
-                                onChanged: (val) {
-                                  if (settingsProvider
-                                          .settings.audioVolume.audioPlayback !=
-                                      val.toInt()) {
-                                    settingsProvider.settings.audioVolume
-                                        .audioPlayback = val.toInt();
-                                    settingsProvider.saveData();
-                                  }
-                                }),
-                          ),
-                          const PropertiesDescriptionTitle(
-                              title: 'Default Folder'),
-                          PropertyDescriptionActionCombination(
-                            title: settingsProvider
-                                .settings.defaultFolder.displayName,
-                            child: const AppIcon(
-                              icon: HeroIcons.folder,
-                              color: AppColors.dark,
+                              value: settingsProvider
+                                  .settings.audioVolume.audioPlayback
+                                  .toDouble(),
+                              onChanged: (val) {
+                                int valInt = val.toInt();
+
+                                if (settingsProvider
+                                        .settings.audioVolume.audioPlayback !=
+                                    valInt) {
+                                  settingsProvider.settings.audioVolume
+                                      .audioPlayback = valInt;
+                                }
+                              },
+                              onChangedEnd: (value) => {
+                                AppSharedPreferences.saveData(
+                                    settingsProvider.settings)
+                              },
                             ),
+                          ),
+                          const PropertiesDescriptionTitle(title: 'Folder'),
+                          if (PlatformHelper.isDesktop)
+                            PropertyDescriptionActionCombination(
+                              // TODO: review -> "In der mobilen Version wird aufgrund der Sinnhaftigkeit dieses Feature weggelassen. Begründet kann dies mit den sich ändernden Berechtigungen (bei den verschiedenene Pfaden am Betriebssystem) und der Einfachheit, dass ein Ordner gleich bleibt."
+                              title:
+                                  settingsProvider.settings.defaultFolder.path,
+
+                              child: Consumer<RecordingsProvider>(
+                                builder: (BuildContext context,
+                                        RecordingsProvider recordingsProvider,
+                                        Widget? child) =>
+                                    Row(
+                                  children: [
+                                    AppIcon(
+                                        icon: HeroIcons.arrowUturnLeft,
+                                        color: AppColors.dark,
+                                        onPressed: () async {
+                                          await settingsProvider
+                                              .resetBasePath();
+                                          settingsProvider.loadSoundLibraries();
+                                          recordingsProvider.loadRecordings();
+                                        }),
+                                    const SizedBox(
+                                      width: 20,
+                                    ),
+                                    AppIcon(
+                                      icon: HeroIcons.folder,
+                                      color: AppColors.dark,
+                                      onPressed: () async {
+                                        String? newBasePath =
+                                            await AppFileSystem.directoryPicker(
+                                                title: 'Select Base Folder');
+
+                                        await settingsProvider
+                                            .updateBasePath(newBasePath);
+
+                                        settingsProvider.loadSoundLibraries();
+                                        recordingsProvider.loadRecordings();
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          if (!PlatformHelper.isDesktop)
+                            AppText(
+                              text:
+                                  settingsProvider.settings.defaultFolder.path,
+                              weight: AppFonts.weightLight,
+                              textAlign: TextAlign.center,
+                              height: 1.5,
+                            ),
+                          const SizedBox(
+                            height: 9,
                           ),
                           const PropertiesDescriptionTitle(
                               title: 'Default saved Files'),
@@ -177,7 +237,8 @@ class SettingsOverlay {
                               onChanged: (bool val) {
                                 settingsProvider
                                     .settings.defaultSavedFiles.mp3 = val;
-                                settingsProvider.saveData();
+                                AppSharedPreferences.saveData(
+                                    settingsProvider.settings);
                               },
                             ),
                           ),
@@ -189,7 +250,8 @@ class SettingsOverlay {
                                 onChanged: (bool val) {
                                   settingsProvider.settings.defaultSavedFiles
                                       .mp3AndPlayback = val;
-                                  settingsProvider.saveData();
+                                  AppSharedPreferences.saveData(
+                                      settingsProvider.settings);
                                 },
                               )),
                           const PropertiesDescriptionTitle(
@@ -206,8 +268,11 @@ class SettingsOverlay {
                                         title: 'Select Sound-Library (SF2)');
 
                                 if (soundFontFile != null) {
-                                  AppFileSystem.copyFileToFolder(soundFontFile,
+                                  await AppFileSystem.copyFileToFolder(
+                                      soundFontFile,
                                       AppFileSystem.soundLibrariesFolder);
+
+                                  settingsProvider.loadSoundLibraries();
                                 }
                               },
                             ),
@@ -220,19 +285,24 @@ class SettingsOverlay {
                                   title: soundLibrary.name,
                                   child: Row(
                                     children: [
-                                      AppIcon(
-                                          icon: HeroIcons.trash,
-                                          color: AppColors.dark,
-                                          onPressed: () => AppConfirmOverlay(
-                                              vsync: vsync,
-                                              context: context,
-                                              displayText:
-                                                  'Delete sound library "${soundLibrary.name}"?',
-                                              confirmButtonText: 'Delete',
-                                              onConfirm: () => {
-                                                    print(
-                                                        'Deleted sound library.')
-                                                  }).open()),
+                                      if (!soundLibrary.defaultLibrary)
+                                        AppIcon(
+                                            icon: HeroIcons.trash,
+                                            color: AppColors.dark,
+                                            onPressed: () => AppConfirmOverlay(
+                                                vsync: vsync,
+                                                context: context,
+                                                displayText:
+                                                    'Delete sound library "${soundLibrary.name}"?',
+                                                confirmButtonText: 'Delete',
+                                                onConfirm: () {
+                                                  File(soundLibrary.path)
+                                                      .delete()
+                                                      .whenComplete(() async {
+                                                    await settingsProvider
+                                                        .loadSoundLibraries();
+                                                  });
+                                                }).open()),
                                       const SizedBox(
                                         width: 20,
                                       ),

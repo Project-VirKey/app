@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
-import 'package:virkey/features/cloud_synchronisation/firestore.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/routing/router.dart';
@@ -41,7 +40,7 @@ Future<void> main() async {
   // reload authentication on start-up
   await FirebaseAuth.instance.currentUser?.reload();
 
-  AppFirestore.test();
+  // AppFirestore.test();
 
   // initialize folders for user content (recordings, ...)
   AppFileSystem.initFolders();

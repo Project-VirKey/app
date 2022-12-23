@@ -14,21 +14,18 @@ class Settings {
     required this.defaultFolder,
     required this.defaultSavedFiles,
     required this.soundLibraries,
-    required this.account,
   });
 
   AudioVolume audioVolume;
   DefaultFolder defaultFolder;
   DefaultSavedFiles defaultSavedFiles;
   List<SoundLibrary> soundLibraries;
-  Account account;
 
   factory Settings.fromJson(Map<String, dynamic> json) => Settings(
     audioVolume: AudioVolume.fromJson(json["audioVolume"]),
     defaultFolder: DefaultFolder.fromJson(json["defaultFolder"]),
     defaultSavedFiles: DefaultSavedFiles.fromJson(json["defaultSavedFiles"]),
     soundLibraries: List<SoundLibrary>.from(json["soundLibraries"].map((x) => SoundLibrary.fromJson(x))),
-    account: Account.fromJson(json["account"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -36,23 +33,6 @@ class Settings {
     "defaultFolder": defaultFolder.toJson(),
     "defaultSavedFiles": defaultSavedFiles.toJson(),
     "soundLibraries": List<dynamic>.from(soundLibraries.map((x) => x.toJson())),
-    "account": account.toJson(),
-  };
-}
-
-class Account {
-  Account({
-    required this.loggedIn,
-  });
-
-  bool loggedIn;
-
-  factory Account.fromJson(Map<String, dynamic> json) => Account(
-    loggedIn: json["loggedIn"],
-  );
-
-  Map<String, dynamic> toJson() => {
-    "loggedIn": loggedIn,
   };
 }
 
@@ -78,20 +58,16 @@ class AudioVolume {
 
 class DefaultFolder {
   DefaultFolder({
-    required this.displayName,
     required this.path,
   });
 
-  String displayName;
   String path;
 
   factory DefaultFolder.fromJson(Map<String, dynamic> json) => DefaultFolder(
-    displayName: json["displayName"],
     path: json["path"],
   );
 
   Map<String, dynamic> toJson() => {
-    "displayName": displayName,
     "path": path,
   };
 }

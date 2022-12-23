@@ -47,7 +47,7 @@ class _RecordingsListState extends State<RecordingsList> {
                 key: UniqueKey(),
                 sizeFactor: animation,
                 child: RecordingsListItem(
-                  index: index,
+                  recording: recordingsProvider.recordings[index],
                   vsync: widget.vsync,
                   recordingsProvider: recordingsProvider,
                 ));

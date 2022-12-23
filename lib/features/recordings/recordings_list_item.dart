@@ -20,12 +20,12 @@ import 'package:virkey/utils/platform_helper.dart';
 class RecordingsListItem extends StatelessWidget {
   const RecordingsListItem(
       {Key? key,
-      required this.index,
+      required this.recording,
       required this.vsync,
       required this.recordingsProvider})
       : super(key: key);
 
-  final int index;
+  final Recording recording;
   final TickerProvider vsync;
   final RecordingsProvider recordingsProvider;
 
@@ -51,10 +51,7 @@ class RecordingsListItem extends StatelessWidget {
                       if (recordingsProvider.expandedItem) {
                         recordingsProvider.contractRecordingItem();
                       } else {
-                        await recordingsProvider
-                            .loadPlayback(recordingsProvider.recordings[index]);
-
-                        recordingsProvider.expandRecordingItem(index);
+                        recordingsProvider.expandRecordingItem(recording);
                       }
                     },
                     style: TextButton.styleFrom(
@@ -69,7 +66,7 @@ class RecordingsListItem extends StatelessWidget {
                       children: [
                         Expanded(
                           child: AppText(
-                            text: recordingsProvider.recordings[index].title,
+                            text: recording.title,
                             size: 18,
                             letterSpacing: 3,
                             shadows: const [AppShadows.text],
@@ -158,15 +155,13 @@ class RecordingsListItem extends StatelessWidget {
                                     },
                                     onFieldSubmitted: (value) {
                                       recordingsProvider.updateRecordingTitle(
-                                          recordingsProvider.recordings[index],
-                                          value);
+                                          recording, value);
                                       recordingsProvider
                                           .disableRecordingTitleTextField();
                                     },
                                     focusNode: FocusNode(),
                                     autofocus: true,
-                                    initialValue: recordingsProvider
-                                        .recordings[index].title,
+                                    initialValue: recording.title,
                                     enabled: recordingsProvider
                                         .recordingTitleTextFieldVisible,
                                     maxLines: 1,
@@ -188,10 +183,9 @@ class RecordingsListItem extends StatelessWidget {
                                     color: AppColors.dark,
                                     onPressed: () {
                                       recordingsProvider.updateRecordingTitle(
-                                          recordingsProvider.recordings[index],
+                                          recording,
                                           recordingsTitleField ??
-                                              recordingsProvider
-                                                  .recordings[index].title);
+                                              recording.title);
                                       recordingsProvider
                                           .disableRecordingTitleTextField();
                                     },
@@ -206,6 +200,8 @@ class RecordingsListItem extends StatelessWidget {
                                               .recordingTitleTextFieldVisible =
                                           true;
                                       recordingsProvider.expandRecordingsList();
+                                      recordingsProvider
+                                          .notifyProviderListeners();
                                     },
                                   ),
                               ],
@@ -229,32 +225,25 @@ class RecordingsListItem extends StatelessWidget {
                               // if file has been selected -> store in recordings folder
                               if (playbackFile != null) {
                                 if (await AppFileSystem.savePlaybackFile(
-                                        playbackFile,
-                                        recordingsProvider
-                                            .recordings[index].title) !=
+                                        playbackFile, recording.title) !=
                                     null) {
-                                  await recordingsProvider.loadPlayback(
-                                      recordingsProvider.recordings[index]);
+                                  await recordingsProvider
+                                      .loadPlayback(recording);
                                 }
                               }
                             },
                           ),
                         ),
-                        if (recordingsProvider.recordings[index].playback !=
-                            null)
+                        if (recording.playbackPath != null)
                           PropertyDescriptionActionCombination(
-                            title: recordingsProvider
-                                    .recordings[index].playbackTitle ??
-                                '',
+                            title: recording.playbackTitle ?? '',
                             child: Row(
                               children: [
                                 AppSwitch(
-                                  value: recordingsProvider
-                                      .recordings[index].playbackActive,
+                                  value: recording.playbackActive,
                                   onChanged: (bool val) {
                                     recordingsProvider.setPlaybackStatus(
-                                        recordingsProvider.recordings[index],
-                                        val);
+                                        recording, val);
                                   },
                                 ),
                                 const SizedBox(
@@ -267,17 +256,17 @@ class RecordingsListItem extends StatelessWidget {
                                       vsync: vsync,
                                       context: context,
                                       displayText:
-                                          'Delete playback "${recordingsProvider.recordings[index].playbackTitle}"?',
+                                          'Delete playback "${recording.playbackTitle}"?',
                                       confirmButtonText: 'Delete',
                                       onConfirm: () {
-                                        recordingsProvider
-                                            .recordings[index].playback
-                                            ?.delete()
-                                            .whenComplete(() async {
-                                          await recordingsProvider.loadPlayback(
-                                              recordingsProvider
-                                                  .recordings[index]);
-                                        });
+                                        if (recording.playbackPath != null) {
+                                          File(recording.playbackPath as String)
+                                              .delete()
+                                              .whenComplete(() async {
+                                            await recordingsProvider
+                                                .loadPlayback(recording);
+                                          });
+                                        }
                                       }).open(),
                                 ),
                               ],
@@ -317,11 +306,10 @@ class RecordingsListItem extends StatelessWidget {
                                 vsync: vsync,
                                 context: context,
                                 displayText:
-                                    'Delete recording "${recordingsProvider.recordings[index].title}"?',
+                                    'Delete recording "${recording.title}"?',
                                 confirmButtonText: 'Delete',
                                 onConfirm: () {
-                                  recordingsProvider.deleteRecording(
-                                      recordingsProvider.recordings[index]);
+                                  recordingsProvider.deleteRecording(recording);
                                 }).open(),
                           ),
                         ),
