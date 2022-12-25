@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_play_pause_button.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
@@ -280,11 +282,14 @@ class RecordingsListItem extends StatelessWidget {
                             color: AppColors.dark,
                           ),
                         ),
-                        const PropertyDescriptionActionCombination(
+                        PropertyDescriptionActionCombination(
                           title: 'MIDI',
                           child: AppIcon(
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
+                            onPressed: () => AppFileSystem.exportFile(
+                                path: recording.path,
+                                dialogTitle: 'Export MIDI'),
                           ),
                         ),
                         const PropertyDescriptionActionCombination(
