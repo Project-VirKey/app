@@ -43,7 +43,7 @@ class AppFileSystem {
       File(path).copySync(exportPath!);
     } else {
       // open native share dialog for mobile
-      Share.share(path);
+      Share.share(path, subject: AppFileSystem.getFilenameWithoutExtension(path));
     }
   }
 
