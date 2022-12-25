@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
@@ -29,6 +30,21 @@ class AppFileSystem {
 
   static Future<String?> directoryPicker({required String title}) async {
     return await FilePicker.platform.getDirectoryPath(dialogTitle: title);
+  }
+
+  static Future<void> exportFile(
+      {required String path, required String dialogTitle}) async {
+    if (PlatformHelper.isDesktop) {
+      // open save as dialog to select folder
+      String? exportPath = await FilePicker.platform.saveFile(
+          dialogTitle: dialogTitle,
+          fileName: AppFileSystem.getFilenameFromPath(path));
+
+      File(path).copySync(exportPath!);
+    } else {
+      // open native share dialog for mobile
+      Share.share(path);
+    }
   }
 
   static Future<String?> getBasePath() async {
