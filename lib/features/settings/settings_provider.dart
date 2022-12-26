@@ -38,14 +38,14 @@ class SettingsProvider extends ChangeNotifier {
       _settings.defaultSavedFiles.mp3 = loadedSettings.defaultSavedFiles.mp3;
       _settings.defaultSavedFiles.mp3AndPlayback =
           loadedSettings.defaultSavedFiles.mp3AndPlayback;
-    }
 
-    SoundLibrary? selectedLibrary = loadedSettings?.soundLibraries
-        .where((soundLibrary) => soundLibrary.selected)
-        .first;
+      SoundLibrary? selectedLibrary = loadedSettings.soundLibraries
+          .where((soundLibrary) => soundLibrary.selected)
+          .first;
 
-    for (var soundLibrary in _settings.soundLibraries) {
-      soundLibrary.selected = soundLibrary.name == selectedLibrary?.name;
+      for (var soundLibrary in _settings.soundLibraries) {
+        soundLibrary.selected = soundLibrary.name == selectedLibrary.name;
+      }
     }
 
     // load the selected sound library
@@ -99,8 +99,7 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   Future<void> resetBasePath() async {
-    await updateBasePath(
-        await AppFileSystem.getBasePath());
+    await updateBasePath(await AppFileSystem.getBasePath());
   }
 
   Future<void> updateBasePath(String? newBasePath) async {
