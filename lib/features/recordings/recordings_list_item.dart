@@ -1,9 +1,7 @@
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_play_pause_button.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';

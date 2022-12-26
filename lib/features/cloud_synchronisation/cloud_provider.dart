@@ -18,7 +18,8 @@ class CloudProvider extends ChangeNotifier {
         print('User is currently signed out!');
         _cloud.loggedIn = false;
       } else {
-        print(user);
+        // do not print user on windows => causes exception
+        // print(user);
         print('User is signed in!');
         _cloud.loggedIn = true;
         _cloud.user = user;

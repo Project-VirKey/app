@@ -49,15 +49,24 @@ dependencies:
   shared_preferences: ^2.0.15
   permission_handler: ^10.2.0
   dart_melty_soundfont: ^1.1.5
-  firebase_core: ^2.3.0
-  firebase_core_desktop: ^1.0.2
-  firebase_auth: ^4.1.5
   provider: ^6.0.4
   path_provider: ^2.0.11
   email_validator: ^2.1.17
   file_picker: ^5.2.3
-  cloud_firestore: ^4.2.0
   share_plus: ^6.3.0
+  firebase_core: ^2.3.0
+  firebase_auth: ^4.1.5
+  cloud_firestore: ^4.2.0
+  firebase_core_desktop:
+    # using fork of original plugin, due to compatibility with newer version of firebase_core (major version change)
+    git:
+      url: https://github.com/yegobox/flutterfire_desktop
+      path: packages/firebase_core/firebase_core_desktop
+  firebase_auth_desktop:
+    # using fork of original plugin, due to compatibility with newer version of firebase_auth (major version change)
+    git:
+      url: https://github.com/yegobox/flutterfire_desktop
+      path: packages/firebase_auth/firebase_auth_desktop
 
 dev_dependencies:
   flutter_test:
