@@ -21,6 +21,9 @@ Future<void> main() async {
     setWindowMinSize(const Size(830, 580));
   }
 
+  // initialize folders for user content (recordings, ...)
+  AppFileSystem.initFolders();
+
   // run the app
   runApp(MultiProvider(
     providers: [
@@ -41,9 +44,6 @@ Future<void> main() async {
   await FirebaseAuth.instance.currentUser?.reload();
 
   // AppFirestore.test();
-
-  // initialize folders for user content (recordings, ...)
-  AppFileSystem.initFolders();
 }
 
 class App extends StatelessWidget {

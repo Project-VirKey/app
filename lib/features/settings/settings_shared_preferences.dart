@@ -12,7 +12,13 @@ class AppSharedPreferences {
     final prefs = await SharedPreferences.getInstance();
 
     if (prefs.containsKey('settings')) {
-      return settingsFromJson(prefs.getString('settings') ?? '');
+      // try, because if the model changes there will be an error trying to convert
+      // the read string from shared preferences to the model with settingsFromJson
+      try {
+        return settingsFromJson(prefs.getString('settings') ?? '');
+      } catch (e) {
+        return null;
+      }
     } else {
       return null;
     }
