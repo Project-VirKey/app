@@ -67,6 +67,7 @@ dependencies:
     git:
       url: https://github.com/yegobox/flutterfire_desktop
       path: packages/firebase_auth/firebase_auth_desktop
+  midi_util: ^1.0.2
 
 dev_dependencies:
   flutter_test:

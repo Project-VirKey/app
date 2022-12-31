@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
+import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/routing/router.dart';
@@ -30,6 +31,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ChangeNotifierProvider(create: (_) => CloudProvider()),
       ChangeNotifierProvider(create: (_) => RecordingsProvider()),
+      ChangeNotifierProvider(create: (_) => PianoProvider()),
     ],
     child: const App(),
   ));

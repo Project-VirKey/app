@@ -104,11 +104,12 @@ class ImportOverlay {
                 ConstrainedBox(
                   constraints: BoxConstraints(
                       maxWidth: MediaQuery.of(context).size.width * .5),
-                  child: const PropertyDescriptionActionCombination(
+                  child: PropertyDescriptionActionCombination(
                     type: PropertyDescriptionActionCombinationType.onlyChild,
                     child: AppIcon(
                       icon: HeroIcons.arrowDownTray,
                       color: AppColors.dark,
+                      onPressed: () {},
                     ),
                   ),
                 ),
