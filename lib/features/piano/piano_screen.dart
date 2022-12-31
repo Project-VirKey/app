@@ -8,6 +8,7 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/piano/import_overlay.dart';
 import 'package:virkey/features/piano/piano_key.dart';
+import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/utils/platform_helper.dart';
@@ -31,137 +32,154 @@ class _PianoScreenState extends State<PianoScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.secondary,
-      body: Center(
-        child: Consumer<SettingsProvider>(
-          builder: (BuildContext context, SettingsProvider settingsProvider,
-                  Widget? child) =>
-              Column(
-            children: [
-              Container(
-                color: AppColors.dark,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Wrap(
-                            spacing: 15,
-                            children: [
-                              AppIcon(
-                                icon: HeroIcons.arrowUturnLeft,
-                                color: AppColors.secondary,
-                                onPressed: () => context.go('/'),
-                                size: 30,
+        backgroundColor: AppColors.secondary,
+        body: Center(
+          child: Consumer<SettingsProvider>(
+            builder: (BuildContext context, SettingsProvider settingsProvider,
+                    Widget? child) =>
+                Consumer<PianoProvider>(
+              builder: (BuildContext context, PianoProvider pianoProvider,
+                      Widget? child) =>
+                  Column(
+                children: [
+                  Container(
+                    color: AppColors.dark,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5, horizontal: 5),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Wrap(
+                                spacing: 15,
+                                children: [
+                                  AppIcon(
+                                    icon: HeroIcons.arrowUturnLeft,
+                                    color: AppColors.secondary,
+                                    onPressed: () => context.go('/'),
+                                    size: 30,
+                                  ),
+                                  AppIcon(
+                                    icon: HeroIcons.arrowDownTray,
+                                    color: AppColors.secondary,
+                                    onPressed: () => _importOverlay.open(),
+                                    size: 30,
+                                  ),
+                                  AppIcon(
+                                    icon: HeroIcons.cog6Tooth,
+                                    color: AppColors.secondary,
+                                    onPressed: () => _settingsOverlay.open(),
+                                    size: 30,
+                                  ),
+                                ],
                               ),
-                              AppIcon(
-                                icon: HeroIcons.arrowDownTray,
-                                color: AppColors.secondary,
-                                onPressed: () => _importOverlay.open(),
-                                size: 30,
-                              ),
-                              AppIcon(
-                                icon: HeroIcons.cog6Tooth,
-                                color: AppColors.secondary,
-                                onPressed: () => _settingsOverlay.open(),
-                                size: 30,
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
+                          const Align(
+                              alignment: Alignment.center,
+                              child: Padding(
+                                padding: EdgeInsets.only(top: 5),
+                                child: AppText(
+                                  text: 'ViRKEY',
+                                  size: 28,
+                                  letterSpacing: 4,
+                                  family: AppFonts.secondary,
+                                  color: AppColors.secondary,
+                                ),
+                              )),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Wrap(
+                              // vertical centering of containing widgets
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 15,
+                              children: [
+                                const AppText(
+                                  text: '00:00:00',
+                                  size: 20,
+                                  color: AppColors.secondary,
+                                  weight: AppFonts.weightLight,
+                                  letterSpacing: 4,
+                                ),
+                                AnimatedCrossFade(
+                                  crossFadeState: pianoProvider.isRecording
+                                      ? CrossFadeState.showSecond
+                                      : CrossFadeState.showFirst,
+                                  duration: const Duration(milliseconds: 200),
+                                  firstChild: AppIcon(
+                                    icon: Icons.radio_button_checked,
+                                    color: AppColors.secondary,
+                                    onPressed: () =>
+                                        pianoProvider.toggleRecording(),
+                                    size: 30,
+                                  ),
+                                  secondChild: AppIcon(
+                                    icon: Icons.radio_button_checked,
+                                    color: AppColors.secondary,
+                                    onPressed: () =>
+                                        pianoProvider.toggleRecording(),
+                                    size: 30,
+                                  ),
+                                ),
+                                AppIcon(
+                                  icon: HeroIcons.play,
+                                  color: AppColors.secondary,
+                                  onPressed: () => {},
+                                  size: 30,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 5),
-                            child: AppText(
-                              text: 'ViRKEY',
-                              size: 28,
-                              letterSpacing: 4,
-                              family: AppFonts.secondary,
-                              color: AppColors.secondary,
-                            ),
-                          )),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Wrap(
-                          // vertical centering of containing widgets
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 15,
-                          children: [
-                            const AppText(
-                              text: '00:00:00',
-                              size: 20,
-                              color: AppColors.secondary,
-                              weight: AppFonts.weightLight,
-                              letterSpacing: 4,
-                            ),
-                            AppIcon(
-                              icon: Icons.radio_button_checked,
-                              color: AppColors.secondary,
-                              onPressed: () => {},
-                              size: 30,
-                            ),
-                            AppIcon(
-                              icon: HeroIcons.play,
-                              color: AppColors.secondary,
-                              onPressed: () => {},
-                              size: 30,
-                            ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: GestureDetector(
+                        onVerticalDragUpdate: (DragUpdateDetails details) {
+                          if (PlatformHelper.isDesktop) {
+                            return;
+                          }
+
+                          int keyIndex = (details.globalPosition.dx /
+                                  (MediaQuery.of(context).size.width) *
+                                  7)
+                              .floor();
+
+                          if (keyIndex != prevVal) {
+                            // FlutterMidi().playMidiNote(
+                            //     midi: PianoKeys.white[keyIndex][1] +
+                            //         PianoKeys.midiOffset);
+                            prevVal = keyIndex;
+                          }
+                        },
+                        onVerticalDragEnd: (DragEndDetails details) =>
+                            {prevVal = -1},
+                        child: Stack(
+                          // alignment: Alignment.topCenter,
+                          children: const [
+                            PianoKeysWhite(),
+                            Positioned(
+                              left: 0,
+                              right: 0,
+                              top: 0,
+                              child: PianoKeysBlack(),
+                            )
                           ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.center,
-                  child: GestureDetector(
-                    onVerticalDragUpdate: (DragUpdateDetails details) {
-                      if (PlatformHelper.isDesktop) {
-                        return;
-                      }
-
-                      int keyIndex = (details.globalPosition.dx /
-                              (MediaQuery.of(context).size.width) *
-                              7)
-                          .floor();
-
-                      if (keyIndex != prevVal) {
-                        // FlutterMidi().playMidiNote(
-                        //     midi: PianoKeys.white[keyIndex][1] +
-                        //         PianoKeys.midiOffset);
-                        prevVal = keyIndex;
-                      }
-                    },
-                    onVerticalDragEnd: (DragEndDetails details) =>
-                        {prevVal = -1},
-                    child: Stack(
-                      // alignment: Alignment.topCenter,
-                      children: const [
-                        PianoKeysWhite(),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          top: 0,
-                          child: PianoKeysBlack(),
-                        )
-                      ],
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

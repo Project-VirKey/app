@@ -4,10 +4,12 @@ import 'package:dart_melty_soundfont/synthesizer.dart';
 import 'package:dart_melty_soundfont/synthesizer_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
+import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
 class PianoKeys {
@@ -75,7 +77,6 @@ class PianoKeys {
 
     final player = AudioPlayer();
     // player.setPlayerMode(PlayerMode.lowLatency);
-
 
     await player.stop();
     //await player.setSourceBytes(waveUint8List);
@@ -231,37 +232,46 @@ class PianoKeyWhite extends StatelessWidget {
         children: [
           Container(
             margin: const EdgeInsets.only(left: 5, right: 5, bottom: 5),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                foregroundColor: AppColors.dark,
-                backgroundColor: AppColors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: AppRadius.radius,
-                    bottomRight: AppRadius.radius,
-                    topLeft: topLeft,
-                    topRight: topRight,
+            child: Consumer<PianoProvider>(
+              builder: (BuildContext context, PianoProvider pianoProvider,
+                      Widget? child) =>
+                  ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: AppColors.dark,
+                  backgroundColor: AppColors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: AppRadius.radius,
+                      bottomRight: AppRadius.radius,
+                      topLeft: topLeft,
+                      topRight: topRight,
+                    ),
                   ),
                 ),
-              ),
-              onPressed: () async {
-                // await player.stop();
-                // await player.setSource(
-                //     AssetSource('audio/mixkit-arcade-retro-game-over-213.wav');
-                // );
-                // await player.setSourceBytes(PianoKeys().synth);
-                // await player.resume();
-                // FlutterMidi().playMidiNote(midi: midiNoteNumber);
-                // PianoKeys().synth.noteOn(channel: 0, key: 72, velocity: 10);
-              },
-              child: Container(
-                alignment: Alignment.bottomCenter,
-                padding: const EdgeInsets.only(bottom: 25),
-                child: AppText(
-                  text: name,
-                  size: parentWidth * .04,
-                  color: AppColors.dark,
-                  family: AppFonts.secondary,
+                onPressed: () async {
+                  // await player.stop();
+                  // await player.setSource(
+                  //     AssetSource('audio/mixkit-arcade-retro-game-over-213.wav');
+                  // );
+                  // await player.setSourceBytes(PianoKeys().synth);
+                  // await player.resume();
+                  // FlutterMidi().playMidiNote(midi: midiNoteNumber);
+                  // PianoKeys().synth.noteOn(channel: 0, key: 72, velocity: 10);
+
+                  if (pianoProvider.isRecording) {
+                    pianoProvider.recordingAddNote(midiNoteNumber);
+                    print(pianoProvider.recordedNotes);
+                  }
+                },
+                child: Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: const EdgeInsets.only(bottom: 25),
+                  child: AppText(
+                    text: name,
+                    size: parentWidth * .04,
+                    color: AppColors.dark,
+                    family: AppFonts.secondary,
+                  ),
                 ),
               ),
             ),
