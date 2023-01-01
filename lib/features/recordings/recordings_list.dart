@@ -7,16 +7,14 @@ import 'package:virkey/utils/platform_helper.dart';
 class RecordingsList extends StatefulWidget {
   const RecordingsList({
     Key? key,
-    required this.vsync,
   }) : super(key: key);
-
-  final TickerProvider vsync;
 
   @override
   State<RecordingsList> createState() => _RecordingsListState();
 }
 
-class _RecordingsListState extends State<RecordingsList> {
+class _RecordingsListState extends State<RecordingsList>
+    with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Consumer<RecordingsProvider>(
@@ -48,7 +46,7 @@ class _RecordingsListState extends State<RecordingsList> {
                 sizeFactor: animation,
                 child: RecordingsListItem(
                   recording: recordingsProvider.recordings[index],
-                  vsync: widget.vsync,
+                  vsync: this,
                   recordingsProvider: recordingsProvider,
                 ));
           },

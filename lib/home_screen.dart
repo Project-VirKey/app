@@ -10,6 +10,7 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/constants/shadows.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
+import 'package:virkey/features/piano/piano_play_button.dart';
 import 'package:virkey/features/recordings/recordings_list.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/recordings/recordings_title_bar.dart';
@@ -44,7 +45,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 Widget? child) =>
             Column(
           children: <Widget>[
-            // AppButton(appText: const AppText(text: 'Play Note',), onPressed: (() => {})),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 20),
               child: Row(
@@ -129,10 +129,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     color: AppColors.dark,
                     onPressed: () {
                       if (Provider.of<CloudProvider>(context).cloud.loggedIn) {
-
-                      } else {
-
-                      }
+                      } else {}
                     },
                     size: 30,
                   ),
@@ -148,64 +145,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ? CrossFadeState.showFirst
                   : CrossFadeState.showSecond,
               duration: RecordingsProvider.expandDuration,
-              firstChild: const SizedBox(
-                width: 150,
+              firstChild: SizedBox(
+                width: MediaQuery.of(context).size.width,
                 height: 0,
               ),
-              secondChild: Column(
-                children: [
-                  const SizedBox(
-                    height: 40,
-                  ),
-                  SizedBox(
-                    width: 150,
-                    height: 150,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.dark,
-                        foregroundColor: AppColors.tertiary,
-                        shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.all(AppRadius.radius)),
-                      ),
-                      onPressed: () => context.go('/piano'),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          SvgPicture.asset(
-                            'assets/images/VIK_Logo_v2.svg',
-                            height: 73,
-                          ),
-                          const Padding(
-                            padding: EdgeInsets.only(top: 7.5),
-                            child: AppText(
-                              text: 'Play',
-                              family: AppFonts.secondary,
-                              color: AppColors.secondary,
-                              letterSpacing: 6,
-                              size: 28,
-                            ),
-                          ),
-                        ],
-                      ),
+              secondChild: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: const [
+                    SizedBox(
+                      height: 40,
                     ),
-                  ),
-                  const SizedBox(
-                    height: 25,
-                  ),
-                  const AppText(
-                    text: 'Find Device ...',
-                    size: 20,
-                    weight: AppFonts.weightLight,
-                    letterSpacing: 3,
-                  ),
-                  const SizedBox(
-                    height: 60,
-                  ),
-                ],
+                    PianoPlayButton(),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    AppText(
+                      text: 'Find Device ...',
+                      size: 20,
+                      weight: AppFonts.weightLight,
+                      letterSpacing: 3,
+                    ),
+                    SizedBox(
+                      height: 60,
+                    ),
+                  ],
+                ),
               ),
             ),
             const RecordingsTitleBar(),
-            Expanded(child: RecordingsList(vsync: this)),
+            const Expanded(child: RecordingsList()),
           ],
         ),
       ),
