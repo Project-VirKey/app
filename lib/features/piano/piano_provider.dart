@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:midi_util/midi_util.dart';
 import 'package:virkey/utils/file_system.dart';
@@ -16,6 +17,11 @@ class PianoProvider extends ChangeNotifier {
   Timer? _displayTimeTimer;
 
   final int _recordingDelaySeconds = 3;
+
+  bool isPlaybackPlaying = false;
+  String? playbackPath;
+  String? playbackFileName;
+  AudioPlayer playbackPlayer = AudioPlayer();
 
   List get recordedNotes => _recordedNotes;
 
@@ -56,12 +62,24 @@ class PianoProvider extends ChangeNotifier {
 
     _isRecording = true;
     _recordedNotes.clear();
+
+    if (isPlaybackPlaying && playbackPath != null) {
+      playbackPlayer.resume();
+    }
   }
 
-  void stopRecording() {
+  Future<void> stopRecording() async {
     _isRecording = false;
     _displayTimeTimer?.cancel();
     displayTime = _resetDisplayTime;
+
+    if (playbackPath != null) {
+      if (isPlaybackPlaying) {
+        playbackPlayer.stop();
+      }
+      AppFileSystem.savePlaybackFile(File(playbackPath!), recordingTitle);
+    }
+
     createMidiFile();
   }
 
@@ -116,5 +134,21 @@ class PianoProvider extends ChangeNotifier {
         '${AppFileSystem.basePath}${Platform.pathSeparator}${AppFileSystem.recordingsFolder}${Platform.pathSeparator}$recordingTitle.mid');
 
     midiFile.writeFile(outputFile);
+  }
+
+  void setPlayback(String path) {
+    playbackPath = path;
+    playbackFileName = AppFileSystem.getFilenameFromPath(path);
+    isPlaybackPlaying = true;
+    playbackPlayer.setSource(DeviceFileSource(playbackPath!));
+
+    notifyListeners();
+  }
+
+  void removePlayback() {
+    isPlaybackPlaying = false;
+    playbackPath = null;
+
+    notifyListeners();
   }
 }
