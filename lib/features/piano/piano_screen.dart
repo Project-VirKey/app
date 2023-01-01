@@ -9,9 +9,12 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/piano/import_overlay.dart';
 import 'package:virkey/features/piano/piano_key.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
+import 'package:virkey/features/piano/piano_recording_title_overlay.dart';
+import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/utils/platform_helper.dart';
+import 'package:virkey/utils/snackbar.dart';
 
 class PianoScreen extends StatefulWidget {
   const PianoScreen({Key? key}) : super(key: key);
@@ -32,14 +35,17 @@ class _PianoScreenState extends State<PianoScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: AppColors.secondary,
-        body: Center(
-          child: Consumer<SettingsProvider>(
-            builder: (BuildContext context, SettingsProvider settingsProvider,
+      backgroundColor: AppColors.secondary,
+      body: Center(
+        child: Consumer<SettingsProvider>(
+          builder: (BuildContext context, SettingsProvider settingsProvider,
+                  Widget? child) =>
+              Consumer<PianoProvider>(
+            builder: (BuildContext context, PianoProvider pianoProvider,
                     Widget? child) =>
-                Consumer<PianoProvider>(
-              builder: (BuildContext context, PianoProvider pianoProvider,
-                      Widget? child) =>
+                Consumer<RecordingsProvider>(
+              builder: (BuildContext context,
+                      RecordingsProvider recordingsProvider, Widget? child) =>
                   Column(
                 children: [
                   Container(
@@ -98,33 +104,54 @@ class _PianoScreenState extends State<PianoScreen>
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 15,
                               children: [
-                                const AppText(
-                                  text: '00:00:00',
+                                AppText(
+                                  text: pianoProvider.displayTime,
                                   size: 20,
                                   color: AppColors.secondary,
                                   weight: AppFonts.weightLight,
                                   letterSpacing: 4,
                                 ),
-                                AnimatedCrossFade(
-                                  crossFadeState: pianoProvider.isRecording
-                                      ? CrossFadeState.showSecond
-                                      : CrossFadeState.showFirst,
-                                  duration: const Duration(milliseconds: 200),
-                                  firstChild: AppIcon(
-                                    icon: Icons.radio_button_checked,
-                                    color: AppColors.secondary,
-                                    onPressed: () =>
-                                        pianoProvider.toggleRecording(),
-                                    size: 30,
-                                  ),
-                                  secondChild: AppIcon(
-                                    icon: Icons.radio_button_checked,
-                                    color: AppColors.secondary,
-                                    onPressed: () =>
-                                        pianoProvider.toggleRecording(),
-                                    size: 30,
-                                  ),
+                                AppIcon(
+                                  icon: Icons.radio_button_checked,
+                                  color: AppColors.secondary,
+                                  onPressed: () {
+                                    if (pianoProvider.isRecording) {
+                                      pianoProvider.toggleRecording();
+                                      AppSnackBar(
+                                        message:
+                                            'Saved "${pianoProvider.recordingTitle}"',
+                                        context: context,
+                                        vsync: this,
+                                      ).open();
+                                      recordingsProvider.loadRecordings();
+                                    } else {
+                                      RecordingTitleOverlay(
+                                              context: context, vsync: this)
+                                          .open();
+                                    }
+                                  },
+                                  size: 30,
                                 ),
+                                // AnimatedCrossFade(
+                                //   crossFadeState: pianoProvider.isRecording
+                                //       ? CrossFadeState.showSecond
+                                //       : CrossFadeState.showFirst,
+                                //   duration: const Duration(milliseconds: 200),
+                                //   firstChild: AppIcon(
+                                //     icon: Icons.radio_button_checked,
+                                //     color: AppColors.secondary,
+                                //     onPressed: () =>
+                                //         pianoProvider.toggleRecording(),
+                                //     size: 30,
+                                //   ),
+                                //   secondChild: AppIcon(
+                                //     icon: Icons.radio_button_checked,
+                                //     color: AppColors.secondary,
+                                //     onPressed: () =>
+                                //         pianoProvider.toggleRecording(),
+                                //     size: 30,
+                                //   ),
+                                // ),
                                 AppIcon(
                                   icon: HeroIcons.play,
                                   color: AppColors.secondary,
@@ -180,6 +207,8 @@ class _PianoScreenState extends State<PianoScreen>
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
