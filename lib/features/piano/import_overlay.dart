@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:provider/provider.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
@@ -7,8 +10,11 @@ import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
+import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/overlay.dart';
+import 'package:virkey/utils/snackbar.dart';
 
 class ImportOverlay {
   final BuildContext context;
@@ -61,59 +67,95 @@ class ImportOverlay {
           padding: const EdgeInsets.all(11),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const PropertiesDescriptionTitle(
-                  title: 'Audio-Playback',
-                ),
-                Padding(
-                  padding: MediaQuery.of(context).orientation ==
-                          Orientation.landscape
+            child: Padding(
+              padding:
+                  MediaQuery.of(context).orientation == Orientation.landscape
                       ? EdgeInsets.symmetric(
                           horizontal: MediaQuery.of(context).size.width * .15)
                       : EdgeInsets.zero,
-                  child: PropertyDescriptionActionCombination(
-                    title: 'File3.mp3',
-                    child: Row(
-                      children: [
-                        AppSwitch(
-                          value: false,
-                          onChanged: (bool val) => {},
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        AppIcon(
-                          icon: HeroIcons.trash,
+              child: Consumer<PianoProvider>(
+                builder: (BuildContext context, PianoProvider pianoProvider,
+                        Widget? child) =>
+                    Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const PropertiesDescriptionTitle(
+                      title: 'Audio-Playback',
+                    ),
+                    if (pianoProvider.playbackPath == null)
+                      PropertyDescriptionActionCombination(
+                        type:
+                            PropertyDescriptionActionCombinationType.onlyChild,
+                        child: AppIcon(
+                          icon: HeroIcons.arrowDownTray,
                           color: AppColors.dark,
-                          onPressed: () => AppConfirmOverlay(
-                              vsync: vsync,
-                              context: context,
-                              displayText: 'Delete playback "File1.mp3"?',
-                              confirmButtonText: 'Delete',
-                              onConfirm: () => {}).open(),
+                          onPressed: () async {
+                            File? playbackFile = await AppFileSystem.filePicker(
+                                title: 'Select Audio Playback (MP3/WAV)',
+                                allowedExtensions: ['mp3', 'wav']);
+
+                            if (playbackFile == null) {
+                              AppSnackBar(
+                                      message: 'Could not load Playback!',
+                                      context: context,
+                                      vsync: vsync)
+                                  .open();
+                            } else {
+                              // if (await AppFileSystem.savePlaybackFile(
+                              //         playbackFile, recording.title) !=
+                              //     null) {
+                              //   await recordingsProvider
+                              //       .loadPlayback(recording);
+                              // }
+                              pianoProvider.setPlayback(playbackFile.path);
+                            }
+                          },
                         ),
-                      ],
+                      ),
+                    if (pianoProvider.playbackPath != null)
+                      PropertyDescriptionActionCombination(
+                        title: pianoProvider.playbackFileName ?? 'File',
+                        child: Row(
+                          children: [
+                            AppSwitch(
+                              value: pianoProvider.isPlaybackPlaying,
+                              onChanged: (bool val) => {
+                                pianoProvider.isPlaybackPlaying =
+                                    !pianoProvider.isPlaybackPlaying
+                              },
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            AppIcon(
+                              icon: HeroIcons.xMark,
+                              color: AppColors.dark,
+                              onPressed: () => AppConfirmOverlay(
+                                  vsync: vsync,
+                                  context: context,
+                                  displayText:
+                                      'Remove playback "${pianoProvider.playbackFileName}"?',
+                                  confirmButtonText: 'Remove',
+                                  onConfirm: () =>
+                                      pianoProvider.removePlayback()).open(),
+                            ),
+                          ],
+                        ),
+                      ),
+                    const PropertiesDescriptionTitle(
+                      title: 'MIDI',
                     ),
-                  ),
-                ),
-                const PropertiesDescriptionTitle(
-                  title: 'MIDI',
-                ),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                      maxWidth: MediaQuery.of(context).size.width * .5),
-                  child: PropertyDescriptionActionCombination(
-                    type: PropertyDescriptionActionCombinationType.onlyChild,
-                    child: AppIcon(
-                      icon: HeroIcons.arrowDownTray,
-                      color: AppColors.dark,
-                      onPressed: () {},
+                    PropertyDescriptionActionCombination(
+                      type: PropertyDescriptionActionCombinationType.onlyChild,
+                      child: AppIcon(
+                        icon: HeroIcons.arrowDownTray,
+                        color: AppColors.dark,
+                        onPressed: () {},
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),

@@ -175,7 +175,6 @@ class SettingsOverlay {
                           const PropertiesDescriptionTitle(title: 'Folder'),
                           if (PlatformHelper.isDesktop)
                             PropertyDescriptionActionCombination(
-                              // TODO: review -> "In der mobilen Version wird aufgrund der Sinnhaftigkeit dieses Feature weggelassen. Begründet kann dies mit den sich ändernden Berechtigungen (bei den verschiedenene Pfaden am Betriebssystem) und der Einfachheit, dass ein Ordner gleich bleibt."
                               title:
                                   settingsProvider.settings.defaultFolder.path,
 
