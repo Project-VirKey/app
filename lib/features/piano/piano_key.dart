@@ -260,7 +260,6 @@ class PianoKeyWhite extends StatelessWidget {
 
                   if (pianoProvider.isRecording) {
                     pianoProvider.recordingAddNote(midiNoteNumber);
-                    print(pianoProvider.recordedNotes);
                   }
                 },
                 child: Container(
@@ -312,42 +311,50 @@ class PianoKeyBlack extends StatelessWidget {
         height: PlatformHelper.isDesktop
             ? (parentHeight * .6)
             : (parentHeight * .54),
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.zero,
-            foregroundColor: AppColors.white,
-            backgroundColor: AppColors.dark,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: AppRadius.radius,
-                bottomRight: AppRadius.radius,
+        child: Consumer<PianoProvider>(
+          builder: (BuildContext context, PianoProvider pianoProvider,
+                  Widget? child) =>
+              ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.zero,
+              foregroundColor: AppColors.white,
+              backgroundColor: AppColors.dark,
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: AppRadius.radius,
+                  bottomRight: AppRadius.radius,
+                ),
               ),
             ),
-          ),
-          // onPressed: () => FlutterMidi().playMidiNote(midi: midiNoteNumber),
-          onPressed: () => {},
-          child: Container(
-            alignment: Alignment.bottomCenter,
-            padding: const EdgeInsets.only(bottom: 20),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                AppText(
-                  text: name,
-                  size: parentWidth * .045,
-                  color: AppColors.secondary,
-                  family: AppFonts.secondary,
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                AppText(
-                  text: secondName,
-                  size: parentWidth * .033,
-                  color: AppColors.secondary,
-                  family: AppFonts.secondary,
-                ),
-              ],
+            // onPressed: () => FlutterMidi().playMidiNote(midi: midiNoteNumber),
+            onPressed: () {
+              if (pianoProvider.isRecording) {
+                pianoProvider.recordingAddNote(midiNoteNumber);
+              }
+            },
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  AppText(
+                    text: name,
+                    size: parentWidth * .045,
+                    color: AppColors.secondary,
+                    family: AppFonts.secondary,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  AppText(
+                    text: secondName,
+                    size: parentWidth * .033,
+                    color: AppColors.secondary,
+                    family: AppFonts.secondary,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
