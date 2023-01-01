@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:virkey/constants/colors.dart';
 
 class AppSlider extends StatefulWidget {
-  AppSlider({Key? key, this.value = 0, required this.onChanged, this.onChangedEnd})
+  AppSlider(
+      {Key? key, this.value = 0, required this.onChanged, this.onChangedEnd})
       : super(key: key);
 
   double value;
@@ -37,7 +38,9 @@ class _AppSliderState extends State<AppSlider> {
           });
         },
         onChangeEnd: (value) {
-          widget.onChangedEnd!(widget.value);
+          if (widget.onChangedEnd != null) {
+            widget.onChangedEnd!(widget.value);
+          }
         },
       ),
     );

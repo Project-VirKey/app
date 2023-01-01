@@ -311,8 +311,10 @@ class RecordingsListItem extends StatelessWidget {
                                 displayText:
                                     'Delete recording "${recording.title}"?',
                                 confirmButtonText: 'Delete',
-                                onConfirm: () {
-                                  recordingsProvider.deleteRecording(recording);
+                                onConfirm: () async {
+                                  recordingsProvider.contractRecordingItem();
+                                  await recordingsProvider.deleteRecording(recording);
+                                  await recordingsProvider.loadRecordings();
                                 }).open(),
                           ),
                         ),

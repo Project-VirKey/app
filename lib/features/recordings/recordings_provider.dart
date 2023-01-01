@@ -27,7 +27,8 @@ class RecordingsProvider extends ChangeNotifier {
   }
 
   Future<void> loadRecordings() async {
-    AppFileSystem.basePath = (await AppSharedPreferences.loadData())?.defaultFolder.path;
+    AppFileSystem.basePath =
+        (await AppSharedPreferences.loadData())?.defaultFolder.path;
     if (AppFileSystem.basePath == null || AppFileSystem.basePath == '') {
       await AppFileSystem.loadBasePath();
     }
@@ -58,8 +59,10 @@ class RecordingsProvider extends ChangeNotifier {
 
   void addRecordingItem(Recording recording) {
     recordings.insert(0, recording);
-    recordingsListKey.currentState!
-        .insertItem(0, duration: const Duration(milliseconds: 150));
+    if (recordingsListKey.currentState != null) {
+      recordingsListKey.currentState!
+          .insertItem(0, duration: const Duration(milliseconds: 150));
+    }
     notifyListeners();
   }
 

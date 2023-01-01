@@ -14,7 +14,7 @@ class RecordingsList extends StatefulWidget {
 }
 
 class _RecordingsListState extends State<RecordingsList>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Consumer<RecordingsProvider>(
