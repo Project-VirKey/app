@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 
@@ -32,9 +32,9 @@ class _AppAudioPlayerState extends State<AppAudioPlayer> {
         text: 'Play',
       ),
       onPressed: () async => {
-        await player.setSource(
-            AssetSource('audio/mixkit-arcade-retro-game-over-213.wav')),
-        await player.resume()
+        await player.setAudioSource(
+            AudioSource.asset('audio/mixkit-arcade-retro-game-over-213.wav')),
+        player.play()
       },
     );
   }
