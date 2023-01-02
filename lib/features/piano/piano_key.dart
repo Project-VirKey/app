@@ -1,8 +1,9 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:dart_melty_soundfont/dart_melty_soundfont.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mp_audio_stream/mp_audio_stream.dart';
+import 'package:just_audio/just_audio.dart';
+
+// import 'package:mp_audio_stream/mp_audio_stream.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
@@ -21,14 +22,24 @@ class PianoKeys {
   static const midiOffset = 72;
 
   static List white = [
-    ['C', 0, getAudioStream()],
-    ['D', 2, getAudioStream()],
-    ['E', 4, getAudioStream()],
-    ['F', 5, getAudioStream()],
-    ['G', 7, getAudioStream()],
-    ['A', 9, getAudioStream()],
-    ['B', 11, getAudioStream()]
+    ['C', 0],
+    ['D', 2],
+    ['E', 4],
+    ['F', 5],
+    ['G', 7],
+    ['A', 9],
+    ['B', 11]
   ];
+
+  // static List white = [
+  //   ['C', 0, getAudioStream()],
+  //   ['D', 2, getAudioStream()],
+  //   ['E', 4, getAudioStream()],
+  //   ['F', 5, getAudioStream()],
+  //   ['G', 7, getAudioStream()],
+  //   ['A', 9, getAudioStream()],
+  //   ['B', 11, getAudioStream()]
+  // ];
 
   static const List black = [
     ['C#', 'Db', 1],
@@ -41,7 +52,8 @@ class PianoKeys {
 
   static late ByteData bytes;
   static late Synthesizer synth;
-  static final AudioStream audioStream = getAudioStream();
+
+  // static final AudioStream audioStream = getAudioStream();
 
   void loadLibrary(String asset) async {
     // Create the synthesizer.
@@ -56,7 +68,7 @@ class PianoKeys {
           enableReverbAndChorus: true,
         ));
 
-    white[0][2].init();
+    // white[0][2].init();
   }
 }
 
@@ -76,7 +88,6 @@ class PianoKeysWhite extends StatelessWidget {
           PianoKeyWhite(
             name: pianoKeyInfo[0],
             midiNoteNumber: pianoKeyInfo[1] + PianoKeys.midiOffset,
-            audioStream: pianoKeyInfo[2],
             parentWidth: maxWidthDesktop,
             topLeft:
                 index == 0 && (mediaQuerySize.height * .9 >= maxHeightDesktop)
@@ -188,7 +199,7 @@ class PianoKeyWhite extends StatelessWidget {
     required this.topLeft,
     required this.topRight,
     required this.midiNoteNumber,
-    required this.audioStream,
+    // required this.audioStream,
   }) : super(key: key);
 
   final String name;
@@ -196,13 +207,11 @@ class PianoKeyWhite extends StatelessWidget {
   final Radius topLeft;
   final Radius topRight;
   final int midiNoteNumber;
-  final AudioStream audioStream;
+
+  // final AudioStream audioStream;
 
   @override
   Widget build(BuildContext context) {
-    final player = AudioPlayer();
-    player.setPlayerMode(PlayerMode.lowLatency);
-
     return Expanded(
       child: Stack(
         alignment: Alignment.centerRight,
@@ -238,17 +247,28 @@ class PianoKeyWhite extends StatelessWidget {
                       .noteOn(channel: 0, key: midiNoteNumber, velocity: 120);
 
                   // Render the waveform (3 seconds)
-                  List<double> wave = List.filled(44100 * 3, 0);
-                  PianoKeys.synth.renderMono(wave);
+                  // List<double> wave = List.filled(44100 * 3, 0);
+                  // PianoKeys.synth.renderMono(wave);
+                  ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: 44100 * 3);
+                  PianoKeys.synth.renderMonoInt16(buf16);
 
-                  try {
-                    PianoKeys.audioStream.uninit();
-                  } catch (e) {
-                    print(e);
-                  }
-                  PianoKeys.audioStream.init();
+                  // print(buf16.bytes.buffer.asInt16List());
 
-                  audioStream.push(Float32List.fromList(wave));
+                  // try {
+                  //   PianoKeys.audioStream.uninit();
+                  // } catch (e) {
+                  //   print(e);
+                  // }
+                  // PianoKeys.audioStream.init();
+                  //
+                  // PianoKeys.audioStream.push(Float32List.fromList(wave));
+                  // List<int> intWave = List.of(wave).map((e) => e * 255).cast<int>().toList();
+
+
+                  // AudioPlayer notePlayer = AudioPlayer();
+                  // notePlayer.setAudioSource(MyCustomSource(buf16.bytes.buffer.asInt16List()));
+                  // notePlayer.setAudioSource(MyCustomSource(waveInt));
+                  // notePlayer.play();
                 },
                 child: Container(
                   alignment: Alignment.bottomCenter,
@@ -348,5 +368,25 @@ class PianoKeyBlack extends StatelessWidget {
         ),
       );
     }
+  }
+}
+
+// Feed your own stream of bytes into the player
+class MyCustomSource extends StreamAudioSource {
+  final List<int> bytes;
+
+  MyCustomSource(this.bytes);
+
+  @override
+  Future<StreamAudioResponse> request([int? start, int? end]) async {
+    start ??= 0;
+    end ??= bytes.length;
+    return StreamAudioResponse(
+      sourceLength: bytes.length,
+      contentLength: end - start,
+      offset: start,
+      stream: Stream.value(bytes.sublist(start, end)),
+      contentType: 'audio/mpeg',
+    );
   }
 }

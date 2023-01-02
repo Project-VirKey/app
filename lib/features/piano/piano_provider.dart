@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:midi_util/midi_util.dart';
 import 'package:virkey/utils/file_system.dart';
 
@@ -64,7 +64,8 @@ class PianoProvider extends ChangeNotifier {
     _recordedNotes.clear();
 
     if (isPlaybackPlaying && playbackPath != null) {
-      playbackPlayer.resume();
+      playbackPlayer.seek(const Duration(seconds: 0));
+      playbackPlayer.play();
     }
   }
 
@@ -140,7 +141,7 @@ class PianoProvider extends ChangeNotifier {
     playbackPath = path;
     playbackFileName = AppFileSystem.getFilenameFromPath(path);
     isPlaybackPlaying = true;
-    playbackPlayer.setSource(DeviceFileSource(playbackPath!));
+    playbackPlayer.setAudioSource(AudioSource.file(playbackPath!));
 
     notifyListeners();
   }
