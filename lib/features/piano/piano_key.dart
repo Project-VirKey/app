@@ -1,9 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
-import 'package:dart_melty_soundfont/audio_renderer_ex.dart';
-import 'package:dart_melty_soundfont/synthesizer.dart';
-import 'package:dart_melty_soundfont/synthesizer_settings.dart';
+import 'package:dart_melty_soundfont/dart_melty_soundfont.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mp_audio_stream/mp_audio_stream.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
@@ -21,14 +20,14 @@ class PianoKeys {
   // C5
   static const midiOffset = 72;
 
-  static const List white = [
-    ['C', 0],
-    ['D', 2],
-    ['E', 4],
-    ['F', 5],
-    ['G', 7],
-    ['A', 9],
-    ['B', 11]
+  static List white = [
+    ['C', 0, getAudioStream()],
+    ['D', 2, getAudioStream()],
+    ['E', 4, getAudioStream()],
+    ['F', 5, getAudioStream()],
+    ['G', 7, getAudioStream()],
+    ['A', 9, getAudioStream()],
+    ['B', 11, getAudioStream()]
   ];
 
   static const List black = [
@@ -40,17 +39,11 @@ class PianoKeys {
     ['A#', 'Bb', 10]
   ];
 
-  // {flutterMidi.playMidiNote(midi: 65)}
-
-  // late FlutterMidi flutterMidi = FlutterMidi();
-  late ByteData bytes;
-  late Synthesizer synth;
+  static late ByteData bytes;
+  static late Synthesizer synth;
+  static final AudioStream audioStream = getAudioStream();
 
   void loadLibrary(String asset) async {
-    // flutterMidi.unmute(); // Optionally Unmute
-    // ByteData byte = await rootBundle.load(asset);
-    // flutterMidi.prepare(sf2: byte);
-
     // Create the synthesizer.
     bytes = await rootBundle.load(asset);
 
@@ -63,25 +56,7 @@ class PianoKeys {
           enableReverbAndChorus: true,
         ));
 
-    synth.noteOn(channel: 0, key: 76, velocity: 120);
-
-    // Render the waveform (3 seconds)
-    // ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: 44100 * 1);
-    // synth.renderMonoInt16(buf16);
-    List<double> wave = List.filled(44100 * 3, 0);
-    synth.renderMono(wave);
-
-    //Uint8List waveUint8List = Uint8List.fromList(wave.map((e) => (e.abs() * 255)).toList());
-
-    print(wave.getRange(2000, 2100));
-
-    final player = AudioPlayer();
-    // player.setPlayerMode(PlayerMode.lowLatency);
-
-    await player.stop();
-    //await player.setSourceBytes(waveUint8List);
-    // await player.setSourceBytes(buf16.bytes.buffer.asUint8List());
-    await player.resume();
+    white[0][2].init();
   }
 }
 
@@ -101,6 +76,7 @@ class PianoKeysWhite extends StatelessWidget {
           PianoKeyWhite(
             name: pianoKeyInfo[0],
             midiNoteNumber: pianoKeyInfo[1] + PianoKeys.midiOffset,
+            audioStream: pianoKeyInfo[2],
             parentWidth: maxWidthDesktop,
             topLeft:
                 index == 0 && (mediaQuerySize.height * .9 >= maxHeightDesktop)
@@ -212,6 +188,7 @@ class PianoKeyWhite extends StatelessWidget {
     required this.topLeft,
     required this.topRight,
     required this.midiNoteNumber,
+    required this.audioStream,
   }) : super(key: key);
 
   final String name;
@@ -219,6 +196,7 @@ class PianoKeyWhite extends StatelessWidget {
   final Radius topLeft;
   final Radius topRight;
   final int midiNoteNumber;
+  final AudioStream audioStream;
 
   @override
   Widget build(BuildContext context) {
@@ -249,18 +227,28 @@ class PianoKeyWhite extends StatelessWidget {
                   ),
                 ),
                 onPressed: () async {
-                  // await player.stop();
-                  // await player.setSource(
-                  //     AssetSource('audio/mixkit-arcade-retro-game-over-213.wav');
-                  // );
-                  // await player.setSourceBytes(PianoKeys().synth);
-                  // await player.resume();
-                  // FlutterMidi().playMidiNote(midi: midiNoteNumber);
-                  // PianoKeys().synth.noteOn(channel: 0, key: 72, velocity: 10);
-
                   if (pianoProvider.isRecording) {
                     pianoProvider.recordingAddNote(midiNoteNumber);
                   }
+
+                  print(midiNoteNumber);
+
+                  PianoKeys.synth.reset();
+                  PianoKeys.synth
+                      .noteOn(channel: 0, key: midiNoteNumber, velocity: 120);
+
+                  // Render the waveform (3 seconds)
+                  List<double> wave = List.filled(44100 * 3, 0);
+                  PianoKeys.synth.renderMono(wave);
+
+                  try {
+                    PianoKeys.audioStream.uninit();
+                  } catch (e) {
+                    print(e);
+                  }
+                  PianoKeys.audioStream.init();
+
+                  audioStream.push(Float32List.fromList(wave));
                 },
                 child: Container(
                   alignment: Alignment.bottomCenter,
