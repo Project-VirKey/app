@@ -177,7 +177,6 @@ class SettingsOverlay {
                             PropertyDescriptionActionCombination(
                               title:
                                   settingsProvider.settings.defaultFolder.path,
-
                               child: Consumer<RecordingsProvider>(
                                 builder: (BuildContext context,
                                         RecordingsProvider recordingsProvider,
@@ -264,14 +263,40 @@ class SettingsOverlay {
                                 // specifying allowedExtensions not possible -> 'sf2' not allowed as allowed extension
                                 File? soundFontFile =
                                     await AppFileSystem.filePicker(
-                                        title: 'Select Sound-Library (SF2)');
+                                        title: 'Select Sound-Library (SF2)',
+                                        allowedExtensions: ['SF2']);
 
                                 if (soundFontFile != null) {
-                                  await AppFileSystem.copyFileToFolder(
-                                      soundFontFile,
-                                      AppFileSystem.soundLibrariesFolder);
+                                  if (!(await AppFileSystem.checkIfFileInFolder(
+                                      AppFileSystem.soundLibrariesFolder,
+                                      AppFileSystem.getFilenameFromPath(
+                                          soundFontFile.path)))) {
+                                    await AppFileSystem.copyFileToFolder(
+                                        soundFontFile,
+                                        AppFileSystem.soundLibrariesFolder);
 
-                                  settingsProvider.loadSoundLibraries();
+                                    settingsProvider.loadSoundLibraries();
+
+                                    AppSnackBar(
+                                            message: 'Imported SoundFont!',
+                                            context: context,
+                                            vsync: vsync)
+                                        .open();
+                                  } else {
+                                    AppSnackBar(
+                                            message:
+                                                'SoundFont already imported!',
+                                            context: context,
+                                            vsync: vsync)
+                                        .open();
+                                  }
+                                } else {
+                                  AppSnackBar(
+                                          message:
+                                              'Could not import SoundFont!',
+                                          context: context,
+                                          vsync: vsync)
+                                      .open();
                                 }
                               },
                             ),

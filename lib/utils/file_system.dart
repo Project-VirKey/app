@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dart_midi/dart_midi.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -43,7 +44,8 @@ class AppFileSystem {
       File(path).copySync(exportPath!);
     } else {
       // open native share dialog for mobile
-      Share.share(path, subject: AppFileSystem.getFilenameWithoutExtension(path));
+      Share.share(path,
+          subject: AppFileSystem.getFilenameWithoutExtension(path));
     }
   }
 
@@ -61,7 +63,8 @@ class AppFileSystem {
       return (await getApplicationDocumentsDirectory()).path;
     } else if (Platform.isWindows) {
       // folder: Documents\VirKey\
-      return '${(await getApplicationDocumentsDirectory()).path}${Platform.pathSeparator}$rootFolderName';
+      return '${(await getApplicationDocumentsDirectory()).path}${Platform
+          .pathSeparator}$rootFolderName';
     } else if (Platform.isMacOS) {
       // folder: /Applications/VirKey/
 
@@ -144,7 +147,8 @@ class AppFileSystem {
     }
 
     File? file = File(
-        '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}$fileName');
+        '$basePath${Platform.pathSeparator}$folderName${Platform
+            .pathSeparator}$fileName');
 
     if ((await file.exists())) {
       return file.path;
@@ -157,10 +161,11 @@ class AppFileSystem {
     }
   }
 
-  static Future<FileSystemEntity> deleteFile(
-      String fileName, String folderName) async {
+  static Future<FileSystemEntity> deleteFile(String fileName,
+      String folderName) async {
     return await File(
-            '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}$fileName')
+        '$basePath${Platform.pathSeparator}$folderName${Platform
+            .pathSeparator}$fileName')
         .delete();
   }
 
@@ -174,28 +179,26 @@ class AppFileSystem {
     //     '$pathWithoutFileName${Platform.pathSeparator}$fileName.${getFileExtensionFromPath(path)}');
 
     return (await File(path).rename(
-            '$pathWithoutFileName${Platform.pathSeparator}$fileName.${getFileExtensionFromPath(path)}'))
+        '$pathWithoutFileName${Platform
+            .pathSeparator}$fileName.${getFileExtensionFromPath(path)}'))
         .path;
   }
 
-  static Future<List<FileSystemEntity>?> listFilesInFolder(
-      String folderName, List<String> fileExtensions) async {
+  static Future<List<FileSystemEntity>?> listFilesInFolder(String folderName,
+      List<String> fileExtensions) async {
     if (!(checkBasePath() && await checkPermission())) {
       return null;
     }
 
     Directory? dir = Directory('$basePath${Platform.pathSeparator}$folderName');
 
-    if (Platform.isMacOS) {
-      return dir
-          .listSync()
-          .where((file) => getFilenameFromPath(file.path) != '.DS_Store')
-          .where((file) => fileExtensions
-              .contains(getFileExtensionFromPath(file.path).toLowerCase()))
-          .toList();
-    }
-
-    return dir.listSync();
+    return dir
+        .listSync()
+        .where((file) => getFilenameFromPath(file.path) != '.DS_Store')
+        .where((file) =>
+        fileExtensions
+            .contains(getFileExtensionFromPath(file.path).toLowerCase()))
+        .toList();
   }
 
   static Future<String> copyFileToFolder(File file, String folderName,
@@ -203,31 +206,56 @@ class AppFileSystem {
     // if newFilename is set -> use it with the file extension from the original file
     // else use the original filename
     return (await file.copy(
-            '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}${newFilename == null ? getFilenameFromPath(file.path) : '$newFilename.${getFileExtensionFromPath(file.path)}'}'))
+        '$basePath${Platform.pathSeparator}$folderName${Platform
+            .pathSeparator}${newFilename == null ? getFilenameFromPath(
+            file.path) : '$newFilename.${getFileExtensionFromPath(
+            file.path)}'}'))
         .path;
   }
 
   static File getFileFromNameAndFolder(String fileName, String folderName) {
     return File(
-        '$basePath${Platform.pathSeparator}$folderName${Platform.pathSeparator}$fileName');
+        '$basePath${Platform.pathSeparator}$folderName${Platform
+            .pathSeparator}$fileName');
   }
 
   static String getFilenameFromPath(String path) {
-    return path.split(Platform.pathSeparator).last;
+    return path
+        .split(Platform.pathSeparator)
+        .last;
   }
 
   static String getFilenameWithoutExtension(String path) {
-    return path.split(Platform.pathSeparator).last.split('.').first;
+    return path
+        .split(Platform.pathSeparator)
+        .last
+        .split('.')
+        .first;
   }
 
   static String getFileExtensionFromPath(String path) {
-    return path.split('.').last;
+    return path
+        .split('.')
+        .last;
+  }
+
+  static Future<bool> checkIfFileInFolder(String folderName,
+      String fileName) async {
+    List<FileSystemEntity>? filesInFolder = await listFilesInFolder(
+        folderName, [AppFileSystem.getFileExtensionFromPath(fileName)]);
+
+    if (filesInFolder != null) {
+      return filesInFolder.where((FileSystemEntity file) =>
+      AppFileSystem.getFilenameFromPath(file.path) == fileName).isNotEmpty;
+    } else {
+      return false;
+    }
   }
 
   static Future<List?> getPlaybackFromRecording(String recordingTitle) async {
     List<FileSystemEntity>? folderSoundLibraries =
-        (await AppFileSystem.listFilesInFolder(
-            AppFileSystem.recordingsFolder, ['mp3', 'wav']));
+    (await AppFileSystem.listFilesInFolder(
+        AppFileSystem.recordingsFolder, ['mp3', 'wav']));
 
     List? playbackAndTitle;
 
@@ -259,9 +287,16 @@ class AppFileSystem {
     return playbackAndTitle;
   }
 
-  static Future<String?> savePlaybackFile(
-      File playback, String recordingTitle) async {
+  static Future<String?> savePlaybackFile(File playback,
+      String recordingTitle) async {
     return await copyFileToFolder(playback, recordingsFolder,
-        '${recordingTitle}_${getFilenameWithoutExtension(playback.path)}_Playback');
+        '${recordingTitle}_${getFilenameWithoutExtension(
+            playback.path)}_Playback');
+  }
+
+  static final MidiParser _midiParser = MidiParser();
+
+  static MidiFile midiFileFromRecording(String recordingPath) {
+    return _midiParser.parseMidiFromFile(File(recordingPath));
   }
 }

@@ -101,12 +101,6 @@ class ImportOverlay {
                                       vsync: vsync)
                                   .open();
                             } else {
-                              // if (await AppFileSystem.savePlaybackFile(
-                              //         playbackFile, recording.title) !=
-                              //     null) {
-                              //   await recordingsProvider
-                              //       .loadPlayback(recording);
-                              // }
                               pianoProvider.setPlayback(playbackFile.path);
                             }
                           },
@@ -145,14 +139,62 @@ class ImportOverlay {
                     const PropertiesDescriptionTitle(
                       title: 'MIDI',
                     ),
-                    PropertyDescriptionActionCombination(
-                      type: PropertyDescriptionActionCombinationType.onlyChild,
-                      child: AppIcon(
-                        icon: HeroIcons.arrowDownTray,
-                        color: AppColors.dark,
-                        onPressed: () {},
+                    if (pianoProvider.visualizeMidiPath == null)
+                      PropertyDescriptionActionCombination(
+                        type:
+                            PropertyDescriptionActionCombinationType.onlyChild,
+                        child: AppIcon(
+                          icon: HeroIcons.arrowDownTray,
+                          color: AppColors.dark,
+                          onPressed: () async {
+                            File? visualizeMidiFile =
+                                await AppFileSystem.filePicker(
+                                    title: 'Select Midi File (MID)',
+                                    allowedExtensions: ['mid']);
+
+                            if (visualizeMidiFile == null) {
+                              AppSnackBar(
+                                      message: 'Could not load Midi file!',
+                                      context: context,
+                                      vsync: vsync)
+                                  .open();
+                            } else {
+                              pianoProvider
+                                  .setVisualizeMidi(visualizeMidiFile.path);
+                            }
+                          },
+                        ),
                       ),
-                    ),
+                    if (pianoProvider.visualizeMidiPath != null)
+                      PropertyDescriptionActionCombination(
+                        title: pianoProvider.visualizeMidiFileName ?? 'File',
+                        child: Row(
+                          children: [
+                            AppSwitch(
+                              value: pianoProvider.isVisualizeMidiPlaying,
+                              onChanged: (bool val) => {
+                                pianoProvider.isVisualizeMidiPlaying =
+                                    !pianoProvider.isVisualizeMidiPlaying
+                              },
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            AppIcon(
+                              icon: HeroIcons.xMark,
+                              color: AppColors.dark,
+                              onPressed: () => AppConfirmOverlay(
+                                  vsync: vsync,
+                                  context: context,
+                                  displayText:
+                                      'Remove midi file "${pianoProvider.visualizeMidiFileName}"?',
+                                  confirmButtonText: 'Remove',
+                                  onConfirm: () => pianoProvider
+                                      .removeVisualizeMidi()).open(),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),

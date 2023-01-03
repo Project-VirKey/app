@@ -69,10 +69,15 @@ dependencies:
   midi_util: ^1.0.2
   just_audio: ^0.9.31
   just_audio_windows: ^0.2.0
+  dart_midi:
+    git:
+      url: https://github.com/genit-jp/dart_midi
+      path: .
 #  mp_audio_stream:
 #    git:
 #      url: https://github.com/leontappe/miniaudio-dart
 #      path: .
+
 
 dev_dependencies:
   flutter_test:

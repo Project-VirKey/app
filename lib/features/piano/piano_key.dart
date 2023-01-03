@@ -31,16 +31,6 @@ class PianoKeys {
     ['B', 11]
   ];
 
-  // static List white = [
-  //   ['C', 0, getAudioStream()],
-  //   ['D', 2, getAudioStream()],
-  //   ['E', 4, getAudioStream()],
-  //   ['F', 5, getAudioStream()],
-  //   ['G', 7, getAudioStream()],
-  //   ['A', 9, getAudioStream()],
-  //   ['B', 11, getAudioStream()]
-  // ];
-
   static const List black = [
     ['C#', 'Db', 1],
     ['D#', 'Eb', 3],
@@ -87,6 +77,7 @@ class PianoKeysWhite extends StatelessWidget {
           index,
           PianoKeyWhite(
             name: pianoKeyInfo[0],
+            position: index,
             midiNoteNumber: pianoKeyInfo[1] + PianoKeys.midiOffset,
             parentWidth: maxWidthDesktop,
             topLeft:
@@ -151,7 +142,9 @@ class PianoKeysBlack extends StatelessWidget {
         parentHeight: parentHeight,
       ));
 
+      int position = index;
       if (pianoKey.isEmpty) {
+        position -= 1;
         pianoKeys.add(PianoKeyBlack(
           name: '',
           secondName: '',
@@ -162,6 +155,7 @@ class PianoKeysBlack extends StatelessWidget {
         pianoKeys.add(PianoKeyBlack(
           name: pianoKey[0],
           secondName: pianoKey[1],
+          position: position,
           midiNoteNumber: pianoKey[2] + PianoKeys.midiOffset,
           parentWidth: parentWidth,
           parentHeight: parentHeight,
@@ -191,13 +185,14 @@ class PianoKeysBlack extends StatelessWidget {
   }
 }
 
-class PianoKeyWhite extends StatelessWidget {
+class PianoKeyWhite extends StatefulWidget {
   const PianoKeyWhite({
     Key? key,
     required this.name,
     required this.parentWidth,
     required this.topLeft,
     required this.topRight,
+    required this.position,
     required this.midiNoteNumber,
     // required this.audioStream,
   }) : super(key: key);
@@ -206,10 +201,18 @@ class PianoKeyWhite extends StatelessWidget {
   final double parentWidth;
   final Radius topLeft;
   final Radius topRight;
+  final int position;
   final int midiNoteNumber;
 
-  // final AudioStream audioStream;
+  @override
+  State<PianoKeyWhite> createState() => _PianoKeyWhiteState();
+}
 
+class _PianoKeyWhiteState extends State<PianoKeyWhite> {
+  late int longPressStart;
+  bool longPress = false;
+
+  // final AudioStream audioStream;
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -222,62 +225,85 @@ class PianoKeyWhite extends StatelessWidget {
             child: Consumer<PianoProvider>(
               builder: (BuildContext context, PianoProvider pianoProvider,
                       Widget? child) =>
-                  ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: AppColors.dark,
-                  backgroundColor: AppColors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: AppRadius.radius,
-                      bottomRight: AppRadius.radius,
-                      topLeft: topLeft,
-                      topRight: topRight,
+                  GestureDetector(
+                onLongPressStart: (LongPressStartDetails details) {
+                  longPressStart = pianoProvider.millisecondsSinceEpoch;
+                  longPress = true;
+                  setState(() {});
+                },
+                onLongPressEnd: (LongPressEndDetails details) {
+                  if (longPress) {
+                    double timeDifference =
+                        (pianoProvider.millisecondsSinceEpoch - longPressStart)
+                            .toDouble();
+                    longPress = false;
+                    setState(() {});
+                    longPressStart = 0;
+
+                    pianoProvider.recordingAddNote(
+                        widget.midiNoteNumber, timeDifference);
+                  }
+                },
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: AppColors.dark,
+                    backgroundColor: longPress
+                        ? const Color(0xffdedede)
+                        : (pianoProvider.pianoKeysWhite[widget.position][2]
+                            ? AppColors.primary
+                            : AppColors.white),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                        bottomLeft: AppRadius.radius,
+                        bottomRight: AppRadius.radius,
+                        topLeft: widget.topLeft,
+                        topRight: widget.topRight,
+                      ),
                     ),
                   ),
-                ),
-                onPressed: () async {
-                  if (pianoProvider.isRecording) {
-                    pianoProvider.recordingAddNote(midiNoteNumber);
-                  }
+                  onPressed: () async {
+                    if (pianoProvider.isRecording) {
+                      pianoProvider.recordingAddNote(widget.midiNoteNumber);
+                    }
 
-                  print(midiNoteNumber);
+                    print(widget.midiNoteNumber);
 
-                  PianoKeys.synth.reset();
-                  PianoKeys.synth
-                      .noteOn(channel: 0, key: midiNoteNumber, velocity: 120);
+                    PianoKeys.synth.reset();
+                    PianoKeys.synth.noteOn(
+                        channel: 0, key: widget.midiNoteNumber, velocity: 120);
 
-                  // Render the waveform (3 seconds)
-                  // List<double> wave = List.filled(44100 * 3, 0);
-                  // PianoKeys.synth.renderMono(wave);
-                  ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: 44100 * 3);
-                  PianoKeys.synth.renderMonoInt16(buf16);
+                    // Render the waveform (3 seconds)
+                    // List<double> wave = List.filled(44100 * 3, 0);
+                    // PianoKeys.synth.renderMono(wave);
+                    ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: 44100 * 3);
+                    PianoKeys.synth.renderMonoInt16(buf16);
 
-                  // print(buf16.bytes.buffer.asInt16List());
+                    // print(buf16.bytes.buffer.asInt16List());
 
-                  // try {
-                  //   PianoKeys.audioStream.uninit();
-                  // } catch (e) {
-                  //   print(e);
-                  // }
-                  // PianoKeys.audioStream.init();
-                  //
-                  // PianoKeys.audioStream.push(Float32List.fromList(wave));
-                  // List<int> intWave = List.of(wave).map((e) => e * 255).cast<int>().toList();
+                    // try {
+                    //   PianoKeys.audioStream.uninit();
+                    // } catch (e) {
+                    //   print(e);
+                    // }
+                    // PianoKeys.audioStream.init();
+                    //
+                    // PianoKeys.audioStream.push(Float32List.fromList(wave));
+                    // List<int> intWave = List.of(wave).map((e) => e * 255).cast<int>().toList();
 
-
-                  // AudioPlayer notePlayer = AudioPlayer();
-                  // notePlayer.setAudioSource(MyCustomSource(buf16.bytes.buffer.asInt16List()));
-                  // notePlayer.setAudioSource(MyCustomSource(waveInt));
-                  // notePlayer.play();
-                },
-                child: Container(
-                  alignment: Alignment.bottomCenter,
-                  padding: const EdgeInsets.only(bottom: 25),
-                  child: AppText(
-                    text: name,
-                    size: parentWidth * .04,
-                    color: AppColors.dark,
-                    family: AppFonts.secondary,
+                    // AudioPlayer notePlayer = AudioPlayer();
+                    // notePlayer.setAudioSource(MyCustomSource(buf16.bytes.buffer.asInt16List()));
+                    // notePlayer.setAudioSource(MyCustomSource(waveInt));
+                    // notePlayer.play();
+                  },
+                  child: Container(
+                    alignment: Alignment.bottomCenter,
+                    padding: const EdgeInsets.only(bottom: 25),
+                    child: AppText(
+                      text: widget.name,
+                      size: widget.parentWidth * .04,
+                      color: AppColors.dark,
+                      family: AppFonts.secondary,
+                    ),
                   ),
                 ),
               ),
@@ -289,10 +315,11 @@ class PianoKeyWhite extends StatelessWidget {
   }
 }
 
-class PianoKeyBlack extends StatelessWidget {
+class PianoKeyBlack extends StatefulWidget {
   const PianoKeyBlack({
     Key? key,
     required this.name,
+    this.position = 0,
     this.midiNoteNumber = 0,
     this.secondName = '',
     this.widthMultiplier = 1,
@@ -301,6 +328,7 @@ class PianoKeyBlack extends StatelessWidget {
   }) : super(key: key);
 
   final String name;
+  final int position;
   final int midiNoteNumber;
   final String secondName;
   final double widthMultiplier;
@@ -308,60 +336,92 @@ class PianoKeyBlack extends StatelessWidget {
   final double parentHeight;
 
   @override
+  State<PianoKeyBlack> createState() => _PianoKeyBlackState();
+}
+
+class _PianoKeyBlackState extends State<PianoKeyBlack> {
+  late int longPressStart;
+  bool longPress = false;
+
+  @override
   Widget build(BuildContext context) {
-    if (name.isEmpty) {
+    if (widget.name.isEmpty) {
       return Container(
-        width: parentWidth * .1 * widthMultiplier,
+        width: widget.parentWidth * .1 * widget.widthMultiplier,
       );
     } else {
       return SizedBox(
-        width: parentWidth * .1,
+        width: widget.parentWidth * .1,
         height: PlatformHelper.isDesktop
-            ? (parentHeight * .6)
-            : (parentHeight * .54),
+            ? (widget.parentHeight * .6)
+            : (widget.parentHeight * .54),
         child: Consumer<PianoProvider>(
           builder: (BuildContext context, PianoProvider pianoProvider,
                   Widget? child) =>
-              ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.zero,
-              foregroundColor: AppColors.white,
-              backgroundColor: AppColors.dark,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.only(
-                  bottomLeft: AppRadius.radius,
-                  bottomRight: AppRadius.radius,
-                ),
-              ),
-            ),
-            // onPressed: () => FlutterMidi().playMidiNote(midi: midiNoteNumber),
-            onPressed: () {
-              if (pianoProvider.isRecording) {
-                pianoProvider.recordingAddNote(midiNoteNumber);
+              GestureDetector(
+            onLongPressStart: (LongPressStartDetails details) {
+              longPressStart = pianoProvider.millisecondsSinceEpoch;
+              longPress = true;
+              setState(() {});
+            },
+            onLongPressEnd: (LongPressEndDetails details) {
+              if (longPress) {
+                double timeDifference =
+                    (pianoProvider.millisecondsSinceEpoch - longPressStart)
+                        .toDouble();
+                longPress = false;
+                setState(() {});
+                longPressStart = 0;
+
+                pianoProvider.recordingAddNote(
+                    widget.midiNoteNumber, timeDifference);
               }
             },
-            child: Container(
-              alignment: Alignment.bottomCenter,
-              padding: const EdgeInsets.only(bottom: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  AppText(
-                    text: name,
-                    size: parentWidth * .045,
-                    color: AppColors.secondary,
-                    family: AppFonts.secondary,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                foregroundColor: AppColors.white,
+                backgroundColor: longPress
+                    ? const Color(0xff454545)
+                    : (pianoProvider.pianoKeysBlack[widget.position][3]
+                        ? AppColors.primary
+                        : AppColors.dark),
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: AppRadius.radius,
+                    bottomRight: AppRadius.radius,
                   ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  AppText(
-                    text: secondName,
-                    size: parentWidth * .033,
-                    color: AppColors.secondary,
-                    family: AppFonts.secondary,
-                  ),
-                ],
+                ),
+              ),
+              // onPressed: () => FlutterMidi().playMidiNote(midi: midiNoteNumber),
+              onPressed: () {
+                if (pianoProvider.isRecording) {
+                  pianoProvider.recordingAddNote(widget.midiNoteNumber);
+                }
+              },
+              child: Container(
+                alignment: Alignment.bottomCenter,
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    AppText(
+                      text: widget.name,
+                      size: widget.parentWidth * .045,
+                      color: AppColors.secondary,
+                      family: AppFonts.secondary,
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    AppText(
+                      text: widget.secondName,
+                      size: widget.parentWidth * .033,
+                      color: AppColors.secondary,
+                      family: AppFonts.secondary,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
