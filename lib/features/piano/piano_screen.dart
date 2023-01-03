@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
+import 'package:virkey/common_widgets/app_play_pause_button.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/constants/colors.dart';
@@ -132,32 +133,14 @@ class _PianoScreenState extends State<PianoScreen>
                                   },
                                   size: 30,
                                 ),
-                                // AnimatedCrossFade(
-                                //   crossFadeState: pianoProvider.isRecording
-                                //       ? CrossFadeState.showSecond
-                                //       : CrossFadeState.showFirst,
-                                //   duration: const Duration(milliseconds: 200),
-                                //   firstChild: AppIcon(
-                                //     icon: Icons.radio_button_checked,
-                                //     color: AppColors.secondary,
-                                //     onPressed: () =>
-                                //         pianoProvider.toggleRecording(),
-                                //     size: 30,
-                                //   ),
-                                //   secondChild: AppIcon(
-                                //     icon: Icons.radio_button_checked,
-                                //     color: AppColors.secondary,
-                                //     onPressed: () =>
-                                //         pianoProvider.toggleRecording(),
-                                //     size: 30,
-                                //   ),
-                                // ),
-                                AppIcon(
-                                  icon: HeroIcons.play,
-                                  color: AppColors.secondary,
-                                  onPressed: () => {},
-                                  size: 30,
-                                ),
+                                AppPlayPauseButton(
+                                  value: pianoProvider.test,
+                                  light: true,
+                                  onPressed: () {
+                                    pianoProvider.test = !pianoProvider.test;
+                                    setState(() {});
+                                  },
+                                )
                               ],
                             ),
                           ),

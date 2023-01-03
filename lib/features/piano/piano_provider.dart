@@ -47,6 +47,8 @@ class PianoProvider extends ChangeNotifier {
   String? playbackFileName;
   AudioPlayer playbackPlayer = AudioPlayer();
 
+  bool test = false;
+
   // optional midi file for displaying notes on piano keys
   bool isVisualizeMidiPlaying = false;
   String? visualizeMidiPath;
@@ -59,6 +61,9 @@ class PianoProvider extends ChangeNotifier {
   int get millisecondsSinceEpoch => DateTime.now().millisecondsSinceEpoch;
 
   int get _elapsedTime => millisecondsSinceEpoch - _startTimeStamp;
+
+  bool get isSomethingPlaying =>
+      isRecording || isPlaybackPlaying || isVisualizeMidiPlaying;
 
   PianoProvider() {
     displayTime = _resetDisplayTime;
