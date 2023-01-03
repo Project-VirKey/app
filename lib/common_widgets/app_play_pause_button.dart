@@ -3,17 +3,18 @@ import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 
 import 'package:virkey/constants/colors.dart';
-import 'package:virkey/constants/shadows.dart';
 
 class AppPlayPauseButton extends StatefulWidget {
-  AppPlayPauseButton({
+   AppPlayPauseButton({
     Key? key,
     this.value = false,
-    required this.onChanged,
+    this.light = false,
+    required this.onPressed,
   }) : super(key: key);
 
   bool value;
-  final ValueChanged<bool> onChanged;
+  bool light;
+  final dynamic onPressed;
 
   @override
   State<AppPlayPauseButton> createState() => _AppPlayPauseButtonState();
@@ -22,47 +23,23 @@ class AppPlayPauseButton extends StatefulWidget {
 class _AppPlayPauseButtonState extends State<AppPlayPauseButton> {
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            widget.value = !widget.value;
-            widget.onChanged(widget.value);
-          });
-        },
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              width: 45,
-              height: 45,
-              decoration: BoxDecoration(
-                boxShadow: const [AppShadows.boxShadow],
-                color: AppColors.secondary,
-                border: Border.all(color: AppColors.dark),
-                borderRadius: BorderRadius.circular(100.0),
-              ),
-            ),
-            Visibility(
-              visible: widget.value,
-              child: const AppIcon(
-                icon: HeroIcons.play,
-                color: AppColors.dark,
-                displayShadow: false,
-                size: 30,
-              ),
-            ),
-            Visibility(
-              visible: !widget.value,
-              child: const AppIcon(
-                icon: HeroIcons.pause,
-                color: AppColors.dark,
-                displayShadow: false,
-                size: 30,
-              ),
-            )
-          ],
+    return GestureDetector(
+      onTap: () => widget.onPressed(),
+      child: AnimatedCrossFade(
+        crossFadeState:
+            widget.value ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+        duration: const Duration(milliseconds: 150),
+        firstChild: AppIcon(
+          icon: HeroIcons.play,
+          color: widget.light ? AppColors.secondary : AppColors.dark,
+          displayShadow: false,
+          size: 30,
+        ),
+        secondChild: AppIcon(
+          icon: HeroIcons.pause,
+          color: widget.light ? AppColors.secondary : AppColors.dark,
+          displayShadow: false,
+          size: 30,
         ),
       ),
     );

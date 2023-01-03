@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
-import 'package:virkey/common_widgets/app_play_pause_button.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
 import 'package:virkey/common_widgets/app_slider.dart';
@@ -12,6 +11,7 @@ import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/shadows.dart';
+import 'package:virkey/features/recordings/recordings_list_play_pause_button.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/file_system.dart';
@@ -124,15 +124,8 @@ class RecordingsListItem extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              Positioned(
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 7),
-                                  child: AppPlayPauseButton(
-                                    onChanged: (val) => {},
-                                  ),
-                                ),
-                              ),
+                              const Positioned(
+                                  child: RecordingsListPlayPauseButton()),
                             ],
                           ),
                         ),
@@ -313,7 +306,8 @@ class RecordingsListItem extends StatelessWidget {
                                 confirmButtonText: 'Delete',
                                 onConfirm: () async {
                                   recordingsProvider.contractRecordingItem();
-                                  await recordingsProvider.deleteRecording(recording);
+                                  await recordingsProvider
+                                      .deleteRecording(recording);
                                   await recordingsProvider.loadRecordings();
                                 }).open(),
                           ),
