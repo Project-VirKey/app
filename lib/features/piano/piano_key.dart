@@ -226,12 +226,12 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
               builder: (BuildContext context, PianoProvider pianoProvider,
                       Widget? child) =>
                   GestureDetector(
-                onLongPressStart: (LongPressStartDetails details) {
+                    onTapDown: (details) {
                   longPressStart = pianoProvider.millisecondsSinceEpoch;
                   longPress = true;
                   setState(() {});
                 },
-                onLongPressEnd: (LongPressEndDetails details) {
+                onLongPressEnd: (details) {
                   if (longPress) {
                     double timeDifference =
                         (pianoProvider.millisecondsSinceEpoch - longPressStart)
@@ -359,12 +359,12 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
           builder: (BuildContext context, PianoProvider pianoProvider,
                   Widget? child) =>
               GestureDetector(
-            onLongPressStart: (LongPressStartDetails details) {
+            onTapDown: (details) {
               longPressStart = pianoProvider.millisecondsSinceEpoch;
               longPress = true;
               setState(() {});
             },
-            onLongPressEnd: (LongPressEndDetails details) {
+            onLongPressEnd: (details) {
               if (longPress) {
                 double timeDifference =
                     (pianoProvider.millisecondsSinceEpoch - longPressStart)
