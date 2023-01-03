@@ -141,6 +141,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.1.5"
+  dart_midi:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "29d8ecdf34dce7c80467fee72cc4f3e541142382"
+      url: "https://github.com/genit-jp/dart_midi"
+    source: git
+    version: "1.0.1"
   desktop_webview_auth:
     dependency: transitive
     description:
