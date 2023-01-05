@@ -23,7 +23,7 @@ Future<void> main() async {
   }
 
   // initialize folders for user content (recordings, ...)
-  AppFileSystem.initFolders();
+  await AppFileSystem.initFolders();
 
   // run the app
   runApp(MultiProvider(
