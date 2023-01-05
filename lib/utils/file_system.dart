@@ -35,17 +35,19 @@ class AppFileSystem {
 
   static Future<void> exportFile(
       {required String path, required String dialogTitle}) async {
+    String filename = AppFileSystem.getFilenameFromPath(path);
+
     if (PlatformHelper.isDesktop) {
       // open save as dialog to select folder
       String? exportPath = await FilePicker.platform.saveFile(
           dialogTitle: dialogTitle,
-          fileName: AppFileSystem.getFilenameFromPath(path));
+          fileName: filename);
 
       File(path).copySync(exportPath!);
     } else {
       // open native share dialog for mobile
       Share.share(path,
-          subject: AppFileSystem.getFilenameWithoutExtension(path));
+          subject: filename);
     }
   }
 

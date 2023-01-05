@@ -266,11 +266,17 @@ class RecordingsListItem extends StatelessWidget {
                             ),
                           ),
                         const PropertiesDescriptionTitle(title: 'Export'),
-                        const PropertyDescriptionActionCombination(
+                        PropertyDescriptionActionCombination(
                           title: 'Audio',
                           child: AppIcon(
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
+                            onPressed: () {
+                              // TODO: convert MIDI to MP3
+                              AppFileSystem.exportFile(
+                                  path: recording.path,
+                                  dialogTitle: 'Export MP3');
+                            },
                           ),
                         ),
                         PropertyDescriptionActionCombination(
@@ -278,16 +284,24 @@ class RecordingsListItem extends StatelessWidget {
                           child: AppIcon(
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
-                            onPressed: () => AppFileSystem.exportFile(
-                                path: recording.path,
-                                dialogTitle: 'Export MIDI'),
+                            onPressed: () {
+                              AppFileSystem.exportFile(
+                                  path: recording.path,
+                                  dialogTitle: 'Export MIDI');
+                            },
                           ),
                         ),
-                        const PropertyDescriptionActionCombination(
+                        PropertyDescriptionActionCombination(
                           title: 'Audio & MIDI',
                           child: AppIcon(
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
+                            onPressed: () {
+                              // TODO: convert MIDI to MP3 & compress into zip file (probably also export playback & MP3 with MIDI + Playback)
+                              AppFileSystem.exportFile(
+                                  path: recording.path,
+                                  dialogTitle: 'Export MP3 & MIDI');
+                            },
                           ),
                         ),
                         const PropertiesDescriptionTitle(
