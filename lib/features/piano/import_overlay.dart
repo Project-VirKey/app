@@ -112,10 +112,10 @@ class ImportOverlay {
                         child: Row(
                           children: [
                             AppSwitch(
-                              value: pianoProvider.isPlaybackPlaying,
+                              value: pianoProvider.isPlaybackActive,
                               onChanged: (bool val) => {
-                                pianoProvider.isPlaybackPlaying =
-                                    !pianoProvider.isPlaybackPlaying
+                                pianoProvider.isPlaybackActive =
+                                    !pianoProvider.isPlaybackActive
                               },
                             ),
                             const SizedBox(
@@ -171,10 +171,10 @@ class ImportOverlay {
                         child: Row(
                           children: [
                             AppSwitch(
-                              value: pianoProvider.isVisualizeMidiPlaying,
+                              value: pianoProvider.isVisualizeMidiActive,
                               onChanged: (bool val) => {
-                                pianoProvider.isVisualizeMidiPlaying =
-                                    !pianoProvider.isVisualizeMidiPlaying
+                                pianoProvider.isVisualizeMidiActive =
+                                    !pianoProvider.isVisualizeMidiActive
                               },
                             ),
                             const SizedBox(

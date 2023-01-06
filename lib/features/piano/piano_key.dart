@@ -268,8 +268,6 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
                       pianoProvider.recordingAddNote(widget.midiNoteNumber);
                     }
 
-                    print(widget.midiNoteNumber);
-
                     PianoKeys.synth.reset();
                     PianoKeys.synth.noteOn(
                         channel: 0, key: widget.midiNoteNumber, velocity: 120);

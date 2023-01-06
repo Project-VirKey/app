@@ -33,26 +33,28 @@ class PianoProvider extends ChangeNotifier {
   final List _recordedNotes = [];
   bool _isRecording = false;
   int _startTimeStamp = 0;
-
   String recordingTitle = '';
 
   String displayTime = '';
+  final String _resetDisplayTime = '00:00:000';
   Timer? _displayTimeTimer;
-
   final int _recordingDelaySeconds = 3;
+  int? _previousElapsedTime;
 
   // optional playback while recording/playing
+  bool isPlaybackActive = false;
+
   bool isPlaybackPlaying = false;
   String? playbackPath;
   String? playbackFileName;
   AudioPlayer playbackPlayer = AudioPlayer();
 
-  bool test = false;
-
   // optional midi file for displaying notes on piano keys
+  bool isVisualizeMidiActive = false;
   bool isVisualizeMidiPlaying = false;
   String? visualizeMidiPath;
   String? visualizeMidiFileName;
+  int? visualizeMidiCurrentEventPos;
 
   List get recordedNotes => _recordedNotes;
 
@@ -62,15 +64,71 @@ class PianoProvider extends ChangeNotifier {
 
   int get _elapsedTime => millisecondsSinceEpoch - _startTimeStamp;
 
-  bool get isSomethingPlaying =>
-      isRecording || isPlaybackPlaying || isVisualizeMidiPlaying;
+  bool get isSomethingPlaying => isPlaybackPlaying || isVisualizeMidiPlaying;
 
   PianoProvider() {
     displayTime = _resetDisplayTime;
   }
 
+  // ----------------------------------------------------------------
+
+  void playPause() {
+    togglePlayback();
+
+    if (isVisualizeMidiPlaying) {
+      pauseVisualizeMidi();
+    } else {
+      startVisualizeMidi();
+    }
+
+    // print('---');
+    // print(isPlaybackPlaying);
+    // print(isVisualizeMidiPlaying);
+    // print(isRecording);
+    // print('---');
+    if (!isRecording) {
+      if (_displayTimeTimer == null) {
+        if (isPlaybackPlaying || isVisualizeMidiPlaying) {
+          setStartTimeStamp();
+          startDisplayTimeTimer();
+        }
+      } else {
+        if (_displayTimeTimer!.isActive) {
+          pauseDisplayTimeTimer();
+        } else {
+          if (isPlaybackPlaying || isVisualizeMidiPlaying) {
+            setStartTimeStamp();
+            startDisplayTimeTimer();
+          }
+        }
+      }
+    }
+
+    if (isRecording) {
+    } else {}
+
+    notifyListeners();
+  }
+
+  void stop() {
+    if (!isRecording) {
+      stopDisplayTimeTimer();
+    }
+
+    isVisualizeMidiPlaying = false;
+    visualizeMidiCurrentEventPos = null;
+
+    stopPlayback();
+    playbackPlayer.seek(const Duration(seconds: 0));
+
+    notifyListeners();
+  }
+
+  // ----------------------------------------------------------------
+
   String get formattedElapsedTime {
-    Duration timeDifferenceObj = Duration(milliseconds: _elapsedTime.abs());
+    Duration timeDifferenceObj = Duration(
+        milliseconds: _elapsedTime.abs() + (_previousElapsedTime ?? 0));
 
     int minutes = timeDifferenceObj.inMinutes;
     int seconds = timeDifferenceObj.inSeconds - (minutes * 60);
@@ -81,102 +139,183 @@ class PianoProvider extends ChangeNotifier {
     return '${_elapsedTime.isNegative ? '- ' : ''}${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}:${milliseconds.toString().padLeft(3, '0')}';
   }
 
-  String get _resetDisplayTime => '00:00:000';
+  void setStartTimeStamp([bool delay = false]) {
+    _startTimeStamp =
+        millisecondsSinceEpoch + (delay ? (_recordingDelaySeconds * 1000) : 0);
+  }
 
-  Future<void> startRecording() async {
-    _startTimeStamp = millisecondsSinceEpoch + _recordingDelaySeconds * 1000;
-
+  void startDisplayTimeTimer() {
     _displayTimeTimer =
         Timer.periodic(const Duration(milliseconds: 20), (timer) {
       displayTime = formattedElapsedTime;
       notifyListeners();
     });
-
-    await Future.delayed(Duration(seconds: _recordingDelaySeconds));
-
-    _isRecording = true;
-    _recordedNotes.clear();
-
-    if (isPlaybackPlaying && playbackPath != null) {
-      playbackPlayer.seek(const Duration(seconds: 0));
-      playbackPlayer.play();
-    }
-
-    if (isVisualizeMidiPlaying && visualizeMidiPath != null) {
-      MidiFile parsedMidi =
-          AppFileSystem.midiFileFromRecording(visualizeMidiPath!);
-
-      for (List<MidiEvent> track in parsedMidi.tracks) {
-        for (MidiEvent midiEvent in track) {
-          if (midiEvent is NoteOnEvent) {
-            int playedPianoKeyWhite = pianoKeysWhite.indexWhere(
-                (pianoKeyWhite) =>
-                    pianoKeyWhite[1] + midiOffset == midiEvent.noteNumber);
-            int playedPianoKeyBlack =
-                pianoKeysBlack.indexWhere((pianoKeyBlack) {
-              if (pianoKeyBlack.isEmpty) {
-                return false;
-              }
-              return (pianoKeyBlack[2] + midiOffset) == midiEvent.noteNumber;
-            });
-
-            await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
-
-            if (playedPianoKeyWhite >= 0) {
-              pianoKeysWhite[playedPianoKeyWhite][2] = true;
-              notifyListeners();
-              Future.delayed(Duration(milliseconds: midiEvent.duration), () {
-                pianoKeysWhite[playedPianoKeyWhite][2] = false;
-                notifyListeners();
-              });
-            }
-
-            if (playedPianoKeyBlack >= 0) {
-              pianoKeysBlack[playedPianoKeyBlack][3] = true;
-              notifyListeners();
-              Future.delayed(Duration(milliseconds: midiEvent.duration), () {
-                pianoKeysBlack[playedPianoKeyBlack][3] = false;
-                notifyListeners();
-              });
-            }
-
-            print('n: ${midiEvent.noteNumber}');
-            print('t: ${midiEvent.deltaTime}');
-            print('d: ${midiEvent.duration}');
-          }
-        }
-      }
-    }
   }
 
-  Future<void> stopRecording() async {
-    _isRecording = false;
+  void stopDisplayTimeTimer() {
     _displayTimeTimer?.cancel();
     displayTime = _resetDisplayTime;
-
-    if (playbackPath != null) {
-      if (isPlaybackPlaying) {
-        playbackPlayer.stop();
-      }
-      AppFileSystem.savePlaybackFile(File(playbackPath!), recordingTitle);
-    }
-
-    createMidiFile();
+    _previousElapsedTime = null;
+    print('stopped timer');
   }
+
+  void pauseDisplayTimeTimer() {
+    _previousElapsedTime = _elapsedTime + (_previousElapsedTime ?? 0);
+    setStartTimeStamp();
+
+    _displayTimeTimer?.cancel();
+  }
+
+  // ----------------------------------------------------------------
+
+  void togglePlayback() {
+    if (isPlaybackPlaying) {
+      stopPlayback();
+    } else {
+      startPlayback();
+    }
+  }
+
+  void stopPlayback() {
+    if (isPlaybackActive && playbackPath != null) {
+      playbackPlayer.stop();
+      isPlaybackPlaying = false;
+    }
+  }
+
+  void startPlayback() {
+    if (isPlaybackActive && playbackPath != null) {
+      playbackPlayer.play();
+      isPlaybackPlaying = true;
+    }
+  }
+
+  // ----------------------------------------------------------------
 
   void toggleRecording() {
     if (_isRecording) {
       stopRecording();
+      stopPlayback();
+      stopVisualizeMidi();
+      stopDisplayTimeTimer();
     } else {
+      _previousElapsedTime = null;
       startRecording();
     }
 
     notifyListeners();
   }
 
+  Future<void> startRecording() async {
+    setStartTimeStamp(true);
+    startDisplayTimeTimer();
+
+    stopPlayback();
+
+    await Future.delayed(Duration(seconds: _recordingDelaySeconds));
+
+    _isRecording = true;
+    _recordedNotes.clear();
+
+    playbackPlayer.seek(const Duration(seconds: 0));
+    startPlayback();
+
+    stopVisualizeMidi();
+    startVisualizeMidi();
+  }
+
+  Future<void> stopRecording() async {
+    _isRecording = false;
+
+    if (playbackPath != null) {
+      AppFileSystem.savePlaybackFile(File(playbackPath!), recordingTitle);
+    }
+
+    createMidiFile();
+  }
+
   void recordingAddNote(int midiNote, [double duration = 500]) {
+    print(midiNote);
+
     _recordedNotes.add([midiNote, _elapsedTime, duration]);
   }
+
+  // ----------------------------------------------------------------
+
+  Future<void> startVisualizeMidi() async {
+    if (!isVisualizeMidiActive || visualizeMidiPath == null) {
+      return;
+    }
+
+    isVisualizeMidiPlaying = true;
+    MidiFile parsedMidi =
+        AppFileSystem.midiFileFromRecording(visualizeMidiPath!);
+
+    midiEventTrackLoop:
+    for (List<MidiEvent> track in parsedMidi.tracks) {
+      for (int i = 0; i < track.length; i++) {
+        MidiEvent midiEvent = track[i];
+
+        if (!isVisualizeMidiPlaying) {
+          // if playing is set to false during midi visualization -> break out of the complete loop
+          break midiEventTrackLoop;
+        }
+
+        print(visualizeMidiCurrentEventPos);
+        if (midiEvent is! NoteOnEvent ||
+            (visualizeMidiCurrentEventPos ?? -1) > i) {
+          continue;
+        }
+
+        visualizeMidiCurrentEventPos = i;
+
+        int playedPianoKeyWhite = pianoKeysWhite.indexWhere((pianoKeyWhite) =>
+            pianoKeyWhite[1] + midiOffset == midiEvent.noteNumber);
+
+        int playedPianoKeyBlack = pianoKeysBlack.indexWhere((pianoKeyBlack) {
+          if (pianoKeyBlack.isEmpty) {
+            return false;
+          }
+          return (pianoKeyBlack[2] + midiOffset) == midiEvent.noteNumber;
+        });
+
+        await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
+
+        if (playedPianoKeyWhite >= 0) {
+          pianoKeysWhite[playedPianoKeyWhite][2] = true;
+          notifyListeners();
+          Future.delayed(Duration(milliseconds: midiEvent.duration), () {
+            pianoKeysWhite[playedPianoKeyWhite][2] = false;
+            notifyListeners();
+          });
+        }
+
+        if (playedPianoKeyBlack >= 0) {
+          pianoKeysBlack[playedPianoKeyBlack][3] = true;
+          notifyListeners();
+          Future.delayed(Duration(milliseconds: midiEvent.duration), () {
+            pianoKeysBlack[playedPianoKeyBlack][3] = false;
+            notifyListeners();
+          });
+        }
+
+        // print('n: ${midiEvent.noteNumber}');
+        // print('t: ${midiEvent.deltaTime}');
+        // print('d: ${midiEvent.duration}');
+      }
+    }
+  }
+
+  void stopVisualizeMidi() {
+    isVisualizeMidiPlaying = false;
+    visualizeMidiCurrentEventPos = null;
+  }
+
+  void pauseVisualizeMidi() {
+    isVisualizeMidiPlaying = false;
+  }
+
+  // ----------------------------------------------------------------
 
   void createMidiFile() {
     int track = 0;
@@ -211,23 +350,25 @@ class PianoProvider extends ChangeNotifier {
           volume: volume);
     });
 
-    var outputFile = File(
+    File outputFile = File(
         '${AppFileSystem.basePath}${Platform.pathSeparator}${AppFileSystem.recordingsFolder}${Platform.pathSeparator}$recordingTitle.mid');
 
     midiFile.writeFile(outputFile);
   }
 
+  // ----------------------------------------------------------------
+
   void setPlayback(String path) {
     playbackPath = path;
     playbackFileName = AppFileSystem.getFilenameFromPath(path);
-    isPlaybackPlaying = true;
+    isPlaybackActive = true;
     playbackPlayer.setAudioSource(AudioSource.file(playbackPath!));
 
     notifyListeners();
   }
 
   void removePlayback() {
-    isPlaybackPlaying = false;
+    isPlaybackActive = false;
     playbackPath = null;
 
     notifyListeners();
@@ -236,13 +377,13 @@ class PianoProvider extends ChangeNotifier {
   Future<void> setVisualizeMidi(String path) async {
     visualizeMidiPath = path;
     visualizeMidiFileName = AppFileSystem.getFilenameFromPath(path);
-    isVisualizeMidiPlaying = true;
+    isVisualizeMidiActive = true;
 
     notifyListeners();
   }
 
   void removeVisualizeMidi() {
-    isVisualizeMidiPlaying = false;
+    isVisualizeMidiActive = false;
     visualizeMidiPath = null;
 
     notifyListeners();
