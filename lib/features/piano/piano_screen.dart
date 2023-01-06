@@ -31,10 +31,35 @@ class _PianoScreenState extends State<PianoScreen>
   late final ImportOverlay _importOverlay =
       ImportOverlay(context: context, vsync: this);
 
+  late final AnimationController _recordButtonAnimationController =
+      AnimationController(vsync: this, duration: const Duration(seconds: 1));
+
+  // https://api.flutter.dev/flutter/animation/ColorTween-class.html, 06.01.2022
+  late final Animation _recordButtonAnimation =
+      ColorTween(begin: AppColors.secondary, end: AppColors.primary)
+          .animate(_recordButtonAnimationController);
+
   int prevVal = -1;
 
   @override
+  void initState() {
+    _recordButtonAnimation.addListener(() {
+      setState(() {});
+    });
+
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (Provider.of<PianoProvider>(context).isRecording) {
+      if (!_recordButtonAnimationController.isAnimating) {
+        _recordButtonAnimationController.repeat(reverse: true);
+      }
+    } else {
+      _recordButtonAnimationController.reset();
+    }
+
     return Scaffold(
       backgroundColor: AppColors.secondary,
       body: Center(
@@ -64,6 +89,9 @@ class _PianoScreenState extends State<PianoScreen>
                               child: Wrap(
                                 spacing: 15,
                                 children: [
+                                  const SizedBox(
+                                    width: 5,
+                                  ),
                                   AppIcon(
                                     icon: HeroIcons.arrowUturnLeft,
                                     color: AppColors.secondary,
@@ -114,7 +142,7 @@ class _PianoScreenState extends State<PianoScreen>
                                 ),
                                 AppIcon(
                                   icon: Icons.radio_button_checked,
-                                  color: AppColors.secondary,
+                                  color: _recordButtonAnimation.value,
                                   onPressed: () {
                                     if (pianoProvider.isRecording) {
                                       pianoProvider.toggleRecording();
@@ -134,12 +162,20 @@ class _PianoScreenState extends State<PianoScreen>
                                   size: 30,
                                 ),
                                 AppPlayPauseButton(
-                                  value: pianoProvider.test,
+                                  value: pianoProvider.isSomethingPlaying,
                                   light: true,
+                                  onPressed: () => pianoProvider.playPause(),
+                                ),
+                                AppIcon(
+                                  icon: HeroIcons.stop,
+                                  color: AppColors.secondary,
+                                  size: 30,
                                   onPressed: () {
-                                    pianoProvider.test = !pianoProvider.test;
-                                    setState(() {});
+                                    pianoProvider.stop();
                                   },
+                                ),
+                                const SizedBox(
+                                  width: 5,
                                 )
                               ],
                             ),
