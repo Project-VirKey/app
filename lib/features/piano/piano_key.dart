@@ -1,18 +1,20 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:dart_melty_soundfont/dart_melty_soundfont.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
-
-// import 'package:mp_audio_stream/mp_audio_stream.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
+import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
-class PianoKeys {
+class Piano {
   // C D E F G A B
 
   // C# D# F# G# A#
@@ -72,13 +74,13 @@ class PianoKeysWhite extends StatelessWidget {
     double maxHeightDesktop = 560;
 
     List<PianoKeyWhite> pianoKeys = [];
-    PianoKeys.white.asMap().forEach((index, pianoKeyInfo) {
+    Piano.white.asMap().forEach((index, pianoKeyInfo) {
       pianoKeys.insert(
           index,
           PianoKeyWhite(
             name: pianoKeyInfo[0],
             position: index,
-            midiNoteNumber: pianoKeyInfo[1] + PianoKeys.midiOffset,
+            midiNoteNumber: pianoKeyInfo[1] + Piano.midiOffset,
             parentWidth: maxWidthDesktop,
             topLeft:
                 index == 0 && (mediaQuerySize.height * .9 >= maxHeightDesktop)
@@ -134,7 +136,7 @@ class PianoKeysBlack extends StatelessWidget {
       parentHeight: parentHeight,
     ));
 
-    PianoKeys.black.asMap().forEach((index, pianoKey) {
+    Piano.black.asMap().forEach((index, pianoKey) {
       pianoKeys.add(PianoKeyBlack(
         name: '',
         widthMultiplier: multiplierSpacer,
@@ -156,7 +158,7 @@ class PianoKeysBlack extends StatelessWidget {
           name: pianoKey[0],
           secondName: pianoKey[1],
           position: position,
-          midiNoteNumber: pianoKey[2] + PianoKeys.midiOffset,
+          midiNoteNumber: pianoKey[2] + Piano.midiOffset,
           parentWidth: parentWidth,
           parentHeight: parentHeight,
         ));
@@ -211,6 +213,20 @@ class PianoKeyWhite extends StatefulWidget {
 class _PianoKeyWhiteState extends State<PianoKeyWhite> {
   late int longPressStart;
   bool longPress = false;
+
+  List<int> stringToUint8ListToList(String input) =>
+      ascii.encode(input).toList();
+
+  List<int> int8ToUint8ListWith2BytesToList(int input) =>
+      (Uint8List(2)..buffer.asByteData().setInt8(0, input));
+
+  List<int> int8ToUint8ListWith4BytesToList(int input) =>
+      (Uint8List(4)..buffer.asByteData().setUint8(0, input));
+
+  List<int> int8ToInt32ToUint8ListWith4BytesToList(int input) =>
+      (Uint8List(4)..buffer.asByteData().setInt32(0, input, Endian.big))
+          .reversed
+          .toList();
 
   // final AudioStream audioStream;
   @override
@@ -268,15 +284,15 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
                       pianoProvider.recordingAddNote(widget.midiNoteNumber);
                     }
 
-                    PianoKeys.synth.reset();
-                    PianoKeys.synth.noteOn(
+                    Piano.synth.reset();
+                    Piano.synth.noteOn(
                         channel: 0, key: widget.midiNoteNumber, velocity: 120);
 
                     // Render the waveform (3 seconds)
                     // List<double> wave = List.filled(44100 * 3, 0);
                     // PianoKeys.synth.renderMono(wave);
                     ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: 44100 * 3);
-                    PianoKeys.synth.renderMonoInt16(buf16);
+                    Piano.synth.renderMonoInt16(buf16);
 
                     // print(buf16.bytes.buffer.asInt16List());
 
@@ -290,10 +306,92 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
                     // PianoKeys.audioStream.push(Float32List.fromList(wave));
                     // List<int> intWave = List.of(wave).map((e) => e * 255).cast<int>().toList();
 
-                    // AudioPlayer notePlayer = AudioPlayer();
-                    // notePlayer.setAudioSource(MyCustomSource(buf16.bytes.buffer.asInt16List()));
+                    // print(buf16.bytes.buffer.asInt16List());
+
+                    int sampleRate = 44100;
+                    int channels = 1;
+                    int bitsPerSample = 16;
+                    int seconds = 3;
+                    int dataBytesCount =
+                        buf16.bytes.buffer.asInt8List().length;
+
+                    print(dataBytesCount);
+
+                    List<int> wavDataIntList = [];
+                    wavDataIntList.addAll(stringToUint8ListToList('RIFF'));
+                    wavDataIntList.addAll(
+                        int8ToInt32ToUint8ListWith4BytesToList(
+                            dataBytesCount + 36));
+                    wavDataIntList.addAll(stringToUint8ListToList('WAVE'));
+                    wavDataIntList
+                        .addAll(stringToUint8ListToList('fmt '));
+                    wavDataIntList.addAll(int8ToUint8ListWith4BytesToList(16));
+                    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(1));
+                    wavDataIntList
+                        .addAll(int8ToUint8ListWith2BytesToList(channels));
+                    wavDataIntList.addAll(
+                        int8ToInt32ToUint8ListWith4BytesToList(sampleRate));
+                    wavDataIntList.addAll(
+                        int8ToInt32ToUint8ListWith4BytesToList(
+                            (sampleRate * bitsPerSample * channels) ~/ 8));
+                    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(
+                        (bitsPerSample * channels) ~/ 8));
+                    wavDataIntList
+                        .addAll(int8ToUint8ListWith2BytesToList(bitsPerSample));
+                    wavDataIntList.addAll(stringToUint8ListToList('data'));
+                    wavDataIntList.addAll(
+                        int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount));
+                    wavDataIntList.addAll(buf16.bytes.buffer.asInt8List());
+                    Uint8List wavData = Uint8List.fromList(wavDataIntList);
+
+                    final File f = File(
+                        '${AppFileSystem.basePath}${Platform.pathSeparator}output1.wav');
+                    f.writeAsBytesSync(wavData.buffer.asInt8List());
+
+                    AudioPlayer notePlayer = AudioPlayer();
+                    notePlayer
+                        .setAudioSource(MyCustomSource(wavData))
+                        .whenComplete(() => notePlayer.play());
+
                     // notePlayer.setAudioSource(MyCustomSource(waveInt));
                     // notePlayer.play();
+
+                    print(widget.midiNoteNumber);
+
+                    // var wav = WavContent.fromBytes(buf16.bytes.buffer.asInt8List().buffer.asByteData());
+                    //
+                    // print(wav.numChannels);
+                    // print(wav.numSamples);
+                    // print(wav.sampleRate);
+                    // print(wav.bitsPerSample);
+                    // // actual samples store in wav.samplesForChannel
+                    // RandomAccessFile f = File('${AppFileSystem.basePath}${Platform.pathSeparator}hello.wav').openSync(mode: FileMode.writeOnly);
+                    // f.writeFromSync(wav.toBytes().buffer.asInt8List());
+                    // f.flushSync();
+                    // f.closeSync();
+
+                    // final File f = File(
+                    //     '${AppFileSystem.basePath}${Platform.pathSeparator}output.mp3');
+                    // final IOSink sink = f.openWrite();
+                    // final LameMp3Encoder encoder =
+                    //     LameMp3Encoder(sampleRate: 44100, numChannels: 1);
+                    //
+                    // final mp3Frame = await encoder.encode(
+                    //     leftChannel: buf16.bytes.buffer.asInt16List());
+                    // sink.add(mp3Frame);
+                    // // continue until all samples have been encoded
+                    //
+                    // // finally, flush encoder buffer
+                    // final lastMp3Frame = await encoder.flush();
+                    // sink.add(lastMp3Frame);
+                    //
+                    // AudioPlayer notePlayer = AudioPlayer();
+                    // notePlayer
+                    //     .setAudioSource(AudioSource.file(
+                    //         '${AppFileSystem.basePath}${Platform.pathSeparator}output.mp3'))
+                    //     .whenComplete(() => notePlayer.play());
+
+                    // Player.bytes(Uint8List.fromList(buf16.bytes.buffer.asInt8List()));
                   },
                   child: Container(
                     alignment: Alignment.bottomCenter,
