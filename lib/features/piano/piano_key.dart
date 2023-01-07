@@ -22,49 +22,108 @@ class Piano {
   static const midiOffset = 72;
 
   static List white = [
-    ['C', 0],
-    ['D', 2],
-    ['E', 4],
-    ['F', 5],
-    ['G', 7],
-    ['A', 9],
-    ['B', 11]
+    [
+      ['C'],
+      0,
+      null
+    ],
+    [
+      ['D'],
+      2,
+      null
+    ],
+    [
+      ['E'],
+      4,
+      null
+    ],
+    [
+      ['F'],
+      5,
+      null
+    ],
+    [
+      ['G'],
+      7,
+      null
+    ],
+    [
+      ['A'],
+      9,
+      null
+    ],
+    [
+      ['B'],
+      11,
+      null
+    ]
   ];
 
-  static const List black = [
-    ['C#', 'Db', 1],
-    ['D#', 'Eb', 3],
+  static List black = [
+    [
+      ['C#', 'Db'],
+      1,
+      null
+    ],
+    [
+      ['D#', 'Eb'],
+      3,
+      null
+    ],
     [],
-    ['F#', 'Gb', 6],
-    ['G#', 'Ab', 8],
-    ['A#', 'Bb', 10]
+    [
+      ['F#', 'Gb'],
+      6,
+      null
+    ],
+    [
+      ['G#', 'Ab'],
+      8,
+      null
+    ],
+    [
+      ['A#', 'Bb'],
+      10,
+      null
+    ]
   ];
+
+  static const int sampleRate = 44100;
+  static const int channels = 1;
+  static const int bitsPerSample = 16;
+  static const int seconds = 3;
 
   static late ByteData bytes;
   static late Synthesizer synth;
 
   void loadLibrary(String asset) async {
-    // Create the synthesizer.
     bytes = await rootBundle.load(asset);
 
+    // Create the synthesizer
     synth = Synthesizer.loadByteData(
         bytes,
         SynthesizerSettings(
-          sampleRate: 44100,
+          sampleRate: sampleRate,
           blockSize: 64,
           maximumPolyphony: 64,
           enableReverbAndChorus: true,
         ));
+
+    for (var wK = 0; wK < white.length; wK++) {
+      white[wK][2] = loadPianoKeyWAV(white[wK][1] + midiOffset);
+    }
+
+    for (var bK = 0; bK < black.length; bK++) {
+      if (black[bK].isEmpty) {
+        continue;
+      }
+      black[bK][2] = loadPianoKeyWAV(black[bK][1] + midiOffset);
+    }
   }
 
-  static void playPianoNote(int midiNote) {
+  static Uint8List loadPianoKeyWAV(int midiNote) {
     synth.reset();
     synth.noteOn(channel: 0, key: midiNote, velocity: 120);
-
-    int sampleRate = 44100;
-    int channels = 1;
-    int bitsPerSample = 16;
-    int seconds = 3;
 
     // Render the waveform (3 seconds)
     ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: sampleRate * seconds);
@@ -76,6 +135,9 @@ class Piano {
 
     // WAV - Data Structure Documentation (Wav file format)
     // https://sites.google.com/site/musicgapi/technical-documents/wav-file-format, 07.01.2022
+
+    // Write a WAV file from scratch - C++ Audio Programming
+    // https://youtu.be/qqjvB_VxMRM?t=1333, 07.01.2022
 
     // WAV Files: File Structure, Case Analysis and PCM Explained
     // https://www.videoproc.com/resource/wav-file.htm, 07.01.2022
@@ -121,13 +183,7 @@ class Piano {
     // sample data: PCM data
     wavDataIntList.addAll(buf16.bytes.buffer.asInt8List());
 
-    Uint8List wavData = Uint8List.fromList(wavDataIntList);
-
-    // initiate AudioPlayer and use WAV-File-Byte-Data as source
-    AudioPlayer notePlayer = AudioPlayer();
-    notePlayer
-        .setAudioSource(MyCustomSource(wavData))
-        .whenComplete(() => notePlayer.play());
+    return Uint8List.fromList(wavDataIntList);
   }
 
   static List<int> stringToUint8ListToList(String input) =>
@@ -143,6 +199,37 @@ class Piano {
       (Uint8List(4)..buffer.asByteData().setInt32(0, input, Endian.big))
           .reversed
           .toList();
+
+  static AudioPlayer notePlayer = AudioPlayer();
+
+  static void playPianoNote(int arIndex, [bool isBlackKey = false]) {
+    // initiate AudioPlayer and use WAV-File-Byte-Data as source
+
+    notePlayer
+        .setAudioSource(
+            MyCustomSource(isBlackKey ? black[arIndex][2] : white[arIndex][2]))
+        .whenComplete(() => notePlayer.play());
+  }
+}
+
+// Feed your own stream of bytes into the player
+class MyCustomSource extends StreamAudioSource {
+  final List<int> bytes;
+
+  MyCustomSource(this.bytes);
+
+  @override
+  Future<StreamAudioResponse> request([int? start, int? end]) async {
+    start ??= 0;
+    end ??= bytes.length;
+    return StreamAudioResponse(
+      sourceLength: bytes.length,
+      contentLength: end - start,
+      offset: start,
+      stream: Stream.value(bytes.sublist(start, end)),
+      contentType: 'audio/mpeg',
+    );
+  }
 }
 
 class PianoKeysWhite extends StatelessWidget {
@@ -159,8 +246,8 @@ class PianoKeysWhite extends StatelessWidget {
       pianoKeys.insert(
           index,
           PianoKeyWhite(
-            name: pianoKeyInfo[0],
-            position: index,
+            name: pianoKeyInfo[0][0],
+            index: index,
             midiNoteNumber: pianoKeyInfo[1] + Piano.midiOffset,
             parentWidth: maxWidthDesktop,
             topLeft:
@@ -236,10 +323,10 @@ class PianoKeysBlack extends StatelessWidget {
         ));
       } else {
         pianoKeys.add(PianoKeyBlack(
-          name: pianoKey[0],
-          secondName: pianoKey[1],
-          position: position,
-          midiNoteNumber: pianoKey[2] + Piano.midiOffset,
+          name: pianoKey[0][0],
+          secondName: pianoKey[0][1],
+          index: position,
+          midiNoteNumber: pianoKey[1] + Piano.midiOffset,
           parentWidth: parentWidth,
           parentHeight: parentHeight,
         ));
@@ -275,7 +362,7 @@ class PianoKeyWhite extends StatefulWidget {
     required this.parentWidth,
     required this.topLeft,
     required this.topRight,
-    required this.position,
+    required this.index,
     required this.midiNoteNumber,
     // required this.audioStream,
   }) : super(key: key);
@@ -284,7 +371,7 @@ class PianoKeyWhite extends StatefulWidget {
   final double parentWidth;
   final Radius topLeft;
   final Radius topRight;
-  final int position;
+  final int index;
   final int midiNoteNumber;
 
   @override
@@ -334,7 +421,7 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
                     foregroundColor: AppColors.dark,
                     backgroundColor: longPress
                         ? const Color(0xffdedede)
-                        : (pianoProvider.pianoKeysWhite[widget.position][2]
+                        : (pianoProvider.pianoKeysWhite[widget.index][2]
                             ? AppColors.primary
                             : AppColors.white),
                     shape: RoundedRectangleBorder(
@@ -351,7 +438,7 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
                       pianoProvider.recordingAddNote(widget.midiNoteNumber);
                     }
 
-                    Piano.playPianoNote(widget.midiNoteNumber);
+                    Piano.playPianoNote(widget.index);
                   },
                   child: Container(
                     alignment: Alignment.bottomCenter,
@@ -377,7 +464,7 @@ class PianoKeyBlack extends StatefulWidget {
   const PianoKeyBlack({
     Key? key,
     required this.name,
-    this.position = 0,
+    this.index = 0,
     this.midiNoteNumber = 0,
     this.secondName = '',
     this.widthMultiplier = 1,
@@ -386,7 +473,7 @@ class PianoKeyBlack extends StatefulWidget {
   }) : super(key: key);
 
   final String name;
-  final int position;
+  final int index;
   final int midiNoteNumber;
   final String secondName;
   final double widthMultiplier;
@@ -443,7 +530,7 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
                 foregroundColor: AppColors.white,
                 backgroundColor: longPress
                     ? const Color(0xff454545)
-                    : (pianoProvider.pianoKeysBlack[widget.position][3]
+                    : (pianoProvider.pianoKeysBlack[widget.index][3]
                         ? AppColors.primary
                         : AppColors.dark),
                 shape: const RoundedRectangleBorder(
@@ -453,13 +540,12 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
                   ),
                 ),
               ),
-              // onPressed: () => FlutterMidi().playMidiNote(midi: midiNoteNumber),
               onPressed: () {
                 if (pianoProvider.isRecording) {
                   pianoProvider.recordingAddNote(widget.midiNoteNumber);
                 }
 
-                Piano.playPianoNote(widget.midiNoteNumber);
+                Piano.playPianoNote(widget.index, true);
               },
               child: Container(
                 alignment: Alignment.bottomCenter,
@@ -490,25 +576,5 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
         ),
       );
     }
-  }
-}
-
-// Feed your own stream of bytes into the player
-class MyCustomSource extends StreamAudioSource {
-  final List<int> bytes;
-
-  MyCustomSource(this.bytes);
-
-  @override
-  Future<StreamAudioResponse> request([int? start, int? end]) async {
-    start ??= 0;
-    end ??= bytes.length;
-    return StreamAudioResponse(
-      sourceLength: bytes.length,
-      contentLength: end - start,
-      offset: start,
-      stream: Stream.value(bytes.sublist(start, end)),
-      contentType: 'audio/mpeg',
-    );
   }
 }
