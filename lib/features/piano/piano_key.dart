@@ -73,26 +73,57 @@ class Piano {
     int dataBytesCount = buf16.bytes.buffer.asInt8List().length;
 
     List<int> wavDataIntList = [];
+
+    // WAV - Data Structure Documentation (Wav file format)
+    // https://sites.google.com/site/musicgapi/technical-documents/wav-file-format, 07.01.2022
+
+    // WAV Files: File Structure, Case Analysis and PCM Explained
+    // https://www.videoproc.com/resource/wav-file.htm, 07.01.2022
+
+    // WAV - Example Data & Documentation
+    // http://www.topherlee.com/software/pcm-tut-wavformat.html, 07.01.2022
+
+    // Wave File Header - RIFF Type Chunk
+    // ChunkID: "RIFF"
     wavDataIntList.addAll(stringToUint8ListToList('RIFF'));
+    // Chunk Data Size: length of waveform + 36 (size of header minus 8 (size of file header))
     wavDataIntList
         .addAll(int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount + 36));
+    // ChunkID: "WAVE"
     wavDataIntList.addAll(stringToUint8ListToList('WAVE'));
+
+    // Format Chunk - fmt
+    // ChunkID: "fmt "
     wavDataIntList.addAll(stringToUint8ListToList('fmt '));
+    // Chunk Data Size: 16 Bytes
     wavDataIntList.addAll(int8ToUint8ListWith4BytesToList(16));
+    // Compression Code: 1 (= PCM - Pulse Code Modulation)
     wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(1));
+    // Number of Channels: 1 (mono)
     wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(channels));
+    // Sample Rate: 44100 Hz
     wavDataIntList.addAll(int8ToInt32ToUint8ListWith4BytesToList(sampleRate));
+    // Average Bytes per Second
     wavDataIntList.addAll(int8ToInt32ToUint8ListWith4BytesToList(
         (sampleRate * bitsPerSample * channels) ~/ 8));
+    // Block Align: number of bytes per sample slice
     wavDataIntList.addAll(
         int8ToUint8ListWith2BytesToList((bitsPerSample * channels) ~/ 8));
+    // Significant Bits per Sample: 16 Bit
     wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(bitsPerSample));
+
+    // Data Chunk - data
+    // ChunkID: "data"
     wavDataIntList.addAll(stringToUint8ListToList('data'));
+    // Chunk Data Size: length of waveform
     wavDataIntList
         .addAll(int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount));
+    // sample data: PCM data
     wavDataIntList.addAll(buf16.bytes.buffer.asInt8List());
+
     Uint8List wavData = Uint8List.fromList(wavDataIntList);
 
+    // initiate AudioPlayer and use WAV-File-Byte-Data as source
     AudioPlayer notePlayer = AudioPlayer();
     notePlayer
         .setAudioSource(MyCustomSource(wavData))
