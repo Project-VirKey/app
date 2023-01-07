@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:dart_melty_soundfont/dart_melty_soundfont.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,6 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
-import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
 class Piano {
@@ -45,8 +43,6 @@ class Piano {
   static late ByteData bytes;
   static late Synthesizer synth;
 
-  // static final AudioStream audioStream = getAudioStream();
-
   void loadLibrary(String asset) async {
     // Create the synthesizer.
     bytes = await rootBundle.load(asset);
@@ -59,9 +55,63 @@ class Piano {
           maximumPolyphony: 64,
           enableReverbAndChorus: true,
         ));
-
-    // white[0][2].init();
   }
+
+  static void playPianoNote(int midiNote) {
+    synth.reset();
+    synth.noteOn(channel: 0, key: midiNote, velocity: 120);
+
+    int sampleRate = 44100;
+    int channels = 1;
+    int bitsPerSample = 16;
+    int seconds = 3;
+
+    // Render the waveform (3 seconds)
+    ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: sampleRate * seconds);
+    synth.renderMonoInt16(buf16);
+
+    int dataBytesCount = buf16.bytes.buffer.asInt8List().length;
+
+    List<int> wavDataIntList = [];
+    wavDataIntList.addAll(stringToUint8ListToList('RIFF'));
+    wavDataIntList
+        .addAll(int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount + 36));
+    wavDataIntList.addAll(stringToUint8ListToList('WAVE'));
+    wavDataIntList.addAll(stringToUint8ListToList('fmt '));
+    wavDataIntList.addAll(int8ToUint8ListWith4BytesToList(16));
+    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(1));
+    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(channels));
+    wavDataIntList.addAll(int8ToInt32ToUint8ListWith4BytesToList(sampleRate));
+    wavDataIntList.addAll(int8ToInt32ToUint8ListWith4BytesToList(
+        (sampleRate * bitsPerSample * channels) ~/ 8));
+    wavDataIntList.addAll(
+        int8ToUint8ListWith2BytesToList((bitsPerSample * channels) ~/ 8));
+    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(bitsPerSample));
+    wavDataIntList.addAll(stringToUint8ListToList('data'));
+    wavDataIntList
+        .addAll(int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount));
+    wavDataIntList.addAll(buf16.bytes.buffer.asInt8List());
+    Uint8List wavData = Uint8List.fromList(wavDataIntList);
+
+    AudioPlayer notePlayer = AudioPlayer();
+    notePlayer
+        .setAudioSource(MyCustomSource(wavData))
+        .whenComplete(() => notePlayer.play());
+  }
+
+  static List<int> stringToUint8ListToList(String input) =>
+      ascii.encode(input).toList();
+
+  static List<int> int8ToUint8ListWith2BytesToList(int input) =>
+      (Uint8List(2)..buffer.asByteData().setInt8(0, input));
+
+  static List<int> int8ToUint8ListWith4BytesToList(int input) =>
+      (Uint8List(4)..buffer.asByteData().setUint8(0, input));
+
+  static List<int> int8ToInt32ToUint8ListWith4BytesToList(int input) =>
+      (Uint8List(4)..buffer.asByteData().setInt32(0, input, Endian.big))
+          .reversed
+          .toList();
 }
 
 class PianoKeysWhite extends StatelessWidget {
@@ -214,20 +264,6 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
   late int longPressStart;
   bool longPress = false;
 
-  List<int> stringToUint8ListToList(String input) =>
-      ascii.encode(input).toList();
-
-  List<int> int8ToUint8ListWith2BytesToList(int input) =>
-      (Uint8List(2)..buffer.asByteData().setInt8(0, input));
-
-  List<int> int8ToUint8ListWith4BytesToList(int input) =>
-      (Uint8List(4)..buffer.asByteData().setUint8(0, input));
-
-  List<int> int8ToInt32ToUint8ListWith4BytesToList(int input) =>
-      (Uint8List(4)..buffer.asByteData().setInt32(0, input, Endian.big))
-          .reversed
-          .toList();
-
   // final AudioStream audioStream;
   @override
   Widget build(BuildContext context) {
@@ -284,114 +320,7 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
                       pianoProvider.recordingAddNote(widget.midiNoteNumber);
                     }
 
-                    Piano.synth.reset();
-                    Piano.synth.noteOn(
-                        channel: 0, key: widget.midiNoteNumber, velocity: 120);
-
-                    // Render the waveform (3 seconds)
-                    // List<double> wave = List.filled(44100 * 3, 0);
-                    // PianoKeys.synth.renderMono(wave);
-                    ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: 44100 * 3);
-                    Piano.synth.renderMonoInt16(buf16);
-
-                    // print(buf16.bytes.buffer.asInt16List());
-
-                    // try {
-                    //   PianoKeys.audioStream.uninit();
-                    // } catch (e) {
-                    //   print(e);
-                    // }
-                    // PianoKeys.audioStream.init();
-                    //
-                    // PianoKeys.audioStream.push(Float32List.fromList(wave));
-                    // List<int> intWave = List.of(wave).map((e) => e * 255).cast<int>().toList();
-
-                    // print(buf16.bytes.buffer.asInt16List());
-
-                    int sampleRate = 44100;
-                    int channels = 1;
-                    int bitsPerSample = 16;
-                    int seconds = 3;
-                    int dataBytesCount =
-                        buf16.bytes.buffer.asInt8List().length;
-
-                    print(dataBytesCount);
-
-                    List<int> wavDataIntList = [];
-                    wavDataIntList.addAll(stringToUint8ListToList('RIFF'));
-                    wavDataIntList.addAll(
-                        int8ToInt32ToUint8ListWith4BytesToList(
-                            dataBytesCount + 36));
-                    wavDataIntList.addAll(stringToUint8ListToList('WAVE'));
-                    wavDataIntList
-                        .addAll(stringToUint8ListToList('fmt '));
-                    wavDataIntList.addAll(int8ToUint8ListWith4BytesToList(16));
-                    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(1));
-                    wavDataIntList
-                        .addAll(int8ToUint8ListWith2BytesToList(channels));
-                    wavDataIntList.addAll(
-                        int8ToInt32ToUint8ListWith4BytesToList(sampleRate));
-                    wavDataIntList.addAll(
-                        int8ToInt32ToUint8ListWith4BytesToList(
-                            (sampleRate * bitsPerSample * channels) ~/ 8));
-                    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(
-                        (bitsPerSample * channels) ~/ 8));
-                    wavDataIntList
-                        .addAll(int8ToUint8ListWith2BytesToList(bitsPerSample));
-                    wavDataIntList.addAll(stringToUint8ListToList('data'));
-                    wavDataIntList.addAll(
-                        int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount));
-                    wavDataIntList.addAll(buf16.bytes.buffer.asInt8List());
-                    Uint8List wavData = Uint8List.fromList(wavDataIntList);
-
-                    final File f = File(
-                        '${AppFileSystem.basePath}${Platform.pathSeparator}output1.wav');
-                    f.writeAsBytesSync(wavData.buffer.asInt8List());
-
-                    AudioPlayer notePlayer = AudioPlayer();
-                    notePlayer
-                        .setAudioSource(MyCustomSource(wavData))
-                        .whenComplete(() => notePlayer.play());
-
-                    // notePlayer.setAudioSource(MyCustomSource(waveInt));
-                    // notePlayer.play();
-
-                    print(widget.midiNoteNumber);
-
-                    // var wav = WavContent.fromBytes(buf16.bytes.buffer.asInt8List().buffer.asByteData());
-                    //
-                    // print(wav.numChannels);
-                    // print(wav.numSamples);
-                    // print(wav.sampleRate);
-                    // print(wav.bitsPerSample);
-                    // // actual samples store in wav.samplesForChannel
-                    // RandomAccessFile f = File('${AppFileSystem.basePath}${Platform.pathSeparator}hello.wav').openSync(mode: FileMode.writeOnly);
-                    // f.writeFromSync(wav.toBytes().buffer.asInt8List());
-                    // f.flushSync();
-                    // f.closeSync();
-
-                    // final File f = File(
-                    //     '${AppFileSystem.basePath}${Platform.pathSeparator}output.mp3');
-                    // final IOSink sink = f.openWrite();
-                    // final LameMp3Encoder encoder =
-                    //     LameMp3Encoder(sampleRate: 44100, numChannels: 1);
-                    //
-                    // final mp3Frame = await encoder.encode(
-                    //     leftChannel: buf16.bytes.buffer.asInt16List());
-                    // sink.add(mp3Frame);
-                    // // continue until all samples have been encoded
-                    //
-                    // // finally, flush encoder buffer
-                    // final lastMp3Frame = await encoder.flush();
-                    // sink.add(lastMp3Frame);
-                    //
-                    // AudioPlayer notePlayer = AudioPlayer();
-                    // notePlayer
-                    //     .setAudioSource(AudioSource.file(
-                    //         '${AppFileSystem.basePath}${Platform.pathSeparator}output.mp3'))
-                    //     .whenComplete(() => notePlayer.play());
-
-                    // Player.bytes(Uint8List.fromList(buf16.bytes.buffer.asInt8List()));
+                    Piano.playPianoNote(widget.midiNoteNumber);
                   },
                   child: Container(
                     alignment: Alignment.bottomCenter,
@@ -498,6 +427,8 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
                 if (pianoProvider.isRecording) {
                   pianoProvider.recordingAddNote(widget.midiNoteNumber);
                 }
+
+                Piano.playPianoNote(widget.midiNoteNumber);
               },
               child: Container(
                 alignment: Alignment.bottomCenter,

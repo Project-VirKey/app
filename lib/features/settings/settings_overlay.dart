@@ -263,8 +263,7 @@ class SettingsOverlay {
                                 // specifying allowedExtensions not possible -> 'sf2' not allowed as allowed extension
                                 File? soundFontFile =
                                     await AppFileSystem.filePicker(
-                                        title: 'Select Sound-Library (SF2)',
-                                        allowedExtensions: ['SF2']);
+                                        title: 'Select Sound-Library (SF2)');
 
                                 if (soundFontFile != null) {
                                   if (!(await AppFileSystem.checkIfFileInFolder(
