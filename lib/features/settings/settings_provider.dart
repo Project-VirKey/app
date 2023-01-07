@@ -49,7 +49,7 @@ class SettingsProvider extends ChangeNotifier {
     }
 
     // load the selected sound library
-    PianoKeys().loadLibrary(_settings.soundLibraries
+    Piano().loadLibrary(_settings.soundLibraries
         .where((soundLibrary) => soundLibrary.selected)
         .first
         .path);
@@ -92,7 +92,7 @@ class SettingsProvider extends ChangeNotifier {
     selectedSoundLibrary.selected = true;
 
     // load the selected sound library
-    PianoKeys().loadLibrary(selectedSoundLibrary.path);
+    Piano().loadLibrary(selectedSoundLibrary.path);
 
     AppSharedPreferences.saveData(_settings);
     notifyListeners();

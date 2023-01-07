@@ -134,6 +134,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.5"
+  dart_lame:
+    dependency: transitive
+    description:
+      name: dart_lame
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.3"
   dart_melty_soundfont:
     dependency: "direct main"
     description:
@@ -278,6 +285,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_lame:
+    dependency: "direct main"
+    description:
+      name: flutter_lame
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   flutter_launcher_icons:
     dependency: "direct main"
     description:
@@ -818,6 +832,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
+  wav_io:
+    dependency: "direct main"
+    description:
+      name: wav_io
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   win32:
     dependency: transitive
     description:
