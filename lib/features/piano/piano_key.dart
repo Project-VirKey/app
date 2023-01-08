@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dart_melty_soundfont/dart_melty_soundfont.dart';
 import 'package:flutter/material.dart';
@@ -96,8 +97,12 @@ class Piano {
   static late ByteData bytes;
   static late Synthesizer synth;
 
-  void loadLibrary(String asset) async {
-    bytes = await rootBundle.load(asset);
+  void loadLibrary(String path, [bool isAsset = false]) async {
+    if (isAsset) {
+      bytes = await rootBundle.load(path);
+    } else {
+      bytes = File(path).readAsBytesSync().buffer.asByteData();
+    }
 
     // Create the synthesizer
     synth = Synthesizer.loadByteData(

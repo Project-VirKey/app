@@ -49,10 +49,10 @@ class SettingsProvider extends ChangeNotifier {
     }
 
     // load the selected sound library
-    Piano().loadLibrary(_settings.soundLibraries
+    SoundLibrary soundLibrary = _settings.soundLibraries
         .where((soundLibrary) => soundLibrary.selected)
-        .first
-        .path);
+        .first;
+    Piano().loadLibrary(soundLibrary.path, soundLibrary.defaultLibrary);
   }
 
   Future<void> loadSoundLibraries() async {
@@ -92,7 +92,8 @@ class SettingsProvider extends ChangeNotifier {
     selectedSoundLibrary.selected = true;
 
     // load the selected sound library
-    Piano().loadLibrary(selectedSoundLibrary.path);
+    Piano().loadLibrary(
+        selectedSoundLibrary.path, selectedSoundLibrary.defaultLibrary);
 
     AppSharedPreferences.saveData(_settings);
     notifyListeners();
