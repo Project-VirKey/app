@@ -95,7 +95,17 @@ class _PianoScreenState extends State<PianoScreen>
                                   AppIcon(
                                     icon: HeroIcons.arrowUturnLeft,
                                     color: AppColors.secondary,
-                                    onPressed: () => context.go('/'),
+                                    onPressed: () {
+                                      if (pianoProvider.isRecording) {
+                                        AppSnackBar(
+                                                message: 'Active Recording!',
+                                                context: context,
+                                                vsync: this)
+                                            .open();
+                                      } else {
+                                        context.go('/');
+                                      }
+                                    },
                                     size: 30,
                                   ),
                                   AppIcon(

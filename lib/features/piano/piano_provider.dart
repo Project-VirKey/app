@@ -156,7 +156,6 @@ class PianoProvider extends ChangeNotifier {
     _displayTimeTimer?.cancel();
     displayTime = _resetDisplayTime;
     _previousElapsedTime = null;
-    print('stopped timer');
   }
 
   void pauseDisplayTimeTimer() {
@@ -207,6 +206,7 @@ class PianoProvider extends ChangeNotifier {
   }
 
   Future<void> startRecording() async {
+    stopDisplayTimeTimer();
     setStartTimeStamp(true);
     startDisplayTimeTimer();
 
