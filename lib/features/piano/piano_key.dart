@@ -26,36 +26,43 @@ class Piano {
     [
       ['C'],
       0,
+      null,
       null
     ],
     [
       ['D'],
       2,
+      null,
       null
     ],
     [
       ['E'],
       4,
+      null,
       null
     ],
     [
       ['F'],
       5,
+      null,
       null
     ],
     [
       ['G'],
       7,
+      null,
       null
     ],
     [
       ['A'],
       9,
+      null,
       null
     ],
     [
       ['B'],
       11,
+      null,
       null
     ]
   ];
@@ -64,27 +71,32 @@ class Piano {
     [
       ['C#', 'Db'],
       1,
+      null,
       null
     ],
     [
       ['D#', 'Eb'],
       3,
+      null,
       null
     ],
     [],
     [
       ['F#', 'Gb'],
       6,
+      null,
       null
     ],
     [
       ['G#', 'Ab'],
       8,
+      null,
       null
     ],
     [
       ['A#', 'Bb'],
       10,
+      null,
       null
     ]
   ];
@@ -116,6 +128,8 @@ class Piano {
 
     for (var wK = 0; wK < white.length; wK++) {
       white[wK][2] = loadPianoKeyWAV(white[wK][1] + midiOffset);
+      white[wK][3] = AudioPlayer();
+      white[wK][3].setAudioSource(MyCustomSource(white[wK][2]));
     }
 
     for (var bK = 0; bK < black.length; bK++) {
@@ -123,6 +137,8 @@ class Piano {
         continue;
       }
       black[bK][2] = loadPianoKeyWAV(black[bK][1] + midiOffset);
+      black[bK][3] = AudioPlayer();
+      black[bK][3].setAudioSource(MyCustomSource(black[bK][2]));
     }
   }
 
@@ -210,10 +226,13 @@ class Piano {
   static void playPianoNote(int arIndex, [bool isBlackKey = false]) {
     // initiate AudioPlayer and use WAV-File-Byte-Data as source
 
-    notePlayer
-        .setAudioSource(
-            MyCustomSource(isBlackKey ? black[arIndex][2] : white[arIndex][2]))
-        .whenComplete(() => notePlayer.play());
+    if (isBlackKey) {
+      black[arIndex][3].seek(const Duration(seconds: 0));
+      black[arIndex][3].play();
+    } else {
+      white[arIndex][3].seek(const Duration(seconds: 0));
+      white[arIndex][3].play();
+    }
   }
 }
 
