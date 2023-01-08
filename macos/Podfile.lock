@@ -652,6 +652,8 @@ PODS:
     - "gRPC-C++ (~> 1.44.0)"
     - leveldb-library (~> 1.22)
     - nanopb (< 2.30910.0, >= 2.30908.0)
+  - flutter_midi_command (0.0.1):
+    - FlutterMacOS
   - FlutterMacOS (1.0.0)
   - GoogleUtilities/AppDelegateSwizzler (7.10.0):
     - GoogleUtilities/Environment
@@ -752,6 +754,7 @@ DEPENDENCIES:
   - desktop_webview_auth (from `Flutter/ephemeral/.symlinks/plugins/desktop_webview_auth/macos`)
   - firebase_auth (from `Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos`)
   - firebase_core (from `Flutter/ephemeral/.symlinks/plugins/firebase_core/macos`)
+  - flutter_midi_command (from `Flutter/ephemeral/.symlinks/plugins/flutter_midi_command/macos`)
   - FlutterMacOS (from `Flutter/ephemeral`)
   - just_audio (from `Flutter/ephemeral/.symlinks/plugins/just_audio/macos`)
   - path_provider_macos (from `Flutter/ephemeral/.symlinks/plugins/path_provider_macos/macos`)
@@ -789,6 +792,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos
   firebase_core:
     :path: Flutter/ephemeral/.symlinks/plugins/firebase_core/macos
+  flutter_midi_command:
+    :path: Flutter/ephemeral/.symlinks/plugins/flutter_midi_command/macos
   FlutterMacOS:
     :path: Flutter/ephemeral
   just_audio:
@@ -817,6 +822,7 @@ SPEC CHECKSUMS:
   FirebaseCore: 988754646ab3bd4bdcb740f1bfe26b9f6c0d5f2a
   FirebaseCoreInternal: 29b76f784d607df8b2a1259d73c3f04f1210137b
   FirebaseFirestore: 244f71ff14ef44f39e00b44d356eac708ce03103
+  flutter_midi_command: c1a74de594e48e8fffd195a2ed5746161d507a48
   FlutterMacOS: ae6af50a8ea7d6103d888583d46bd8328a7e9811
   GoogleUtilities: bad72cb363809015b1f7f19beb1f1cd23c589f95
   "gRPC-C++": 9675f953ace2b3de7c506039d77be1f2e77a8db2

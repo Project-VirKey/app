@@ -73,6 +73,8 @@ dependencies:
     git:
       url: https://github.com/genit-jp/dart_midi
       path: .
+  flutter_midi_command_platform_interface: ^0.4.0
+  flutter_midi_command: ^0.4.9
 
 dev_dependencies:
   flutter_test:
@@ -100,7 +102,6 @@ flutter:
   # assets:
   assets:
     - assets/images/VIK_Logo_v2.svg
-    - assets/audio/mixkit-arcade-retro-game-over-213.wav
     - assets/sound_libraries/Grand-Piano.sf2
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
+import 'package:virkey/features/midi_device/midi_device_provider.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
@@ -37,7 +38,6 @@ Future<void> main() async {
   ));
 
   // cloud-synchronization
-  // TODO: cloud synchronization for windows
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -46,6 +46,8 @@ Future<void> main() async {
   await FirebaseAuth.instance.currentUser?.reload();
 
   // AppFirestore.test();
+
+  AppMidiTest.test();
 }
 
 class App extends StatelessWidget {
