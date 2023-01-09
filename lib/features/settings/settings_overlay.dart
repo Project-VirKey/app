@@ -127,16 +127,8 @@ class SettingsOverlay {
                               value: settingsProvider
                                   .settings.audioVolume.soundLibrary
                                   .toDouble(),
-                              onChanged: (val) {
-                                int valInt = val.toInt();
-
-                                if (settingsProvider
-                                        .settings.audioVolume.soundLibrary !=
-                                    valInt) {
-                                  settingsProvider.settings.audioVolume
-                                      .soundLibrary = valInt;
-                                }
-                              },
+                              onChanged: (value) => settingsProvider
+                                  .setAudioVolumeSoundLibrary(value),
                               onChangedEnd: (value) => {
                                 AppSharedPreferences.saveData(
                                     settingsProvider.settings)
@@ -156,16 +148,8 @@ class SettingsOverlay {
                               value: settingsProvider
                                   .settings.audioVolume.audioPlayback
                                   .toDouble(),
-                              onChanged: (val) {
-                                int valInt = val.toInt();
-
-                                if (settingsProvider
-                                        .settings.audioVolume.audioPlayback !=
-                                    valInt) {
-                                  settingsProvider.settings.audioVolume
-                                      .audioPlayback = valInt;
-                                }
-                              },
+                              onChanged: (value) => settingsProvider
+                                  .setAudioVolumeAudioPlayback(value),
                               onChangedEnd: (value) => {
                                 AppSharedPreferences.saveData(
                                     settingsProvider.settings)
@@ -228,26 +212,28 @@ class SettingsOverlay {
                           const PropertiesDescriptionTitle(
                               title: 'Default saved Files'),
                           PropertyDescriptionActionCombination(
-                            title: 'MP3',
+                            title: 'Audio',
                             child: AppSwitch(
                               value: settingsProvider
                                   .settings.defaultSavedFiles.mp3,
-                              onChanged: (bool val) {
+                              onChanged: (bool value) {
                                 settingsProvider
-                                    .settings.defaultSavedFiles.mp3 = val;
+                                    .settings.defaultSavedFiles.mp3 = value;
+                                settingsProvider.notify();
                                 AppSharedPreferences.saveData(
                                     settingsProvider.settings);
                               },
                             ),
                           ),
                           PropertyDescriptionActionCombination(
-                              title: 'MP3 + Audio-Playback',
+                              title: 'Audio + Audio-Playback',
                               child: AppSwitch(
                                 value: settingsProvider
                                     .settings.defaultSavedFiles.mp3AndPlayback,
                                 onChanged: (bool val) {
                                   settingsProvider.settings.defaultSavedFiles
                                       .mp3AndPlayback = val;
+                                  settingsProvider.notify();
                                   AppSharedPreferences.saveData(
                                       settingsProvider.settings);
                                 },

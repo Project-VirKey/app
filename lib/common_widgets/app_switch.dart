@@ -3,21 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/common_widgets/app_shadow.dart';
 
-class AppSwitch extends StatefulWidget {
-  AppSwitch({
+class AppSwitch extends StatelessWidget {
+  const AppSwitch({
     Key? key,
     this.value = false,
     required this.onChanged,
   }) : super(key: key);
 
-  bool value;
+  final bool value;
   final ValueChanged<bool> onChanged;
 
-  @override
-  State<AppSwitch> createState() => _AppSwitchState();
-}
-
-class _AppSwitchState extends State<AppSwitch> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
@@ -32,7 +27,7 @@ class _AppSwitchState extends State<AppSwitch> {
               height: 15,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(50.0),
-                color: widget.value ? AppColors.primary : AppColors.tertiary,
+                color: value ? AppColors.primary : AppColors.tertiary,
               ),
             )),
             AnimatedContainer(
@@ -42,8 +37,7 @@ class _AppSwitchState extends State<AppSwitch> {
               height: 20,
               child: AnimatedAlign(
                 duration: const Duration(milliseconds: 150),
-                alignment:
-                    widget.value ? Alignment.centerRight : Alignment.centerLeft,
+                alignment: value ? Alignment.centerRight : Alignment.centerLeft,
                 curve: Curves.decelerate,
                 child: AppShadow(
                   child: Container(
@@ -61,10 +55,7 @@ class _AppSwitchState extends State<AppSwitch> {
           ],
         ),
         onTap: () {
-          setState(() {
-            widget.value = !widget.value;
-            widget.onChanged(widget.value);
-          });
+          onChanged(!value);
         },
       ),
     );

@@ -113,9 +113,10 @@ class ImportOverlay {
                           children: [
                             AppSwitch(
                               value: pianoProvider.isPlaybackActive,
-                              onChanged: (bool val) => {
+                              onChanged: (bool val) {
                                 pianoProvider.isPlaybackActive =
-                                    !pianoProvider.isPlaybackActive
+                                    !pianoProvider.isPlaybackActive;
+                                pianoProvider.notify();
                               },
                             ),
                             const SizedBox(
@@ -172,9 +173,10 @@ class ImportOverlay {
                           children: [
                             AppSwitch(
                               value: pianoProvider.isVisualizeMidiActive,
-                              onChanged: (bool val) => {
+                              onChanged: (bool val) {
                                 pianoProvider.isVisualizeMidiActive =
-                                    !pianoProvider.isVisualizeMidiActive
+                                    !pianoProvider.isVisualizeMidiActive;
+                                pianoProvider.notify();
                               },
                             ),
                             const SizedBox(

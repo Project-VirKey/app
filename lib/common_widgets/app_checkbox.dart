@@ -6,13 +6,13 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/common_widgets/app_shadow.dart';
 
 class AppCheckbox extends StatefulWidget {
-  AppCheckbox({
+  const AppCheckbox({
     Key? key,
     this.value = false,
     required this.onChanged,
   }) : super(key: key);
 
-  bool value;
+  final bool value;
   final ValueChanged<bool> onChanged;
 
   @override
