@@ -19,6 +19,8 @@ class AppFirestore {
 
   static FirebaseFirestore? db = FirebaseFirestore.instance;
 
+  static Map<String, dynamic>? document;
+
   static Future<bool> checkUserDocumentExists() async {
     // check if document exists
     // https://stackoverflow.com/a/62735067/17399214, 19.12.2022
@@ -30,13 +32,13 @@ class AppFirestore {
         false;
   }
 
-  static void createDocument() {
+  static void createDocument(Map<String, dynamic> document) {
     // create document with userId (uid) as title
     // https://stackoverflow.com/a/61724209/17399214, 19.12.2022
     db
         ?.collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid as String)
-        .set({"name": "peter", "boolVal": true});
+        .set(document);
   }
 
   static Future<Map<String, dynamic>?> getDocument() async {
@@ -47,11 +49,14 @@ class AppFirestore {
         ?.data() as Map<String, dynamic>;
   }
 
-  static Future<void> test() async {
-    if (await checkUserDocumentExists()) {
-      print(await getDocument());
-    } else {
-      createDocument();
-    }
+  static Future<void> initialLoad() async {
+    document = (await getDocument())!;
+
+    // if (await checkUserDocumentExists()) {
+    //   document = (await getDocument())!;
+    // } else {
+    //   document = defaultDocument;
+    //   createDocument(defaultDocument);
+    // }
   }
 }

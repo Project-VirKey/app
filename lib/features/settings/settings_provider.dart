@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:virkey/features/cloud_synchronisation/firestore.dart';
 import 'package:virkey/features/piano/piano_key.dart';
 import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/platform_helper.dart';
+import 'package:virkey/utils/timestamp.dart';
 
 class SettingsProvider extends ChangeNotifier {
   final Settings _settings = Settings(
@@ -13,6 +15,7 @@ class SettingsProvider extends ChangeNotifier {
     defaultFolder: DefaultFolder(path: AppFileSystem.basePath ?? ''),
     defaultSavedFiles: DefaultSavedFiles(mp3: false, mp3AndPlayback: false),
     soundLibraries: [],
+    lastUpdated: AppTimestamp.now,
   );
 
   SettingsProvider() {
@@ -20,6 +23,8 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   Future<void> initialLoad() async {
+    print(AppFirestore.document);
+
     await loadSoundLibraries();
     _settings.defaultFolder.path = AppFileSystem.basePath ?? '';
 
