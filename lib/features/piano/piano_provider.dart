@@ -237,8 +237,8 @@ class PianoProvider extends ChangeNotifier {
     createMidiFile();
   }
 
-  void recordingAddNote(int midiNote, [double duration = 500]) {
-    _recordedNotes.add([midiNote, _elapsedTime, duration]);
+  void recordingAddNote(int midiNote) {
+    _recordedNotes.add([midiNote, _elapsedTime]);
   }
 
   // ----------------------------------------------------------------
@@ -322,7 +322,7 @@ class PianoProvider extends ChangeNotifier {
     int track = 0;
     int channel = 0;
     num time = 0; //    # In beats
-    // double duration = 0.5; //    # In beats
+    double duration = 0.5; //    # In beats
     int tempo = 60; //   # In BPM
     int volume = 100; //  # 0-127, as per the MIDI standard
 
@@ -347,7 +347,7 @@ class PianoProvider extends ChangeNotifier {
           channel: channel,
           pitch: _recordedNotes[i][0],
           time: _recordedNotes[i][1] / 1000,
-          duration: _recordedNotes[i][2] / 1000,
+          duration: duration,
           volume: volume);
     });
 
