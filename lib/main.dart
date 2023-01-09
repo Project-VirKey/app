@@ -13,6 +13,7 @@ import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/platform_helper.dart';
 import 'package:window_size/window_size.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'features/cloud_synchronisation/firestore.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -26,17 +27,6 @@ Future<void> main() async {
   // initialize folders for user content (recordings, ...)
   await AppFileSystem.initFolders();
 
-  // run the app
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => SettingsProvider()),
-      ChangeNotifierProvider(create: (_) => CloudProvider()),
-      ChangeNotifierProvider(create: (_) => RecordingsProvider()),
-      ChangeNotifierProvider(create: (_) => PianoProvider()),
-    ],
-    child: const App(),
-  ));
-
   // cloud-synchronization
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -45,9 +35,28 @@ Future<void> main() async {
   // reload authentication on start-up
   await FirebaseAuth.instance.currentUser?.reload();
 
-  // AppFirestore.test();
+  // load firestore document
+  await AppFirestore.initialLoad();
 
-  AppMidiTest.test();
+  // run the app
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => SettingsProvider()),
+      ChangeNotifierProvider(create: (_) => RecordingsProvider()),
+      ChangeNotifierProvider(create: (_) => PianoProvider()),
+      ChangeNotifierProxyProvider<SettingsProvider, CloudProvider>(
+          create: (BuildContext context) => CloudProvider(
+              Provider.of<SettingsProvider>(context, listen: false)),
+          update: (BuildContext context, SettingsProvider settingsProvider,
+              CloudProvider? cloudProvider) {
+            cloudProvider?.setSettingsProvider(settingsProvider);
+            return cloudProvider ?? CloudProvider(settingsProvider);
+          })
+    ],
+    child: const App(),
+  ));
+
+  // AppMidiTest.test();
 }
 
 class App extends StatelessWidget {

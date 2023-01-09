@@ -12,6 +12,7 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/utils/platform_helper.dart';
+import 'package:virkey/utils/timestamp.dart';
 
 class Piano {
   // C D E F G A B
@@ -421,7 +422,7 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
                       Widget? child) =>
                   GestureDetector(
                 onTapDown: (details) {
-                  longPressStart = pianoProvider.millisecondsSinceEpoch;
+                  longPressStart = AppTimestamp.now;
                 },
                 onLongPressStart: (details) {
                   longPress = true;
@@ -430,7 +431,7 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
                 onLongPressEnd: (details) {
                   if (longPress) {
                     double timeDifference =
-                        (pianoProvider.millisecondsSinceEpoch - longPressStart)
+                        (AppTimestamp.now - longPressStart)
                             .toDouble();
                     longPress = false;
                     setState(() {});
@@ -529,7 +530,7 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
                   Widget? child) =>
               GestureDetector(
             onTapDown: (details) {
-              longPressStart = pianoProvider.millisecondsSinceEpoch;
+              longPressStart = AppTimestamp.now;
             },
             onLongPressStart: (details) {
               longPress = true;
@@ -538,7 +539,7 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
             onLongPressEnd: (details) {
               if (longPress) {
                 double timeDifference =
-                    (pianoProvider.millisecondsSinceEpoch - longPressStart)
+                    (AppTimestamp.now - longPressStart)
                         .toDouble();
                 longPress = false;
                 setState(() {});

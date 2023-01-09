@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:midi_util/midi_util.dart';
 import 'package:virkey/utils/file_system.dart';
+import 'package:virkey/utils/timestamp.dart';
 
 class PianoProvider extends ChangeNotifier {
   int midiOffset = 72;
@@ -60,9 +61,7 @@ class PianoProvider extends ChangeNotifier {
 
   bool get isRecording => _isRecording;
 
-  int get millisecondsSinceEpoch => DateTime.now().millisecondsSinceEpoch;
-
-  int get _elapsedTime => millisecondsSinceEpoch - _startTimeStamp;
+  int get _elapsedTime => AppTimestamp.now - _startTimeStamp;
 
   bool get isSomethingPlaying => isPlaybackPlaying || isVisualizeMidiPlaying;
 
@@ -141,7 +140,7 @@ class PianoProvider extends ChangeNotifier {
 
   void setStartTimeStamp([bool delay = false]) {
     _startTimeStamp =
-        millisecondsSinceEpoch + (delay ? (_recordingDelaySeconds * 1000) : 0);
+        AppTimestamp.now + (delay ? (_recordingDelaySeconds * 1000) : 0);
   }
 
   void startDisplayTimeTimer() {
@@ -235,8 +234,6 @@ class PianoProvider extends ChangeNotifier {
   }
 
   void recordingAddNote(int midiNote, [double duration = 500]) {
-    print(midiNote);
-
     _recordedNotes.add([midiNote, _elapsedTime, duration]);
   }
 

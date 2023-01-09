@@ -349,7 +349,7 @@ class SettingsOverlay {
                                 Column(
                               children: [
                                 Visibility(
-                                  visible: cloudProvider.cloud.loggedIn,
+                                  visible: cloudProvider.loggedIn,
                                   child: Column(
                                     children: [
                                       const SizedBox(
@@ -592,7 +592,7 @@ class SettingsOverlay {
                                     ],
                                   ),
                                 ),
-                                if (!cloudProvider.cloud.loggedIn)
+                                if (!cloudProvider.loggedIn)
                                   PropertyDescriptionActionCombination(
                                     title: 'Login / Sign up',
                                     child: AppIcon(
