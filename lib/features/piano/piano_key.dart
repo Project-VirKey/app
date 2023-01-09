@@ -380,7 +380,7 @@ class PianoKeysBlack extends StatelessWidget {
   }
 }
 
-class PianoKeyWhite extends StatefulWidget {
+class PianoKeyWhite extends StatelessWidget {
   const PianoKeyWhite({
     Key? key,
     required this.name,
@@ -389,7 +389,6 @@ class PianoKeyWhite extends StatefulWidget {
     required this.topRight,
     required this.index,
     required this.midiNoteNumber,
-    // required this.audioStream,
   }) : super(key: key);
 
   final String name;
@@ -399,15 +398,6 @@ class PianoKeyWhite extends StatefulWidget {
   final int index;
   final int midiNoteNumber;
 
-  @override
-  State<PianoKeyWhite> createState() => _PianoKeyWhiteState();
-}
-
-class _PianoKeyWhiteState extends State<PianoKeyWhite> {
-  late int longPressStart;
-  bool longPress = false;
-
-  // final AudioStream audioStream;
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -421,56 +411,38 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
               builder: (BuildContext context, PianoProvider pianoProvider,
                       Widget? child) =>
                   GestureDetector(
-                onTapDown: (details) {
-                  longPressStart = AppTimestamp.now;
-                },
-                onLongPressStart: (details) {
-                  longPress = true;
-                  setState(() {});
-                },
-                onLongPressEnd: (details) {
-                  if (longPress) {
-                    double timeDifference =
-                        (AppTimestamp.now - longPressStart)
-                            .toDouble();
-                    longPress = false;
-                    setState(() {});
-                    longPressStart = 0;
-
-                    pianoProvider.recordingAddNote(
-                        widget.midiNoteNumber, timeDifference);
-                  }
-                },
+                onTapDown: (details) {},
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     foregroundColor: AppColors.dark,
-                    backgroundColor: longPress
-                        ? const Color(0xffdedede)
-                        : (pianoProvider.pianoKeysWhite[widget.index][2]
-                            ? AppColors.primary
-                            : AppColors.white),
+                    backgroundColor: AppColors.white,
+                    // backgroundColor: longPress
+                    //     ? const Color(0xffdedede)
+                    //     : (pianoProvider.pianoKeysWhite[widget.index][2]
+                    //         ? AppColors.primary
+                    //         : AppColors.white),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
                         bottomLeft: AppRadius.radius,
                         bottomRight: AppRadius.radius,
-                        topLeft: widget.topLeft,
-                        topRight: widget.topRight,
+                        topLeft: topLeft,
+                        topRight: topRight,
                       ),
                     ),
                   ),
                   onPressed: () async {
                     if (pianoProvider.isRecording) {
-                      pianoProvider.recordingAddNote(widget.midiNoteNumber);
+                      pianoProvider.recordingAddNote(midiNoteNumber);
                     }
 
-                    Piano.playPianoNote(widget.index);
+                    Piano.playPianoNote(index);
                   },
                   child: Container(
                     alignment: Alignment.bottomCenter,
                     padding: const EdgeInsets.only(bottom: 25),
                     child: AppText(
-                      text: widget.name,
-                      size: widget.parentWidth * .04,
+                      text: name,
+                      size: parentWidth * .04,
                       color: AppColors.dark,
                       family: AppFonts.secondary,
                     ),
@@ -485,7 +457,7 @@ class _PianoKeyWhiteState extends State<PianoKeyWhite> {
   }
 }
 
-class PianoKeyBlack extends StatefulWidget {
+class PianoKeyBlack extends StatelessWidget {
   const PianoKeyBlack({
     Key? key,
     required this.name,
@@ -506,58 +478,33 @@ class PianoKeyBlack extends StatefulWidget {
   final double parentHeight;
 
   @override
-  State<PianoKeyBlack> createState() => _PianoKeyBlackState();
-}
-
-class _PianoKeyBlackState extends State<PianoKeyBlack> {
-  late int longPressStart;
-  bool longPress = false;
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.name.isEmpty) {
+    if (name.isEmpty) {
       return Container(
-        width: widget.parentWidth * .1 * widget.widthMultiplier,
+        width: parentWidth * .1 * widthMultiplier,
       );
     } else {
       return SizedBox(
-        width: widget.parentWidth * .1,
+        width: parentWidth * .1,
         height: PlatformHelper.isDesktop
-            ? (widget.parentHeight * .6)
-            : (widget.parentHeight * .54),
+            ? (parentHeight * .6)
+            : (parentHeight * .54),
         child: Consumer<PianoProvider>(
           builder: (BuildContext context, PianoProvider pianoProvider,
                   Widget? child) =>
               GestureDetector(
             onTapDown: (details) {
-              longPressStart = AppTimestamp.now;
-            },
-            onLongPressStart: (details) {
-              longPress = true;
-              setState(() {});
-            },
-            onLongPressEnd: (details) {
-              if (longPress) {
-                double timeDifference =
-                    (AppTimestamp.now - longPressStart)
-                        .toDouble();
-                longPress = false;
-                setState(() {});
-                longPressStart = 0;
-
-                pianoProvider.recordingAddNote(
-                    widget.midiNoteNumber, timeDifference);
-              }
             },
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.zero,
                 foregroundColor: AppColors.white,
-                backgroundColor: longPress
-                    ? const Color(0xff454545)
-                    : (pianoProvider.pianoKeysBlack[widget.index][3]
-                        ? AppColors.primary
-                        : AppColors.dark),
+                backgroundColor: AppColors.dark,
+                // backgroundColor: longPress
+                //     ? const Color(0xff454545)
+                //     : (pianoProvider.pianoKeysBlack[widget.index][3]
+                //         ? AppColors.primary
+                //         : AppColors.dark),
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     bottomLeft: AppRadius.radius,
@@ -567,10 +514,10 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
               ),
               onPressed: () {
                 if (pianoProvider.isRecording) {
-                  pianoProvider.recordingAddNote(widget.midiNoteNumber);
+                  pianoProvider.recordingAddNote(midiNoteNumber);
                 }
 
-                Piano.playPianoNote(widget.index, true);
+                Piano.playPianoNote(index, true);
               },
               child: Container(
                 alignment: Alignment.bottomCenter,
@@ -579,8 +526,8 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     AppText(
-                      text: widget.name,
-                      size: widget.parentWidth * .045,
+                      text: name,
+                      size: parentWidth * .045,
                       color: AppColors.secondary,
                       family: AppFonts.secondary,
                     ),
@@ -588,8 +535,8 @@ class _PianoKeyBlackState extends State<PianoKeyBlack> {
                       height: 10,
                     ),
                     AppText(
-                      text: widget.secondName,
-                      size: widget.parentWidth * .033,
+                      text: secondName,
+                      size: parentWidth * .033,
                       color: AppColors.secondary,
                       family: AppFonts.secondary,
                     ),

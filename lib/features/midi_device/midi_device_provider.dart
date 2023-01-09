@@ -15,6 +15,9 @@ class AppMidiTest {
     if (midiDevices != null && midiDevices.isNotEmpty) {
       midiCommand.disconnectDevice(midiDevices.first);
 
+      print('--> ${midiDevices.length}');
+      print('--> ${midiDevices.first.inputPorts.first.type.name}');
+
       await midiCommand.connectToDevice(midiDevices.first).whenComplete(() {
         midiCommand.onMidiSetupChanged?.listen((data) async {
           print("setup changed $data");
