@@ -36,7 +36,7 @@ Future<void> main() async {
   await FirebaseAuth.instance.currentUser?.reload();
 
   // load firestore document
-  await AppFirestore.initialLoad();
+  // await AppFirestore.initialLoad();
 
   // run the app
   runApp(MultiProvider(

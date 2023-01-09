@@ -69,6 +69,10 @@ class PianoProvider extends ChangeNotifier {
     displayTime = _resetDisplayTime;
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
   // ----------------------------------------------------------------
 
   void playPause() {

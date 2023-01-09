@@ -22,6 +22,10 @@ class SettingsProvider extends ChangeNotifier {
     initialLoad();
   }
 
+  void notify() {
+    notifyListeners();
+  }
+
   Future<void> initialLoad() async {
     print(AppFirestore.document);
 
@@ -125,6 +129,24 @@ class SettingsProvider extends ChangeNotifier {
       _settings.defaultFolder.path = newBasePath;
 
       AppSharedPreferences.saveData(_settings);
+      notifyListeners();
+    }
+  }
+
+  void setAudioVolumeSoundLibrary(double value) {
+    int intValue = value.toInt();
+
+    if (_settings.audioVolume.soundLibrary != intValue) {
+      _settings.audioVolume.soundLibrary = intValue;
+      notifyListeners();
+    }
+  }
+
+  void setAudioVolumeAudioPlayback(double value) {
+    int intValue = value.toInt();
+
+    if (_settings.audioVolume.audioPlayback != intValue) {
+      _settings.audioVolume.audioPlayback = intValue;
       notifyListeners();
     }
   }

@@ -31,7 +31,7 @@ class _DefaultComponentsState extends State<DefaultComponents>
         AppIcon(
             icon: HeroIcons.arrowDownLeft,
             color: AppColors.primary,
-            onPressed: () => {print('tt')}),
+            onPressed: () => {}),
         const AppIcon(
           icon: Icons.record_voice_over_outlined,
           color: AppColors.dark,
@@ -53,9 +53,9 @@ class _DefaultComponentsState extends State<DefaultComponents>
             color: AppColors.secondary,
             weight: AppFonts.weightMedium,
             size: 30),
-        AppSwitch(value: enable, onChanged: (bool val) => {print(val)}),
+        AppSwitch(value: enable, onChanged: (bool val) => {}),
         AppSlider(
-          onChanged: (double value) => {print(value)},
+          onChanged: (double value) => {},
         ),
         AppButton(
           appText: const AppText(text: 'Confirm Overlay'),
@@ -64,9 +64,9 @@ class _DefaultComponentsState extends State<DefaultComponents>
               context: context,
               displayText: 'Delete recording "Recording #3"?',
               confirmButtonText: 'Delete',
-              onConfirm: () => {print('Deleted recording 3')}).open(),
+              onConfirm: () => {}).open(),
         ),
-        AppCheckbox(onChanged: (bool val) => {print(val)}),
+        AppCheckbox(onChanged: (bool val) => {}),
         const AppAudioPlayer()
       ],
     );

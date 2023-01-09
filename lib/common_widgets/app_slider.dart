@@ -2,44 +2,35 @@ import 'package:flutter/material.dart';
 
 import 'package:virkey/constants/colors.dart';
 
-class AppSlider extends StatefulWidget {
-  AppSlider(
+class AppSlider extends StatelessWidget {
+  const AppSlider(
       {Key? key, this.value = 0, required this.onChanged, this.onChangedEnd})
       : super(key: key);
 
-  double value;
+  final double value;
   final ValueChanged<double> onChanged;
   final ValueChanged<double>? onChangedEnd;
 
   @override
-  State<AppSlider> createState() => _AppSliderState();
-}
-
-class _AppSliderState extends State<AppSlider> {
-  @override
   Widget build(BuildContext context) {
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
-          thumbShape:
-              CircleSliderThumb(thumbRadius: 18, sliderValue: widget.value),
+          thumbShape: CircleSliderThumb(thumbRadius: 18, sliderValue: value),
           trackHeight: 5,
           overlayColor: AppColors.dark.withOpacity(.2),
           overlayShape: const RoundSliderOverlayShape(overlayRadius: 20.0),
           activeTrackColor: AppColors.primary,
           inactiveTrackColor: AppColors.tertiary),
       child: Slider(
-        value: widget.value,
+        value: value,
         min: 0,
         max: 100,
         onChanged: (value) {
-          setState(() {
-            widget.value = value;
-            widget.onChanged(widget.value);
-          });
+          onChanged(value);
         },
         onChangeEnd: (value) {
-          if (widget.onChangedEnd != null) {
-            widget.onChangedEnd!(widget.value);
+          if (onChangedEnd != null) {
+            onChangedEnd!(value);
           }
         },
       ),

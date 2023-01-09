@@ -5,15 +5,15 @@ import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/constants/colors.dart';
 
 class AppPlayPauseButton extends StatefulWidget {
-   AppPlayPauseButton({
+   const AppPlayPauseButton({
     Key? key,
     this.value = false,
     this.light = false,
     required this.onPressed,
   }) : super(key: key);
 
-  bool value;
-  bool light;
+  final bool value;
+  final bool light;
   final dynamic onPressed;
 
   @override
