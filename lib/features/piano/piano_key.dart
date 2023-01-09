@@ -12,7 +12,6 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/utils/platform_helper.dart';
-import 'package:virkey/utils/timestamp.dart';
 
 class Piano {
   // C D E F G A B
@@ -411,7 +410,6 @@ class PianoKeyWhite extends StatelessWidget {
               builder: (BuildContext context, PianoProvider pianoProvider,
                       Widget? child) =>
                   GestureDetector(
-                onTapDown: (details) {},
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     foregroundColor: AppColors.dark,
@@ -493,8 +491,6 @@ class PianoKeyBlack extends StatelessWidget {
           builder: (BuildContext context, PianoProvider pianoProvider,
                   Widget? child) =>
               GestureDetector(
-            onTapDown: (details) {
-            },
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.zero,
