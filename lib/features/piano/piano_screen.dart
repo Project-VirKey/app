@@ -39,7 +39,7 @@ class _PianoScreenState extends State<PianoScreen>
       ColorTween(begin: AppColors.secondary, end: AppColors.primary)
           .animate(_recordButtonAnimationController);
 
-  int prevVal = -1;
+  int prevValue = -1;
 
   @override
   void initState() {
@@ -162,7 +162,7 @@ class _PianoScreenState extends State<PianoScreen>
                                         context: context,
                                         vsync: this,
                                       ).open();
-                                      recordingsProvider.loadRecordings();
+                                      recordingsProvider.refreshRecordingsFolderFiles();
                                     } else {
                                       RecordingTitleOverlay(
                                               context: context, vsync: this)
@@ -208,15 +208,15 @@ class _PianoScreenState extends State<PianoScreen>
                                   7)
                               .floor();
 
-                          if (keyIndex != prevVal) {
+                          if (keyIndex != prevValue) {
                             // FlutterMidi().playMidiNote(
                             //     midi: PianoKeys.white[keyIndex][1] +
                             //         PianoKeys.midiOffset);
-                            prevVal = keyIndex;
+                            prevValue = keyIndex;
                           }
                         },
                         onVerticalDragEnd: (DragEndDetails details) =>
-                            {prevVal = -1},
+                            {prevValue = -1},
                         child: Stack(
                           // alignment: Alignment.topCenter,
                           children: const [

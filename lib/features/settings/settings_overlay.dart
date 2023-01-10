@@ -174,7 +174,7 @@ class SettingsOverlay {
                                           await settingsProvider
                                               .resetBasePath();
                                           settingsProvider.loadSoundLibraries();
-                                          recordingsProvider.loadRecordings();
+                                          recordingsProvider.refreshRecordingsFolderFiles();
                                         }),
                                     const SizedBox(
                                       width: 20,
@@ -191,7 +191,7 @@ class SettingsOverlay {
                                             .updateBasePath(newBasePath);
 
                                         settingsProvider.loadSoundLibraries();
-                                        recordingsProvider.loadRecordings();
+                                        recordingsProvider.refreshRecordingsFolderFiles();
                                       },
                                     ),
                                   ],
@@ -230,9 +230,9 @@ class SettingsOverlay {
                               child: AppSwitch(
                                 value: settingsProvider
                                     .settings.defaultSavedFiles.mp3AndPlayback,
-                                onChanged: (bool val) {
+                                onChanged: (bool value) {
                                   settingsProvider.settings.defaultSavedFiles
-                                      .mp3AndPlayback = val;
+                                      .mp3AndPlayback = value;
                                   settingsProvider.notify();
                                   AppSharedPreferences.saveData(
                                       settingsProvider.settings);
@@ -317,7 +317,7 @@ class SettingsOverlay {
                                       ),
                                       AppCheckbox(
                                           value: soundLibrary.selected,
-                                          onChanged: (bool val) =>
+                                          onChanged: (bool value) =>
                                               settingsProvider
                                                   .selectSoundLibrary(
                                                       soundLibrary)),

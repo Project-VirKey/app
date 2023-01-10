@@ -90,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             borderRadius: BorderRadius.all(
                                                 AppRadius.radius)),
                                       ),
+                                      // TODO: stop playing recording when changing routes
                                       onPressed: () => context.go('/piano'),
                                       child: Row(
                                         mainAxisAlignment:

@@ -4,15 +4,22 @@ import 'package:virkey/constants/colors.dart';
 
 class AppSlider extends StatelessWidget {
   const AppSlider(
-      {Key? key, this.value = 0, required this.onChanged, this.onChangedEnd})
+      {Key? key,
+      this.value = 0,
+      required this.onChanged,
+      this.onChangeStart,
+      this.onChangedEnd})
       : super(key: key);
 
   final double value;
   final ValueChanged<double> onChanged;
+  final ValueChanged<double>? onChangeStart;
   final ValueChanged<double>? onChangedEnd;
 
   @override
   Widget build(BuildContext context) {
+    // print(value);
+
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
           thumbShape: CircleSliderThumb(thumbRadius: 18, sliderValue: value),
@@ -25,6 +32,11 @@ class AppSlider extends StatelessWidget {
         value: value,
         min: 0,
         max: 100,
+        onChangeStart: (value) {
+          if (onChangeStart != null) {
+            onChangeStart!(value);
+          }
+        },
         onChanged: (value) {
           onChanged(value);
         },

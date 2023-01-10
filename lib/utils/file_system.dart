@@ -181,7 +181,7 @@ class AppFileSystem {
   }
 
   static Future<List<FileSystemEntity>?> listFilesInFolder(
-      String folderName, List<String> fileExtensions) async {
+      String folderName) async {
     if (!(await checkPermission())) {
       return null;
     }
@@ -195,6 +195,12 @@ class AppFileSystem {
     return dir
         .listSync()
         .where((file) => getFilenameFromPath(file.path) != '.DS_Store')
+        .toList();
+  }
+
+  static List<FileSystemEntity> filterFilesList(
+      List<FileSystemEntity> filesList, List<String> fileExtensions) {
+    return filesList
         .where((file) => fileExtensions
             .contains(getFileExtensionFromPath(file.path).toLowerCase()))
         .toList();
@@ -228,8 +234,7 @@ class AppFileSystem {
 
   static Future<bool> checkIfFileInFolder(
       String folderName, String fileName) async {
-    List<FileSystemEntity>? filesInFolder = await listFilesInFolder(
-        folderName, [AppFileSystem.getFileExtensionFromPath(fileName)]);
+    List<FileSystemEntity>? filesInFolder = await listFilesInFolder(folderName);
 
     if (filesInFolder != null) {
       return filesInFolder
@@ -241,14 +246,19 @@ class AppFileSystem {
     }
   }
 
-  static Future<List?> getPlaybackFromRecording(String recordingTitle) async {
+  static Future<List?> getPlaybackFromRecording(
+      List<FileSystemEntity>? recordingsFolderFiles,
+      String recordingTitle) async {
+    if (recordingsFolderFiles == null) {
+      return null;
+    }
+
     List<FileSystemEntity>? folderSoundLibraries =
-        (await AppFileSystem.listFilesInFolder(
-            AppFileSystem.recordingsFolder, ['mp3', 'wav']));
+        filterFilesList(recordingsFolderFiles, ['mp3', 'wav']);
 
     List? playbackAndTitle;
 
-    folderSoundLibraries?.forEach((element) {
+    for (var element in folderSoundLibraries) {
       String filename = getFilenameWithoutExtension(element.path);
       List<String> filenameSeparated = filename.split('${recordingTitle}_');
 
@@ -271,7 +281,7 @@ class AppFileSystem {
           }
         }
       }
-    });
+    }
 
     return playbackAndTitle;
   }
