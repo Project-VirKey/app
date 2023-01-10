@@ -111,27 +111,39 @@ class RecordingsListItem extends StatelessWidget {
                               Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
-                                children: const [
+                                children: [
                                   AppText(
-                                    text: '0:12',
+                                    text: recordingsProvider
+                                        .formattedPlayingPosition,
                                     size: 18,
                                     letterSpacing: 3,
                                   ),
                                   AppText(
-                                    text: '4:23',
+                                    text: recordingsProvider
+                                        .formattedPlayingLength,
                                     size: 18,
                                     letterSpacing: 3,
                                   ),
                                 ],
                               ),
-                              const Positioned(
-                                  child: RecordingsListPlayPauseButton()),
+                              Positioned(
+                                  child: RecordingsListPlayPauseButton(
+                                value: recordingsProvider.isRecordingPlaying,
+                                onPressed: () {
+                                  if (recordingsProvider.isRecordingPlaying) {
+                                    recordingsProvider.pauseRecording();
+                                  } else {
+                                    recordingsProvider.playRecording(recording);
+                                  }
+                                  recordingsProvider.notify();
+                                },
+                              )),
                             ],
                           ),
                         ),
                         AppSlider(
-                          value: 20,
-                          onChanged: (val) {},
+                          value: recordingsProvider.relativePlayingPosition,
+                          onChanged: (value) {},
                         ),
                         PropertyDescriptionActionCombination(
                           title: '',
@@ -193,8 +205,7 @@ class RecordingsListItem extends StatelessWidget {
                                               .recordingTitleTextFieldVisible =
                                           true;
                                       recordingsProvider.expandRecordingsList();
-                                      recordingsProvider
-                                          .notifyProviderListeners();
+                                      recordingsProvider.notify();
                                     },
                                   ),
                               ],
@@ -221,7 +232,10 @@ class RecordingsListItem extends StatelessWidget {
                                         playbackFile, recording.title) !=
                                     null) {
                                   await recordingsProvider
+                                      .loadRecordingsFolderFiles();
+                                  await recordingsProvider
                                       .loadPlayback(recording);
+                                  recordingsProvider.notify();
                                 }
                               }
                             },
@@ -234,9 +248,9 @@ class RecordingsListItem extends StatelessWidget {
                               children: [
                                 AppSwitch(
                                   value: recording.playbackActive,
-                                  onChanged: (bool val) {
+                                  onChanged: (bool value) {
                                     recordingsProvider.setPlaybackStatus(
-                                        recording, val);
+                                        recording, value);
                                   },
                                 ),
                                 const SizedBox(
@@ -256,8 +270,12 @@ class RecordingsListItem extends StatelessWidget {
                                           File(recording.playbackPath as String)
                                               .delete()
                                               .whenComplete(() async {
+                                            recording.playbackActive = false;
+                                            recording.playbackTitle = null;
+                                            recording.playbackPath = null;
                                             await recordingsProvider
-                                                .loadPlayback(recording);
+                                                .loadRecordingsFolderFiles();
+                                            recordingsProvider.notify();
                                           });
                                         }
                                       }).open(),
@@ -322,7 +340,8 @@ class RecordingsListItem extends StatelessWidget {
                                   recordingsProvider.contractRecordingItem();
                                   await recordingsProvider
                                       .deleteRecording(recording);
-                                  await recordingsProvider.loadRecordings();
+                                  await recordingsProvider
+                                      .refreshRecordingsFolderFiles();
                                 }).open(),
                           ),
                         ),

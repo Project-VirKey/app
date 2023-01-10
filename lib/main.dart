@@ -33,7 +33,11 @@ Future<void> main() async {
   );
 
   // reload authentication on start-up
-  await FirebaseAuth.instance.currentUser?.reload();
+  try {
+    await FirebaseAuth.instance.currentUser?.reload();
+  } catch (e) {
+    print(e);
+  }
 
   // load firestore document
   // await AppFirestore.initialLoad();
@@ -45,8 +49,9 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => RecordingsProvider()),
       ChangeNotifierProvider(create: (_) => PianoProvider()),
       ChangeNotifierProxyProvider<SettingsProvider, CloudProvider>(
-          create: (BuildContext context) => CloudProvider(
-              Provider.of<SettingsProvider>(context, listen: false)),
+          create: (BuildContext context) =>
+              CloudProvider(
+                  Provider.of<SettingsProvider>(context, listen: false)),
           update: (BuildContext context, SettingsProvider settingsProvider,
               CloudProvider? cloudProvider) {
             cloudProvider?.setSettingsProvider(settingsProvider);

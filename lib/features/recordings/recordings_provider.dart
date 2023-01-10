@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:dart_midi/dart_midi.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:virkey/constants/colors.dart';
+import 'package:virkey/features/piano/piano.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/file_system.dart';
 
@@ -14,16 +17,35 @@ class RecordingsProvider extends ChangeNotifier {
   bool expandedItem = false;
   bool recordingTitleTextFieldVisible = false;
 
-  static List<FileSystemEntity> _recordingsFileList = [];
+  bool isRecordingPlaying = false;
+  AudioPlayer playbackPlayer = AudioPlayer();
+  int? midiPlayCurrentEventPos;
+  bool isRecordingSliderModeManual = false;
+
+  static List<FileSystemEntity> _recordingsFolderFiles = [];
 
   List<Recording> get recordings => _recordings;
 
   RecordingsProvider() {
+    refreshRecordingsFolderFiles();
+  }
+
+  void notify() {
+    notifyListeners();
+  }
+
+  Future<void> refreshRecordingsFolderFiles() async {
+    await loadRecordingsFolderFiles();
     loadRecordings();
   }
 
-  void notifyProviderListeners() {
-    notifyListeners();
+  Future<void> loadRecordingsFolderFiles() async {
+    List<FileSystemEntity>? recordingsFolderFiles =
+        (await AppFileSystem.listFilesInFolder(AppFileSystem.recordingsFolder));
+
+    if (recordingsFolderFiles != null) {
+      _recordingsFolderFiles = recordingsFolderFiles;
+    }
   }
 
   Future<void> loadRecordings() async {
@@ -33,25 +55,19 @@ class RecordingsProvider extends ChangeNotifier {
       await AppFileSystem.loadBasePath();
     }
 
-    // get files in recordings folder & filter (with where) for only recordings
-    List<FileSystemEntity>? recordingsFileList =
-        (await AppFileSystem.listFilesInFolder(
-            AppFileSystem.recordingsFolder, ['mid']));
-
-    // print(recordingsFileList);
-
-    _recordingsFileList = recordingsFileList!;
     removeAllRecordingItems();
 
     // add files recordings list as Recording objects
-    for (var recordingFile in recordingsFileList.reversed) {
+    for (var recordingFile
+        in AppFileSystem.filterFilesList(_recordingsFolderFiles, ['mid'])
+            .reversed) {
       Recording recording = Recording(
         title: AppFileSystem.getFilenameWithoutExtension(recordingFile.path),
         path: recordingFile.path,
       );
 
       addRecordingItem(recording);
-      loadPlayback(recording);
+      await loadPlayback(recording);
     }
 
     notifyListeners();
@@ -103,17 +119,20 @@ class RecordingsProvider extends ChangeNotifier {
     removeAllRecordingItems();
     addRecordingItem(recording);
     expandedItem = true;
+    setupRecordingPlayer(recording);
     notifyListeners();
   }
 
-  void contractRecordingItem() {
+  Future<void> contractRecordingItem() async {
     removeAllRecordingItems();
-    for (var element in _recordingsFileList.reversed) {
-      addRecordingItem(
-        Recording(
-            title: AppFileSystem.getFilenameWithoutExtension(element.path),
-            path: element.path),
-      );
+    for (var element
+        in AppFileSystem.filterFilesList(_recordingsFolderFiles, ['mid'])
+            .reversed) {
+      Recording recording = Recording(
+          title: AppFileSystem.getFilenameWithoutExtension(element.path),
+          path: element.path);
+      addRecordingItem(recording);
+      await loadPlayback(recording);
     }
     expandedItem = false;
     notifyListeners();
@@ -150,13 +169,13 @@ class RecordingsProvider extends ChangeNotifier {
       }
     });
 
-    loadRecordings();
+    await loadRecordingsFolderFiles();
   }
 
   Future<void> loadPlayback(Recording recording) async {
     // load playback for recording
-    List? playbackAndTitle =
-        (await AppFileSystem.getPlaybackFromRecording(recording.title));
+    List? playbackAndTitle = (await AppFileSystem.getPlaybackFromRecording(
+        _recordingsFolderFiles, recording.title));
 
     if (playbackAndTitle == null) {
       recording.playbackPath = null;
@@ -165,18 +184,122 @@ class RecordingsProvider extends ChangeNotifier {
       recording.playbackPath = playbackAndTitle[0];
       recording.playbackTitle = playbackAndTitle[1];
     }
-
-    notifyListeners();
   }
 
   void setPlaybackStatus(Recording recording, bool status) {
     recording.playbackActive = status;
+    notifyListeners();
   }
 
   Future<void> deleteRecording(Recording recording) async {
     await File(recording.path).delete().whenComplete(() {
       notifyListeners();
     });
+  }
+
+  // ----------------------------------------------------------------
+
+  Future<void> setupRecordingPlayer(Recording recording) async {
+    if (recording.playbackActive && recording.playbackPath != null) {
+      // await playbackPlayer.dispose();
+      // playbackPlayer.seek(const Duration(seconds: 0));
+      playbackPlayer.setAudioSource(AudioSource.file(recording.playbackPath!));
+    }
+  }
+
+  String getFormattedTime(Duration duration) {
+    int minutes = duration.inMinutes;
+    int seconds = duration.inSeconds - (minutes * 60);
+    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+
+  String get formattedPlayingLength {
+    if (playbackPlayer.duration == null) {
+      return '00:00';
+    } else {
+      return getFormattedTime(playbackPlayer.duration!);
+    }
+  }
+
+  String get formattedPlayingPosition {
+    return getFormattedTime(playbackPlayer.position);
+  }
+
+  double get relativePlayingPosition {
+    if (playbackPlayer.duration == null) {
+      return 0;
+    } else {
+      return ((playbackPlayer.position.inSeconds /
+              playbackPlayer.duration!.inSeconds) *
+          100);
+    }
+  }
+
+  Future<void> playRecording(Recording recording) async {
+    if (recording.playbackActive && recording.playbackPath != null) {
+      playbackPlayer.play();
+      print(playbackPlayer.duration?.inSeconds);
+      playbackPlayer
+          .createPositionStream(
+              minPeriod: const Duration(milliseconds: 500),
+              maxPeriod: const Duration(seconds: 1))
+          .listen((event) {
+        print(event.inMilliseconds);
+        notifyListeners();
+      });
+    }
+
+    isRecordingPlaying = true;
+
+    MidiFile parsedMidi = AppFileSystem.midiFileFromRecording(recording.path);
+
+    midiEventTrackLoop:
+    for (List<MidiEvent> track in parsedMidi.tracks) {
+      for (int i = 0; i < track.length; i++) {
+        MidiEvent midiEvent = track[i];
+
+        if (!isRecordingPlaying) {
+          // if playing is set to false during midi playback -> break out of the complete loop
+          break midiEventTrackLoop;
+        }
+
+        print(midiPlayCurrentEventPos);
+        if (midiEvent is! NoteOnEvent || (midiPlayCurrentEventPos ?? -1) > i) {
+          continue;
+        }
+
+        midiPlayCurrentEventPos = i;
+
+        int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
+            pianoKeyWhite[1] + Piano.midiOffset == midiEvent.noteNumber);
+
+        int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
+          if (pianoKeyBlack.isEmpty) {
+            return false;
+          }
+          return (pianoKeyBlack[1] + Piano.midiOffset) == midiEvent.noteNumber;
+        });
+
+        await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
+
+        if (playedPianoKeyWhite >= 0) {
+          Piano.playPianoNote(playedPianoKeyWhite);
+        }
+
+        if (playedPianoKeyBlack >= 0) {
+          Piano.playPianoNote(playedPianoKeyBlack, true);
+        }
+
+        // print('n: ${midiEvent.noteNumber}');
+        // print('t: ${midiEvent.deltaTime}');
+        // print('d: ${midiEvent.duration}');
+      }
+    }
+  }
+
+  void pauseRecording() {
+    isRecordingPlaying = false;
+    playbackPlayer.pause();
   }
 }
 

@@ -5,30 +5,29 @@ import 'package:dart_midi/dart_midi.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:midi_util/midi_util.dart';
+import 'package:virkey/features/piano/piano.dart';
 import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/timestamp.dart';
 
 class PianoProvider extends ChangeNotifier {
-  int midiOffset = 72;
-
-  // name, note (minus offset), background color
+  // background color
   List pianoKeysWhite = [
-    ['C', 0, false],
-    ['D', 2, false],
-    ['E', 4, false],
-    ['F', 5, false],
-    ['G', 7, false],
-    ['A', 9, false],
-    ['B', 11, false]
+    [false],
+    [false],
+    [false],
+    [false],
+    [false],
+    [false],
+    [false]
   ];
 
   List pianoKeysBlack = [
-    ['C#', 'Db', 1, false],
-    ['D#', 'Eb', 3, false],
+    [false],
+    [false],
     [],
-    ['F#', 'Gb', 6, false],
-    ['G#', 'Ab', 8, false],
-    ['A#', 'Bb', 10, false]
+    [false],
+    [false],
+    [false]
   ];
 
   final List _recordedNotes = [];
@@ -270,32 +269,32 @@ class PianoProvider extends ChangeNotifier {
 
         visualizeMidiCurrentEventPos = i;
 
-        int playedPianoKeyWhite = pianoKeysWhite.indexWhere((pianoKeyWhite) =>
-            pianoKeyWhite[1] + midiOffset == midiEvent.noteNumber);
+        int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
+            pianoKeyWhite[1] + Piano.midiOffset == midiEvent.noteNumber);
 
-        int playedPianoKeyBlack = pianoKeysBlack.indexWhere((pianoKeyBlack) {
+        int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
           if (pianoKeyBlack.isEmpty) {
             return false;
           }
-          return (pianoKeyBlack[2] + midiOffset) == midiEvent.noteNumber;
+          return (pianoKeyBlack[1] + Piano.midiOffset) == midiEvent.noteNumber;
         });
 
         await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
 
         if (playedPianoKeyWhite >= 0) {
-          pianoKeysWhite[playedPianoKeyWhite][2] = true;
+          pianoKeysWhite[playedPianoKeyWhite][0] = true;
           notifyListeners();
           Future.delayed(Duration(milliseconds: midiEvent.duration), () {
-            pianoKeysWhite[playedPianoKeyWhite][2] = false;
+            pianoKeysWhite[playedPianoKeyWhite][0] = false;
             notifyListeners();
           });
         }
 
         if (playedPianoKeyBlack >= 0) {
-          pianoKeysBlack[playedPianoKeyBlack][3] = true;
+          pianoKeysBlack[playedPianoKeyBlack][0] = true;
           notifyListeners();
           Future.delayed(Duration(milliseconds: midiEvent.duration), () {
-            pianoKeysBlack[playedPianoKeyBlack][3] = false;
+            pianoKeysBlack[playedPianoKeyBlack][0] = false;
             notifyListeners();
           });
         }

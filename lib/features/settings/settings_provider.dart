@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:virkey/features/cloud_synchronisation/firestore.dart';
+import 'package:virkey/features/piano/piano.dart';
 import 'package:virkey/features/piano/piano_key.dart';
 import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
@@ -61,7 +62,7 @@ class SettingsProvider extends ChangeNotifier {
     SoundLibrary soundLibrary = _settings.soundLibraries
         .where((soundLibrary) => soundLibrary.selected)
         .first;
-    Piano().loadLibrary(soundLibrary.path, soundLibrary.defaultLibrary);
+    Piano.loadLibrary(soundLibrary.path, soundLibrary.defaultLibrary);
   }
 
   Future<void> loadSoundLibraries() async {
@@ -76,16 +77,21 @@ class SettingsProvider extends ChangeNotifier {
 
     List<FileSystemEntity>? folderSoundLibraries =
         (await AppFileSystem.listFilesInFolder(
-            AppFileSystem.soundLibrariesFolder, ['sf2']));
+            AppFileSystem.soundLibrariesFolder));
 
-    folderSoundLibraries?.forEach((element) {
-      _settings.soundLibraries.add(SoundLibrary(
-          name: AppFileSystem.getFilenameWithoutExtension(element.path),
-          selected: false,
-          path: element.path,
-          url: '',
-          defaultLibrary: false));
-    });
+    if (folderSoundLibraries != null) {
+      folderSoundLibraries =
+          AppFileSystem.filterFilesList(folderSoundLibraries, ['sf2']);
+
+      for (var element in folderSoundLibraries) {
+        _settings.soundLibraries.add(SoundLibrary(
+            name: AppFileSystem.getFilenameWithoutExtension(element.path),
+            selected: false,
+            path: element.path,
+            url: '',
+            defaultLibrary: false));
+      }
+    }
 
     // notify listeners to rebuild affected components
     notifyListeners();
@@ -101,7 +107,7 @@ class SettingsProvider extends ChangeNotifier {
     selectedSoundLibrary.selected = true;
 
     // load the selected sound library
-    Piano().loadLibrary(
+    Piano.loadLibrary(
         selectedSoundLibrary.path, selectedSoundLibrary.defaultLibrary);
 
     AppSharedPreferences.saveData(_settings);

@@ -4,7 +4,12 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/shadows.dart';
 
 class RecordingsListPlayPauseButton extends StatelessWidget {
-  const RecordingsListPlayPauseButton({Key? key}) : super(key: key);
+  const RecordingsListPlayPauseButton(
+      {Key? key, required this.value, required this.onPressed})
+      : super(key: key);
+
+  final bool value;
+  final dynamic onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +18,7 @@ class RecordingsListPlayPauseButton extends StatelessWidget {
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
         child: GestureDetector(
-          onTap: () {},
+          onTap: () => onPressed(),
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -27,7 +32,7 @@ class RecordingsListPlayPauseButton extends StatelessWidget {
                   borderRadius: BorderRadius.circular(100.0),
                 ),
               ),
-              AppPlayPauseButton(onPressed: () {})
+              AppPlayPauseButton(value: value, onPressed: () => onPressed())
             ],
           ),
         ),

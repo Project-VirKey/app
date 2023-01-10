@@ -53,7 +53,7 @@ class _DefaultComponentsState extends State<DefaultComponents>
             color: AppColors.secondary,
             weight: AppFonts.weightMedium,
             size: 30),
-        AppSwitch(value: enable, onChanged: (bool val) => {}),
+        AppSwitch(value: enable, onChanged: (bool value) => {}),
         AppSlider(
           onChanged: (double value) => {},
         ),
@@ -66,7 +66,7 @@ class _DefaultComponentsState extends State<DefaultComponents>
               confirmButtonText: 'Delete',
               onConfirm: () => {}).open(),
         ),
-        AppCheckbox(onChanged: (bool val) => {}),
+        AppCheckbox(onChanged: (bool value) => {}),
         const AppAudioPlayer()
       ],
     );
