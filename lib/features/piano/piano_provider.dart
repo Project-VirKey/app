@@ -261,9 +261,8 @@ class PianoProvider extends ChangeNotifier {
           break midiEventTrackLoop;
         }
 
-        print(visualizeMidiCurrentEventPos);
         if (midiEvent is! NoteOnEvent ||
-            (visualizeMidiCurrentEventPos ?? -1) > i) {
+            (visualizeMidiCurrentEventPos ?? -1) + 1 > i) {
           continue;
         }
 
@@ -298,10 +297,6 @@ class PianoProvider extends ChangeNotifier {
             notifyListeners();
           });
         }
-
-        // print('n: ${midiEvent.noteNumber}');
-        // print('t: ${midiEvent.deltaTime}');
-        // print('d: ${midiEvent.duration}');
       }
     }
   }
