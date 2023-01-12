@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dart_midi/dart_midi.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ class RecordingsProvider extends ChangeNotifier {
   AudioPlayer playbackPlayer = AudioPlayer();
   int? midiPlayCurrentEventPos;
   bool isRecordingSliderModeManual = false;
+  MidiFile? parsedRecordingMidi;
 
   static List<FileSystemEntity> _recordingsFolderFiles = [];
 
@@ -199,14 +201,6 @@ class RecordingsProvider extends ChangeNotifier {
 
   // ----------------------------------------------------------------
 
-  Future<void> setupRecordingPlayer(Recording recording) async {
-    if (recording.playbackActive && recording.playbackPath != null) {
-      // await playbackPlayer.dispose();
-      // playbackPlayer.seek(const Duration(seconds: 0));
-      playbackPlayer.setAudioSource(AudioSource.file(recording.playbackPath!));
-    }
-  }
-
   String getFormattedTime(Duration duration) {
     int minutes = duration.inMinutes;
     int seconds = duration.inSeconds - (minutes * 60);
@@ -235,6 +229,17 @@ class RecordingsProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> setupRecordingPlayer(Recording recording) async {
+    if (recording.playbackActive && recording.playbackPath != null) {
+      // await playbackPlayer.dispose();
+      // playbackPlayer.seek(const Duration(seconds: 0));
+      playbackPlayer.setAudioSource(AudioSource.file(recording.playbackPath!));
+    }
+
+    midiPlayCurrentEventPos = null;
+    parsedRecordingMidi = AppFileSystem.midiFileFromRecording(recording.path);
+  }
+
   Future<void> playRecording(Recording recording) async {
     if (recording.playbackActive && recording.playbackPath != null) {
       playbackPlayer.play();
@@ -249,12 +254,28 @@ class RecordingsProvider extends ChangeNotifier {
       });
     }
 
+    if (parsedRecordingMidi == null) {
+      return;
+    }
+
+    List<MidiEvent>? midiTrack = parsedRecordingMidi?.tracks
+        .reduce((a, b) => a.length > b.length ? a : b);
+    // TODO: don't reduce by length of tracks, but instead by the highest sum of deltaTime
+    if (midiTrack == null) {
+      return;
+    } else {
+      // TODO: convert deltaTime to milliSeconds
+      // midiTrack.retainWhere((MidiEvent midiEvent) => midiEvent is NoteOnEvent);
+      // print('---');
+      // print(parsedRecordingMidi?.header.ticksPerBeat * midiTrack[0].deltaTime);
+      // print('---');
+      // print(midiTrack.map((e) => e.deltaTime).reduce((int a, int b) => a + b));
+    }
+
     isRecordingPlaying = true;
 
-    MidiFile parsedMidi = AppFileSystem.midiFileFromRecording(recording.path);
-
     midiEventTrackLoop:
-    for (List<MidiEvent> track in parsedMidi.tracks) {
+    for (List<MidiEvent> track in parsedRecordingMidi!.tracks) {
       for (int i = 0; i < track.length; i++) {
         MidiEvent midiEvent = track[i];
 
@@ -263,8 +284,9 @@ class RecordingsProvider extends ChangeNotifier {
           break midiEventTrackLoop;
         }
 
-        print(midiPlayCurrentEventPos);
-        if (midiEvent is! NoteOnEvent || (midiPlayCurrentEventPos ?? -1) > i) {
+        // print(midiPlayCurrentEventPos);
+        if (midiEvent is! NoteOnEvent ||
+            (midiPlayCurrentEventPos ?? -1) + 1 > i) {
           continue;
         }
 
@@ -280,6 +302,8 @@ class RecordingsProvider extends ChangeNotifier {
           return (pianoKeyBlack[1] + Piano.midiOffset) == midiEvent.noteNumber;
         });
 
+        print(midiEvent.deltaTime);
+
         await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
 
         if (playedPianoKeyWhite >= 0) {
@@ -289,10 +313,6 @@ class RecordingsProvider extends ChangeNotifier {
         if (playedPianoKeyBlack >= 0) {
           Piano.playPianoNote(playedPianoKeyBlack, true);
         }
-
-        // print('n: ${midiEvent.noteNumber}');
-        // print('t: ${midiEvent.deltaTime}');
-        // print('d: ${midiEvent.duration}');
       }
     }
   }
