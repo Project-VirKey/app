@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:dart_midi/dart_midi.dart';
 import 'package:flutter/material.dart';

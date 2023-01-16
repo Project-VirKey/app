@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:virkey/features/cloud_synchronisation/firestore.dart';
 import 'package:virkey/features/piano/piano.dart';
-import 'package:virkey/features/piano/piano_key.dart';
 import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/file_system.dart';
