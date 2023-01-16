@@ -23,7 +23,7 @@ class _PianoPlayButtonState extends State<PianoPlayButton>
       AnimationController(vsync: this, duration: const Duration(seconds: 1))
         ..repeat(reverse: true);
   late final Animation _animation =
-      Tween(begin: 2.0, end: 8.0).animate(_animationController);
+      Tween(begin: 2.0, end: 6.0).animate(_animationController);
 
   @override
   void initState() {

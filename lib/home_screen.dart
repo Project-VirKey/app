@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:dart_midi/dart_midi.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +11,6 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/constants/shadows.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
-import 'package:virkey/features/piano/piano.dart';
 import 'package:virkey/features/piano/piano_play_button.dart';
 import 'package:virkey/features/recordings/recordings_list.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
@@ -22,7 +18,6 @@ import 'package:virkey/features/recordings/recordings_title_bar.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
-import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/platform_helper.dart';
 import 'package:virkey/utils/snackbar.dart';
 
@@ -154,8 +149,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       displayText: 'Synchronise with the Cloud',
                                       confirmButtonText: 'Synchronise',
                                       onConfirm: () {
-                                        cloudProvider.synchronise(
-                                            settingsProvider.settings);
+                                        cloudProvider.synchronise();
                                       },
                                       vsync: this)
                                   .open();
@@ -173,18 +167,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                AppButton(
-                    appText: const AppText(text: 'Test MIDI to WAV'),
-                    onPressed: () {
-                      MidiParser midiParser = MidiParser();
-                      Piano.midiToWav(
-                          midiParser.parseMidiFromFile(File(
-                              '${AppFileSystem.basePath}${Platform.pathSeparator}test.mid')),
-                          '${AppFileSystem.basePath}${Platform.pathSeparator}test.wav');
-                    }),
+                // const SizedBox(
+                //   height: 20,
+                // ),
+                // AppButton(
+                //     appText: const AppText(text: 'Test MIDI to WAV'),
+                //     onPressed: () {
+                //       MidiParser midiParser = MidiParser();
+                //       Piano.midiToWav(
+                //           midiParser.parseMidiFromFile(File(
+                //               '${AppFileSystem.basePath}${Platform.pathSeparator}test.mid')),
+                //           '${AppFileSystem.basePath}${Platform.pathSeparator}test.wav');
+                //     }),
                 const SizedBox(
                   height: 20,
                 ),

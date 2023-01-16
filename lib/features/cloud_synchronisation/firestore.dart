@@ -32,7 +32,7 @@ class AppFirestore {
         false;
   }
 
-  static void createDocument(Map<String, dynamic> document) {
+  static void setDocument(Map<String, dynamic> document) {
     // create document with userId (uid) as title
     // https://stackoverflow.com/a/61724209/17399214, 19.12.2022
     db
@@ -50,13 +50,11 @@ class AppFirestore {
   }
 
   static Future<void> initialLoad() async {
-    document = (await getDocument())!;
-
-    // if (await checkUserDocumentExists()) {
-    //   document = (await getDocument())!;
-    // } else {
-    //   document = defaultDocument;
-    //   createDocument(defaultDocument);
-    // }
+    if (await checkUserDocumentExists()) {
+      document = (await getDocument())!;
+    } else {
+      document = {};
+      setDocument({});
+    }
   }
 }

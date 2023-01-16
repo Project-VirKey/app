@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:virkey/features/cloud_synchronisation/firestore.dart';
 import 'package:virkey/features/piano/piano.dart';
 import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
@@ -13,7 +12,7 @@ class SettingsProvider extends ChangeNotifier {
   final Settings _settings = Settings(
     audioVolume: AudioVolume(soundLibrary: 0, audioPlayback: 0),
     defaultFolder: DefaultFolder(path: AppFileSystem.basePath ?? ''),
-    defaultSavedFiles: DefaultSavedFiles(mp3: false, mp3AndPlayback: false),
+    defaultSavedFiles: DefaultSavedFiles(wav: false, wavAndPlayback: false),
     soundLibraries: [],
     lastUpdated: AppTimestamp.now,
   );
@@ -27,8 +26,6 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   Future<void> initialLoad() async {
-    print(AppFirestore.document);
-
     await loadSoundLibraries();
     _settings.defaultFolder.path = AppFileSystem.basePath ?? '';
 
@@ -44,9 +41,9 @@ class SettingsProvider extends ChangeNotifier {
           loadedSettings.defaultFolder.path.isNotEmpty) {
         _settings.defaultFolder = loadedSettings.defaultFolder;
       }
-      _settings.defaultSavedFiles.mp3 = loadedSettings.defaultSavedFiles.mp3;
-      _settings.defaultSavedFiles.mp3AndPlayback =
-          loadedSettings.defaultSavedFiles.mp3AndPlayback;
+      _settings.defaultSavedFiles.wav = loadedSettings.defaultSavedFiles.wav;
+      _settings.defaultSavedFiles.wavAndPlayback =
+          loadedSettings.defaultSavedFiles.wavAndPlayback;
 
       SoundLibrary? selectedLibrary = loadedSettings.soundLibraries
           .where((soundLibrary) => soundLibrary.selected)
