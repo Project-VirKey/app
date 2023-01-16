@@ -2,8 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_melty_soundfont/dart_melty_soundfont.dart';
+import 'package:dart_midi/dart_midi.dart';
+import 'package:ffmpeg_cli/ffmpeg_cli.dart' hide Stream;
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Piano {
   // C D E F G A B
@@ -119,22 +122,24 @@ class Piano {
         ));
 
     for (var wK = 0; wK < white.length; wK++) {
-      white[wK][2] = loadPianoKeyWAV(white[wK][1] + midiOffset);
+      white[wK][2] = loadPianoKeyPcm(white[wK][1] + midiOffset);
       white[wK][3] = AudioPlayer();
-      white[wK][3].setAudioSource(MyCustomSource(white[wK][2]));
+      white[wK][3].setAudioSource(
+          MyCustomSource(wrapAudioDataInWavFileFormat(white[wK][2])));
     }
 
     for (var bK = 0; bK < black.length; bK++) {
       if (black[bK].isEmpty) {
         continue;
       }
-      black[bK][2] = loadPianoKeyWAV(black[bK][1] + midiOffset);
+      black[bK][2] = loadPianoKeyPcm(black[bK][1] + midiOffset);
       black[bK][3] = AudioPlayer();
-      black[bK][3].setAudioSource(MyCustomSource(black[bK][2]));
+      black[bK][3].setAudioSource(
+          MyCustomSource(wrapAudioDataInWavFileFormat(black[bK][2])));
     }
   }
 
-  static Uint8List loadPianoKeyWAV(int midiNote) {
+  static Uint8List loadPianoKeyPcm(int midiNote) {
     synth.reset();
     synth.noteOn(channel: 0, key: midiNote, velocity: 120);
 
@@ -142,9 +147,12 @@ class Piano {
     ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: sampleRate * seconds);
     synth.renderMonoInt16(buf16);
 
-    int dataBytesCount = buf16.bytes.buffer.asInt8List().length;
+    return buf16.bytes.buffer.asUint8List();
+  }
 
+  static Uint8List wrapAudioDataInWavFileFormat(Uint8List pcmData) {
     List<int> wavDataIntList = [];
+    int dataBytesCount = pcmData.buffer.asInt8List().length;
 
     // WAV - Data Structure Documentation (Wav file format)
     // https://sites.google.com/site/musicgapi/technical-documents/wav-file-format, 07.01.2022
@@ -194,7 +202,7 @@ class Piano {
     wavDataIntList
         .addAll(int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount));
     // sample data: PCM data
-    wavDataIntList.addAll(buf16.bytes.buffer.asInt8List());
+    wavDataIntList.addAll(pcmData.buffer.asInt8List());
 
     return Uint8List.fromList(wavDataIntList);
   }
@@ -225,6 +233,102 @@ class Piano {
       white[arIndex][3].seek(const Duration(seconds: 0));
       white[arIndex][3].play();
     }
+  }
+
+  static Future<void> midiToWav(
+      MidiFile midiFile, String destinationPath) async {
+    String tempDirPath = (await getTemporaryDirectory()).path;
+    print(tempDirPath);
+
+    List<String> tempFilePaths = [];
+
+    if (midiFile.tracks.length < 2) {
+      // TODO: no tracks
+    }
+
+    List<NoteOnEvent> noteOnEvents =
+        midiFile.tracks[1].whereType<NoteOnEvent>().toList();
+    int previousDeltaTime = 0;
+    int index = 0;
+    for (NoteOnEvent noteOnEvent in noteOnEvents) {
+      int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
+          pianoKeyWhite[1] + Piano.midiOffset == noteOnEvent.noteNumber);
+
+      int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
+        if (pianoKeyBlack.isEmpty) {
+          return false;
+        }
+        return (pianoKeyBlack[1] + Piano.midiOffset) == noteOnEvent.noteNumber;
+      });
+
+      if (playedPianoKeyWhite >= 0 || playedPianoKeyBlack >= 0) {
+        previousDeltaTime += noteOnEvent.deltaTime;
+        index++;
+      }
+
+      print(
+          'deltaSum - ${(sampleRate * 2 * (previousDeltaTime / 1000)).round()}');
+      int neededEmptyBytes =
+          (sampleRate * 2 * (previousDeltaTime / 1000)).round();
+      if (neededEmptyBytes.isOdd) {
+        neededEmptyBytes--;
+      }
+      List<int> emptyBytes = List.filled(neededEmptyBytes, 0);
+
+      if (playedPianoKeyWhite >= 0) {
+        File wavFile =
+            File('$tempDirPath${Platform.pathSeparator}temp_white_$index.wav');
+        wavFile.writeAsBytesSync(wrapAudioDataInWavFileFormat(
+            Uint8List.fromList(
+                [...emptyBytes, ...white[playedPianoKeyWhite][2]])));
+        tempFilePaths.add(wavFile.path);
+      }
+
+      if (playedPianoKeyBlack >= 0) {
+        File wavFile =
+            File('$tempDirPath${Platform.pathSeparator}temp_black_$index.wav');
+        wavFile.writeAsBytesSync(wrapAudioDataInWavFileFormat(
+            Uint8List.fromList(
+                [...emptyBytes, ...black[playedPianoKeyBlack][2]])));
+        tempFilePaths.add(wavFile.path);
+      }
+    }
+
+    print(destinationPath);
+    combineAudioFiles(destinationPath, tempFilePaths);
+  }
+
+  static Future<void> combineAudioFiles(
+      String outputFilepath, List<String> inputFilePaths) async {
+    final FfmpegCommand ffmpegCommand = FfmpegCommand(
+      inputs: [],
+      args: [
+        for (final arg in inputFilePaths) ...[CliArg(name: 'i', value: arg)],
+      ],
+      filterGraph: FilterGraph(chains: [
+        FilterChain(
+            inputs: [],
+            filters: [CustomAMixFilter(inputCount: inputFilePaths.length)],
+            outputs: [])
+      ]),
+      outputFilepath: outputFilepath,
+    );
+
+    print(ffmpegCommand.toCli());
+    await Ffmpeg().run(ffmpegCommand);
+  }
+}
+
+class CustomAMixFilter implements Filter {
+  const CustomAMixFilter({
+    required this.inputCount,
+  });
+
+  final int inputCount;
+
+  @override
+  String toCli() {
+    return 'amix=inputs=$inputCount:duration=longest';
   }
 }
 
