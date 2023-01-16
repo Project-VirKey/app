@@ -40,7 +40,7 @@ Future<void> main() async {
   }
 
   // load firestore document
-  // await AppFirestore.initialLoad();
+  await AppFirestore.initialLoad();
 
   // run the app
   runApp(MultiProvider(

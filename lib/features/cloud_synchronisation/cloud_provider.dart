@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:virkey/features/cloud_synchronisation/firestore.dart';
-import 'package:virkey/features/settings/settings_model.dart' as app_settings;
 import 'package:virkey/features/settings/settings_provider.dart';
 
 class CloudProvider extends ChangeNotifier {
@@ -44,8 +43,8 @@ class CloudProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void synchronise(app_settings.Settings settings) async {
-    print(settings.lastUpdated);
+  void synchronise() async {
+    print(settingsProvider.settings.lastUpdated);
   }
 
   bool isLocalLatest(int localTimestamp, int cloudTimestamp) {
@@ -56,7 +55,42 @@ class CloudProvider extends ChangeNotifier {
     for (var soundLibrary in settingsProvider.settings.soundLibraries) {
       print(soundLibrary.name);
     }
+
     print(AppFirestore.document);
+
+    if (AppFirestore.document == null) {
+      print('upload to cloud');
+      AppFirestore.setDocument(createCloudJson());
+    } else if (AppFirestore.document!['lastUpdated'] == null) {
+      print('upload to cloud');
+      AppFirestore.setDocument(createCloudJson());
+    } else {
+      print('check most recent Update');
+      if (isLocalLatest(settingsProvider.settings.lastUpdated,
+          AppFirestore.document!['settings']['lastUpdated'])) {
+        print('download from cloud');
+      } else {
+        print('upload to cloud');
+        AppFirestore.setDocument(createCloudJson());
+      }
+    }
+
+    print(createCloudJson());
+  }
+
+  Map<String, dynamic> createCloudJson() {
+    Map<String, dynamic> settings = settingsProvider.settings.toJson();
+    settings.remove('defaultFolder');
+    int lastUpdated = settings['lastUpdated'];
+    settings.remove('lastUpdated');
+
+    Map<String, dynamic> result = {
+      'lastUpdated': lastUpdated,
+      'settings': settings,
+      'recordings': 'nothing :)'
+    };
+
+    return result;
   }
 }
 

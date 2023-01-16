@@ -290,10 +290,10 @@ class RecordingsListItem extends StatelessWidget {
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
                             onPressed: () {
-                              // TODO: convert MIDI to MP3
+                              // TODO: convert MIDI to WAV
                               AppFileSystem.exportFile(
                                   path: recording.path,
-                                  dialogTitle: 'Export MP3');
+                                  dialogTitle: 'Export WAV');
                             },
                           ),
                         ),
@@ -315,10 +315,10 @@ class RecordingsListItem extends StatelessWidget {
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
                             onPressed: () {
-                              // TODO: convert MIDI to MP3 & compress into zip file (probably also export playback & MP3 with MIDI + Playback)
+                              // TODO: convert MIDI to WAV & compress into zip file (probably also export playback & WAV with MIDI + Playback)
                               AppFileSystem.exportFile(
                                   path: recording.path,
-                                  dialogTitle: 'Export MP3 & MIDI');
+                                  dialogTitle: 'Export WAV & MIDI');
                             },
                           ),
                         ),

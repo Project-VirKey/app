@@ -79,22 +79,22 @@ class DefaultFolder {
 
 class DefaultSavedFiles {
   DefaultSavedFiles({
-    required this.mp3,
-    required this.mp3AndPlayback,
+    required this.wav,
+    required this.wavAndPlayback,
   });
 
-  bool mp3;
-  bool mp3AndPlayback;
+  bool wav;
+  bool wavAndPlayback;
 
   factory DefaultSavedFiles.fromJson(Map<String, dynamic> json) =>
       DefaultSavedFiles(
-        mp3: json["mp3"],
-        mp3AndPlayback: json["mp3AndPlayback"],
+        wav: json["wav"],
+        wavAndPlayback: json["wavAndPlayback"],
       );
 
   Map<String, dynamic> toJson() => {
-        "mp3": mp3,
-        "mp3AndPlayback": mp3AndPlayback,
+        "wav": wav,
+        "wavAndPlayback": wavAndPlayback,
       };
 }
 

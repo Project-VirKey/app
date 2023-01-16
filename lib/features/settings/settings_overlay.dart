@@ -215,10 +215,10 @@ class SettingsOverlay {
                             title: 'Audio',
                             child: AppSwitch(
                               value: settingsProvider
-                                  .settings.defaultSavedFiles.mp3,
+                                  .settings.defaultSavedFiles.wav,
                               onChanged: (bool value) {
                                 settingsProvider
-                                    .settings.defaultSavedFiles.mp3 = value;
+                                    .settings.defaultSavedFiles.wav = value;
                                 settingsProvider.notify();
                                 AppSharedPreferences.saveData(
                                     settingsProvider.settings);
@@ -229,10 +229,10 @@ class SettingsOverlay {
                               title: 'Audio + Audio-Playback',
                               child: AppSwitch(
                                 value: settingsProvider
-                                    .settings.defaultSavedFiles.mp3AndPlayback,
+                                    .settings.defaultSavedFiles.wavAndPlayback,
                                 onChanged: (bool value) {
                                   settingsProvider.settings.defaultSavedFiles
-                                      .mp3AndPlayback = value;
+                                      .wavAndPlayback = value;
                                   settingsProvider.notify();
                                   AppSharedPreferences.saveData(
                                       settingsProvider.settings);
