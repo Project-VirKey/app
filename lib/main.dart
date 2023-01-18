@@ -40,7 +40,7 @@ Future<void> main() async {
   }
 
   // load firestore document
-  await AppFirestore.initialLoad();
+  // await AppFirestore.initialLoad();
 
   // run the app
   runApp(MultiProvider(
@@ -48,6 +48,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ChangeNotifierProvider(create: (_) => RecordingsProvider()),
       ChangeNotifierProvider(create: (_) => PianoProvider()),
+      ChangeNotifierProvider(create: (_) => MidiDeviceProvider()),
       ChangeNotifierProxyProvider<SettingsProvider, CloudProvider>(
           create: (BuildContext context) =>
               CloudProvider(
@@ -60,8 +61,6 @@ Future<void> main() async {
     ],
     child: const App(),
   ));
-
-  // AppMidiTest.test();
 }
 
 class App extends StatelessWidget {
