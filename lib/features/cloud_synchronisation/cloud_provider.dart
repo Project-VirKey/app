@@ -12,7 +12,7 @@ class CloudProvider extends ChangeNotifier {
 
   CloudProvider(this.settingsProvider) {
     checkAuthStatus();
-    test();
+    // test();
   }
 
   SettingsProvider settingsProvider;
@@ -87,7 +87,7 @@ class CloudProvider extends ChangeNotifier {
     Map<String, dynamic> result = {
       'lastUpdated': lastUpdated,
       'settings': settings,
-      'recordings': 'nothing :)'
+      'recordings': []
     };
 
     return result;

@@ -1,37 +1,76 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 
 class MidiDeviceProvider extends ChangeNotifier {
+  MidiCommand midiCommand = MidiCommand();
+
+  String setupData = '';
+  List<MidiDevice>? midiDevices;
+  bool connected = false;
+  String? connectedDeviceName;
+
+  StreamSubscription<String>? midiSetupStream;
+  StreamSubscription<MidiPacket>? midiDataReceiveStream;
+
+  List<MidiPacket> midiEvents = [];
+
   MidiDeviceProvider() {
-    // print(MidiCommand().devices);
+    initialLoad();
   }
-}
 
-class AppMidiTest {
-  static Future<void> test() async {
-    MidiCommand midiCommand = MidiCommand();
+  Future<void> initialLoad() async {
+    midiSetupStream = midiCommand.onMidiSetupChanged?.listen((data) async {
+      print("setup changed $data");
+      setupData = data;
+      midiDevices = await midiCommand.devices;
 
-    List<MidiDevice>? midiDevices = await midiCommand.devices;
-    if (midiDevices != null && midiDevices.isNotEmpty) {
-      midiCommand.disconnectDevice(midiDevices.first);
+      notifyListeners();
+    });
+  }
 
-      print('--> ${midiDevices.length}');
-      print('--> ${midiDevices.first.inputPorts.first.type.name}');
+  Future<void> connectToFirstDevice() async {
+    if (midiDevices != null) {
+      if (midiDevices!.isNotEmpty) {
+        midiCommand.disconnectDevice(midiDevices!.first);
+      } else {
+        connected = false;
+        connectedDeviceName = null;
+      }
+      midiDataReceiveStream?.cancel();
 
-      await midiCommand.connectToDevice(midiDevices.first).whenComplete(() {
-        midiCommand.onMidiSetupChanged?.listen((data) async {
-          print("setup changed $data");
-        });
+      print('--> ${midiDevices?.length}');
+      print('--> ${midiDevices?.first.inputPorts.first.type.name}');
 
-        print('--> Connected to MidiDevice ${midiDevices.first.name}');
+      await midiCommand.connectToDevice(midiDevices!.first).whenComplete(() {
+        print('--> Connected to MidiDevice ${midiDevices?.first.name}');
+        connected = true;
+        connectedDeviceName = midiDevices?.first.name;
 
         // TODO: listen to midi input does not work
-        midiCommand.onMidiDataReceived?.listen((MidiPacket event) {
+        midiDataReceiveStream =
+            midiCommand.onMidiDataReceived?.listen((MidiPacket event) {
           print(event.device.name);
           print(event.timestamp);
           print(event.data);
+
+          midiEvents.insert(0, event);
+
+          notifyListeners();
         });
       });
+    }
+  }
+
+  void disconnectDevice() {
+    connected = false;
+    connectedDeviceName = null;
+    midiDataReceiveStream?.cancel();
+    if (midiDevices != null) {
+      if (midiDevices!.isNotEmpty) {
+        midiCommand.disconnectDevice(midiDevices!.first);
+      }
     }
   }
 }
