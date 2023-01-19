@@ -346,7 +346,7 @@ class PianoProvider extends ChangeNotifier {
     });
 
     File outputFile = File(
-        '${AppFileSystem.basePath}${Platform.pathSeparator}${AppFileSystem.recordingsFolder}${Platform.pathSeparator}$recordingTitle.mid');
+        '${AppFileSystem.recordingsFolderPath}$recordingTitle.mid');
 
     midiFile.writeFile(outputFile);
   }

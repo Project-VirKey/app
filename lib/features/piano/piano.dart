@@ -235,8 +235,12 @@ class Piano {
     }
   }
 
+  static MidiParser midiParser = MidiParser();
+
   static Future<void> midiToWav(
-      MidiFile midiFile, String destinationPath) async {
+      String midiFilePath, String destinationPath) async {
+    MidiFile midiFile = midiParser.parseMidiFromFile(File(midiFilePath));
+
     String tempDirPath = (await getTemporaryDirectory()).path;
     print(tempDirPath);
 
@@ -295,7 +299,7 @@ class Piano {
     }
 
     print(destinationPath);
-    combineAudioFiles(destinationPath, tempFilePaths);
+    await combineAudioFiles(destinationPath, tempFilePaths);
   }
 
   static Future<void> combineAudioFiles(

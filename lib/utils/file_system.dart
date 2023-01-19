@@ -42,7 +42,9 @@ class AppFileSystem {
       String? exportPath = await FilePicker.platform
           .saveFile(dialogTitle: dialogTitle, fileName: filename);
 
-      File(path).copySync(exportPath!);
+      if (exportPath != null) {
+        File(path).copySync(exportPath);
+      }
     } else {
       // open native share dialog for mobile
       Share.share(path, subject: filename);
@@ -81,6 +83,12 @@ class AppFileSystem {
   static const rootFolderName = 'VirKey';
   static const String recordingsFolder = 'Recordings';
   static const String soundLibrariesFolder = 'Sound-Libraries';
+
+  static String get recordingsFolderPath =>
+      '$basePath${Platform.pathSeparator}$recordingsFolder${Platform.pathSeparator}';
+
+  static String get soundLibrariesFolderPath =>
+      '$basePath${Platform.pathSeparator}$soundLibrariesFolder${Platform.pathSeparator}';
 
   static Future<void> initFolders() async {
     basePath = (await AppSharedPreferences.loadData())?.defaultFolder.path;

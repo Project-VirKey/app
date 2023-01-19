@@ -11,10 +11,12 @@ import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/shadows.dart';
+import 'package:virkey/features/piano/piano.dart';
 import 'package:virkey/features/recordings/recordings_list_play_pause_button.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/file_system.dart';
+import 'package:virkey/utils/loading_overlay.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
 class RecordingsListItem extends StatelessWidget {
@@ -289,11 +291,21 @@ class RecordingsListItem extends StatelessWidget {
                           child: AppIcon(
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
-                            onPressed: () {
-                              // TODO: convert MIDI to WAV
+                            onPressed: () async {
+                              // AppLoadingOverlay appLoadingOverlay =
+                              //     AppLoadingOverlay(
+                              //         context: context, vsync: vsync)
+                              //       ..open();
+
+                              String exportPath =
+                                  '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
+
+                              await Piano.midiToWav(recording.path, exportPath);
+
+                              // appLoadingOverlay.close();
+
                               AppFileSystem.exportFile(
-                                  path: recording.path,
-                                  dialogTitle: 'Export WAV');
+                                  path: exportPath, dialogTitle: 'Export WAV');
                             },
                           ),
                         ),
