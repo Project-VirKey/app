@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:archive/archive_io.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
@@ -297,15 +298,17 @@ class RecordingsListItem extends StatelessWidget {
                               //         context: context, vsync: vsync)
                               //       ..open();
 
-                              String exportPath =
+                              String exportRecordingPath =
                                   '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
 
-                              await Piano.midiToWav(recording.path, exportPath);
+                              await Piano.midiToWav(
+                                  recording.path, exportRecordingPath);
 
                               // appLoadingOverlay.close();
 
                               AppFileSystem.exportFile(
-                                  path: exportPath, dialogTitle: 'Export WAV');
+                                  path: exportRecordingPath,
+                                  dialogTitle: 'Export WAV');
                             },
                           ),
                         ),
@@ -321,16 +324,71 @@ class RecordingsListItem extends StatelessWidget {
                             },
                           ),
                         ),
+                        if (recording.playbackPath != null)
+                          PropertyDescriptionActionCombination(
+                            title: 'Audio + Playback',
+                            child: AppIcon(
+                              icon: HeroIcons.arrowUpTray,
+                              color: AppColors.dark,
+                              onPressed: () async {
+                                String exportRecordingPath =
+                                    '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
+
+                                String exportRecordingPlaybackPath =
+                                    '${AppFileSystem.recordingsFolderPath}${recording.title}_Export-Playback.wav';
+
+                                await Piano.midiToWav(
+                                    recording.path, exportRecordingPath);
+
+                                await Piano.combineAudioFiles(
+                                    exportRecordingPlaybackPath, [
+                                  exportRecordingPath,
+                                  recording.playbackPath!
+                                ]);
+
+                                AppFileSystem.exportFile(
+                                    path: exportRecordingPlaybackPath,
+                                    dialogTitle: 'Export WAV');
+                              },
+                            ),
+                          ),
                         PropertyDescriptionActionCombination(
-                          title: 'Audio & MIDI',
+                          title: 'All Files (ZIP)',
                           child: AppIcon(
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
-                            onPressed: () {
-                              // TODO: convert MIDI to WAV & compress into zip file (probably also export playback & WAV with MIDI + Playback)
+                            onPressed: () async {
+                              String exportRecordingPath =
+                                  '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
+                              await Piano.midiToWav(
+                                  recording.path, exportRecordingPath);
+
+                              List<String> filePaths = [
+                                recording.path,
+                                exportRecordingPath
+                              ];
+                              if (recording.playbackPath != null) {
+                                String exportRecordingPlaybackPath =
+                                    '${AppFileSystem.recordingsFolderPath}${recording.title}_Export-Playback.wav';
+
+                                await Piano.combineAudioFiles(
+                                    exportRecordingPlaybackPath, [
+                                  exportRecordingPath,
+                                  recording.playbackPath!
+                                ]);
+                                filePaths.add(recording.playbackPath!);
+                                filePaths.add(exportRecordingPlaybackPath);
+                              }
+
+                              String exportZipPath =
+                                  '${AppFileSystem.recordingsFolderPath}${recording.title}.zip';
+
+                              await AppFileSystem.createZipFile(
+                                  exportZipPath, filePaths);
+
                               AppFileSystem.exportFile(
-                                  path: recording.path,
-                                  dialogTitle: 'Export WAV & MIDI');
+                                  path: exportZipPath,
+                                  dialogTitle: 'Export all Files (ZIP)');
                             },
                           ),
                         ),

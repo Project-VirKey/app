@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:archive/archive_io.dart';
 import 'package:dart_midi/dart_midi.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
@@ -89,6 +90,8 @@ class AppFileSystem {
 
   static String get soundLibrariesFolderPath =>
       '$basePath${Platform.pathSeparator}$soundLibrariesFolder${Platform.pathSeparator}';
+
+  static ZipFileEncoder zipFileEncoder = ZipFileEncoder();
 
   static Future<void> initFolders() async {
     basePath = (await AppSharedPreferences.loadData())?.defaultFolder.path;
@@ -304,5 +307,13 @@ class AppFileSystem {
 
   static MidiFile midiFileFromRecording(String recordingPath) {
     return _midiParser.parseMidiFromFile(File(recordingPath));
+  }
+
+  static Future<void> createZipFile(String destinationPath, List<String> filePaths) async {
+    zipFileEncoder.create(destinationPath);
+    for (var filePath in filePaths) {
+      await zipFileEncoder.addFile(File(filePath));
+    }
+    zipFileEncoder.close();
   }
 }
