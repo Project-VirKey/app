@@ -168,19 +168,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-                // const SizedBox(
-                //   height: 20,
-                // ),
-                // AppButton(
-                //     appText: const AppText(text: 'Test MIDI to WAV'),
-                //     onPressed: () {
-                //       MidiParser midiParser = MidiParser();
-                //       Piano.midiToWav(
-                //           midiParser.parseMidiFromFile(File(
-                //               '${AppFileSystem.basePath}${Platform.pathSeparator}test.mid')),
-                //           '${AppFileSystem.basePath}${Platform.pathSeparator}test.wav');
-                //     }),
-                const TempMidiStatus(),
+                // const TempMidiStatus(),
                 const SizedBox(
                   height: 20,
                 ),
