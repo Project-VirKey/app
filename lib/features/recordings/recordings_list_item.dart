@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:archive/archive_io.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
@@ -358,6 +357,11 @@ class RecordingsListItem extends StatelessWidget {
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
                             onPressed: () async {
+                              AppLoadingOverlay appLoadingOverlay =
+                                  AppLoadingOverlay(
+                                      context: context, vsync: vsync);
+                              await appLoadingOverlay.open();
+
                               String exportRecordingPath =
                                   '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
                               await Piano.midiToWav(
@@ -385,6 +389,8 @@ class RecordingsListItem extends StatelessWidget {
 
                               await AppFileSystem.createZipFile(
                                   exportZipPath, filePaths);
+
+                              appLoadingOverlay.close();
 
                               AppFileSystem.exportFile(
                                   path: exportZipPath,

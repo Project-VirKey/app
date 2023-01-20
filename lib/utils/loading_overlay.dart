@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:virkey/common_widgets/app_text.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:virkey/constants/colors.dart';
+import 'package:virkey/constants/radius.dart';
 
 class AppLoadingOverlay {
   final BuildContext context;
@@ -15,12 +16,12 @@ class AppLoadingOverlay {
     _animationController.reverse().whenComplete(() => {_overlay.remove()});
   }
 
-  void open() {
+  Future<void> open() async {
     _animationController.addListener(() {
       _overlayState?.setState(() {});
     });
     _overlayState?.insert(_overlay);
-    _animationController.forward();
+    await _animationController.forward();
   }
 
   late final OverlayState? _overlayState = Overlay.of(context);
@@ -47,7 +48,22 @@ class AppLoadingOverlay {
               end: Offset.zero, // goal position
             ).animate(_animationController),
             child: Column(
-              children: const [AppText(text: 'Loading')],
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(
+                  fit: FlexFit.loose,
+                  child: Container(
+                    decoration: const BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.all(AppRadius.radius)),
+                    padding: const EdgeInsets.all(50),
+                    child: LoadingAnimationWidget.waveDots(
+                      color: AppColors.primary,
+                      size: 60,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
