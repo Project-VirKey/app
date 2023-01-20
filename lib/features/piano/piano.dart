@@ -15,7 +15,7 @@ class Piano {
   // Db Eb Gb Ab Bb
 
   // C5
-  static const midiOffset = 72;
+  static const midiOffset = 60;
 
   static List white = [
     [
@@ -61,6 +61,8 @@ class Piano {
       null
     ]
   ];
+
+  // static List whiteData = List.
 
   static List black = [
     [
