@@ -168,7 +168,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-                // const TempMidiStatus(),
+                const TempMidiStatus(),
                 const SizedBox(
                   height: 20,
                 ),
