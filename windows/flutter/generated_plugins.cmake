@@ -4,6 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   desktop_webview_auth
+  flutter_libserialport
   just_audio_windows
   permission_handler_windows
   share_plus
