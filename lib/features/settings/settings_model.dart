@@ -14,22 +14,19 @@ class Settings {
     required this.defaultFolder,
     required this.defaultSavedFiles,
     required this.soundLibraries,
-    required this.lastUpdated,
   });
 
   AudioVolume audioVolume;
   DefaultFolder defaultFolder;
   DefaultSavedFiles defaultSavedFiles;
   List<SoundLibrary> soundLibraries;
-  int lastUpdated;
 
   factory Settings.fromJson(Map<String, dynamic> json) => Settings(
       audioVolume: AudioVolume.fromJson(json["audioVolume"]),
       defaultFolder: DefaultFolder.fromJson(json["defaultFolder"]),
       defaultSavedFiles: DefaultSavedFiles.fromJson(json["defaultSavedFiles"]),
       soundLibraries: List<SoundLibrary>.from(
-          json["soundLibraries"].map((x) => SoundLibrary.fromJson(x))),
-      lastUpdated: json["lastUpdated"]);
+          json["soundLibraries"].map((x) => SoundLibrary.fromJson(x))));
 
   Map<String, dynamic> toJson() => {
         "audioVolume": audioVolume.toJson(),
@@ -37,7 +34,6 @@ class Settings {
         "defaultSavedFiles": defaultSavedFiles.toJson(),
         "soundLibraries":
             List<dynamic>.from(soundLibraries.map((x) => x.toJson())),
-        "lastUpdated": lastUpdated
       };
 }
 
