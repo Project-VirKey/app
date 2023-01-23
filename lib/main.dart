@@ -40,7 +40,8 @@ Future<void> main() async {
   }
 
   // load firestore document
-  // await AppFirestore.initialLoad();
+  await AppFirestore.initialLoad();
+  // TODO: what happens if not logged in?
 
   // run the app
   runApp(MultiProvider(
@@ -50,9 +51,8 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => PianoProvider()),
       ChangeNotifierProvider(create: (_) => MidiDeviceProvider()),
       ChangeNotifierProxyProvider<SettingsProvider, CloudProvider>(
-          create: (BuildContext context) =>
-              CloudProvider(
-                  Provider.of<SettingsProvider>(context, listen: false)),
+          create: (BuildContext context) => CloudProvider(
+              Provider.of<SettingsProvider>(context, listen: false)),
           update: (BuildContext context, SettingsProvider settingsProvider,
               CloudProvider? cloudProvider) {
             cloudProvider?.setSettingsProvider(settingsProvider);

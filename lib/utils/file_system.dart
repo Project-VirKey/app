@@ -94,7 +94,9 @@ class AppFileSystem {
   static ZipFileEncoder zipFileEncoder = ZipFileEncoder();
 
   static Future<void> initFolders() async {
-    basePath = (await AppSharedPreferences.loadData())?.defaultFolder.path;
+    basePath = (await AppSharedPreferences.loadData())?['settings']
+        ?.defaultFolder
+        .path;
     if (basePath == null || basePath == '') {
       await loadBasePath();
     }
@@ -309,7 +311,8 @@ class AppFileSystem {
     return _midiParser.parseMidiFromFile(File(recordingPath));
   }
 
-  static Future<void> createZipFile(String destinationPath, List<String> filePaths) async {
+  static Future<void> createZipFile(
+      String destinationPath, List<String> filePaths) async {
     zipFileEncoder.create(destinationPath);
     for (var filePath in filePaths) {
       await zipFileEncoder.addFile(File(filePath));

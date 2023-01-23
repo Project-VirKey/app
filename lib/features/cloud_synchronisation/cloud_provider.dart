@@ -12,7 +12,7 @@ class CloudProvider extends ChangeNotifier {
 
   CloudProvider(this.settingsProvider) {
     checkAuthStatus();
-    // test();
+    test();
   }
 
   SettingsProvider settingsProvider;
@@ -44,7 +44,7 @@ class CloudProvider extends ChangeNotifier {
   }
 
   void synchronise() async {
-    print(settingsProvider.settings.lastUpdated);
+    print(settingsProvider.lastUpdated);
   }
 
   bool isLocalLatest(int localTimestamp, int cloudTimestamp) {
@@ -66,8 +66,10 @@ class CloudProvider extends ChangeNotifier {
       AppFirestore.setDocument(createCloudJson());
     } else {
       print('check most recent Update');
-      if (isLocalLatest(settingsProvider.settings.lastUpdated,
-          AppFirestore.document!['settings']['lastUpdated'])) {
+
+      // TODO: isLocalLatest is not actually the correct timestamp -> correction needed
+      if (isLocalLatest(settingsProvider.lastUpdated,
+          AppFirestore.document!['lastUpdated'])) {
         print('download from cloud');
       } else {
         print('upload to cloud');
@@ -78,11 +80,26 @@ class CloudProvider extends ChangeNotifier {
     print(createCloudJson());
   }
 
+  void setFromCloud() {
+    settingsProvider.lastUpdated = AppFirestore.document?['lastUpdated'];
+    settingsProvider.settings.audioVolume =
+    AppFirestore.document?['settings']['audioVolume'];
+    settingsProvider.settings.audioVolume =
+    AppFirestore.document?['settings']['defaultSavedFiles'];
+    // settingsProvider.selectSoundLibrary(selectedSoundLibrary)
+
+
+    notifyListeners();
+  }
+
   Map<String, dynamic> createCloudJson() {
     Map<String, dynamic> settings = settingsProvider.settings.toJson();
     settings.remove('defaultFolder');
-    int lastUpdated = settings['lastUpdated'];
+    int lastUpdated = settingsProvider.lastUpdated;
     settings.remove('lastUpdated');
+    for (var soundLibrary in settings['soundLibraries']) {
+      soundLibrary.remove('path');
+    }
 
     Map<String, dynamic> result = {
       'lastUpdated': lastUpdated,

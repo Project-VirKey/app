@@ -13,9 +13,10 @@ class SettingsProvider extends ChangeNotifier {
     audioVolume: AudioVolume(soundLibrary: 0, audioPlayback: 0),
     defaultFolder: DefaultFolder(path: AppFileSystem.basePath ?? ''),
     defaultSavedFiles: DefaultSavedFiles(wav: false, wavAndPlayback: false),
-    soundLibraries: [],
-    lastUpdated: AppTimestamp.now,
+    soundLibraries: []
   );
+
+  int lastUpdated = AppTimestamp.now;
 
   SettingsProvider() {
     initialLoad();
@@ -30,9 +31,10 @@ class SettingsProvider extends ChangeNotifier {
     _settings.defaultFolder.path = AppFileSystem.basePath ?? '';
 
     // load the data from SharedPreferences when the Provider is placed
-    Settings? loadedSettings = await AppSharedPreferences.loadData();
+    Settings? loadedSettings =
+        (await AppSharedPreferences.loadData())?['settings'];
     if (loadedSettings == null) {
-      AppSharedPreferences.saveData(_settings);
+      AppSharedPreferences.saveData(settings: _settings);
     }
 
     if (loadedSettings != null) {
@@ -106,7 +108,7 @@ class SettingsProvider extends ChangeNotifier {
     Piano.loadLibrary(
         selectedSoundLibrary.path, selectedSoundLibrary.defaultLibrary);
 
-    AppSharedPreferences.saveData(_settings);
+    AppSharedPreferences.saveData(settings: _settings);
     notifyListeners();
   }
 
@@ -130,7 +132,7 @@ class SettingsProvider extends ChangeNotifier {
 
       _settings.defaultFolder.path = newBasePath;
 
-      AppSharedPreferences.saveData(_settings);
+      AppSharedPreferences.saveData(settings: _settings);
       notifyListeners();
     }
   }

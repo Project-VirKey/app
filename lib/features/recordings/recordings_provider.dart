@@ -51,7 +51,7 @@ class RecordingsProvider extends ChangeNotifier {
 
   Future<void> loadRecordings() async {
     AppFileSystem.basePath =
-        (await AppSharedPreferences.loadData())?.defaultFolder.path;
+        (await AppSharedPreferences.loadData())?['settings']?.defaultFolder.path;
     if (AppFileSystem.basePath == null || AppFileSystem.basePath == '') {
       await AppFileSystem.loadBasePath();
     }

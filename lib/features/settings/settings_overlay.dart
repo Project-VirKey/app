@@ -131,7 +131,7 @@ class SettingsOverlay {
                                   .setAudioVolumeSoundLibrary(value),
                               onChangedEnd: (value) => {
                                 AppSharedPreferences.saveData(
-                                    settingsProvider.settings)
+                                    settings: settingsProvider.settings)
                               },
                             ),
                           ),
@@ -152,7 +152,7 @@ class SettingsOverlay {
                                   .setAudioVolumeAudioPlayback(value),
                               onChangedEnd: (value) => {
                                 AppSharedPreferences.saveData(
-                                    settingsProvider.settings)
+                                    settings: settingsProvider.settings)
                               },
                             ),
                           ),
@@ -174,7 +174,8 @@ class SettingsOverlay {
                                           await settingsProvider
                                               .resetBasePath();
                                           settingsProvider.loadSoundLibraries();
-                                          recordingsProvider.refreshRecordingsFolderFiles();
+                                          recordingsProvider
+                                              .refreshRecordingsFolderFiles();
                                         }),
                                     const SizedBox(
                                       width: 20,
@@ -191,7 +192,8 @@ class SettingsOverlay {
                                             .updateBasePath(newBasePath);
 
                                         settingsProvider.loadSoundLibraries();
-                                        recordingsProvider.refreshRecordingsFolderFiles();
+                                        recordingsProvider
+                                            .refreshRecordingsFolderFiles();
                                       },
                                     ),
                                   ],
@@ -221,7 +223,7 @@ class SettingsOverlay {
                                     .settings.defaultSavedFiles.wav = value;
                                 settingsProvider.notify();
                                 AppSharedPreferences.saveData(
-                                    settingsProvider.settings);
+                                    settings: settingsProvider.settings);
                               },
                             ),
                           ),
@@ -235,7 +237,7 @@ class SettingsOverlay {
                                       .wavAndPlayback = value;
                                   settingsProvider.notify();
                                   AppSharedPreferences.saveData(
-                                      settingsProvider.settings);
+                                      settings: settingsProvider.settings);
                                 },
                               )),
                           const PropertiesDescriptionTitle(
@@ -447,7 +449,9 @@ class SettingsOverlay {
                                           icon:
                                               HeroIcons.arrowPathRoundedSquare,
                                           color: AppColors.dark,
-                                          onPressed: () {},
+                                          onPressed: () {
+                                            cloudProvider.test();
+                                          },
                                         ),
                                       ),
                                       Padding(
