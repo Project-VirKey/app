@@ -12,7 +12,7 @@ class CloudProvider extends ChangeNotifier {
 
   CloudProvider(this.settingsProvider) {
     checkAuthStatus();
-    test();
+    // test();
   }
 
   SettingsProvider settingsProvider;
@@ -44,6 +44,9 @@ class CloudProvider extends ChangeNotifier {
   }
 
   void synchronise() async {
+    // AppFirestore.initialLoad();
+    // test();
+    // notifyListeners();
     print(settingsProvider.lastUpdated);
   }
 
@@ -52,11 +55,12 @@ class CloudProvider extends ChangeNotifier {
   }
 
   Future<void> test() async {
-    for (var soundLibrary in settingsProvider.settings.soundLibraries) {
-      print(soundLibrary.name);
-    }
+    // for (var soundLibrary in settingsProvider.settings.soundLibraries) {
+    //   print(soundLibrary.name);
+    // }
 
-    print(AppFirestore.document);
+    // print(AppFirestore.document);
+    print(settingsProvider.settings.toJson());
 
     if (AppFirestore.document == null) {
       print('upload to cloud');
@@ -68,32 +72,39 @@ class CloudProvider extends ChangeNotifier {
       print('check most recent Update');
 
       // TODO: isLocalLatest is not actually the correct timestamp -> correction needed
+      print('----- ${settingsProvider.lastUpdated} * ${AppFirestore.document!['lastUpdated']} -----');
+
+      if (settingsProvider.lastUpdated == AppFirestore.document!['lastUpdated']) {
+        print('cloud and local state are equal');
+        return;
+      }
+
       if (isLocalLatest(settingsProvider.lastUpdated,
           AppFirestore.document!['lastUpdated'])) {
-        print('download from cloud');
-      } else {
         print('upload to cloud');
         AppFirestore.setDocument(createCloudJson());
+      } else {
+        print('download from cloud');
       }
     }
 
-    print(createCloudJson());
+    // print(createCloudJson());
   }
 
   void setFromCloud() {
     settingsProvider.lastUpdated = AppFirestore.document?['lastUpdated'];
     settingsProvider.settings.audioVolume =
-    AppFirestore.document?['settings']['audioVolume'];
+        AppFirestore.document?['settings']['audioVolume'];
     settingsProvider.settings.audioVolume =
-    AppFirestore.document?['settings']['defaultSavedFiles'];
+        AppFirestore.document?['settings']['defaultSavedFiles'];
     // settingsProvider.selectSoundLibrary(selectedSoundLibrary)
-
 
     notifyListeners();
   }
 
   Map<String, dynamic> createCloudJson() {
     Map<String, dynamic> settings = settingsProvider.settings.toJson();
+    print(settings);
     settings.remove('defaultFolder');
     int lastUpdated = settingsProvider.lastUpdated;
     settings.remove('lastUpdated');

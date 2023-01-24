@@ -6,17 +6,15 @@ import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/platform_helper.dart';
-import 'package:virkey/utils/timestamp.dart';
 
 class SettingsProvider extends ChangeNotifier {
   final Settings _settings = Settings(
-    audioVolume: AudioVolume(soundLibrary: 0, audioPlayback: 0),
-    defaultFolder: DefaultFolder(path: AppFileSystem.basePath ?? ''),
-    defaultSavedFiles: DefaultSavedFiles(wav: false, wavAndPlayback: false),
-    soundLibraries: []
-  );
+      audioVolume: AudioVolume(soundLibrary: 0, audioPlayback: 0),
+      defaultFolder: DefaultFolder(path: AppFileSystem.basePath ?? ''),
+      defaultSavedFiles: DefaultSavedFiles(wav: false, wavAndPlayback: false),
+      soundLibraries: []);
 
-  int lastUpdated = AppTimestamp.now;
+  int lastUpdated = 0;
 
   SettingsProvider() {
     initialLoad();
@@ -31,8 +29,10 @@ class SettingsProvider extends ChangeNotifier {
     _settings.defaultFolder.path = AppFileSystem.basePath ?? '';
 
     // load the data from SharedPreferences when the Provider is placed
+    lastUpdated = AppSharedPreferences.loadedSharedPreferences?['lastUpdated'] ?? 0;
     Settings? loadedSettings =
-        (await AppSharedPreferences.loadData())?['settings'];
+        AppSharedPreferences.loadedSharedPreferences?['settings'];
+
     if (loadedSettings == null) {
       AppSharedPreferences.saveData(settings: _settings);
     }
