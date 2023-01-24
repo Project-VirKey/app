@@ -14,6 +14,7 @@ import 'package:virkey/utils/platform_helper.dart';
 import 'package:window_size/window_size.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'features/cloud_synchronisation/firestore.dart';
+import 'features/settings/settings_shared_preferences.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
@@ -42,6 +43,10 @@ Future<void> main() async {
   // load firestore document
   await AppFirestore.initialLoad();
   // TODO: what happens if not logged in?
+
+  // TODO: load SharedPreferences before initializing NotifierProvider
+  AppSharedPreferences.loadedSharedPreferences =
+      await AppSharedPreferences.loadData();
 
   // run the app
   runApp(MultiProvider(

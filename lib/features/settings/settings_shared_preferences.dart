@@ -3,6 +3,8 @@ import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/utils/timestamp.dart';
 
 class AppSharedPreferences {
+  static Map<String, dynamic>? loadedSharedPreferences;
+
   static void saveData({
     // required int lastUpdated,
     Settings? settings,
