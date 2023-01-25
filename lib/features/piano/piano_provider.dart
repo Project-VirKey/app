@@ -30,6 +30,8 @@ class PianoProvider extends ChangeNotifier {
     [false]
   ];
 
+  int currentOctaveIndex = 1;
+
   final List _recordedNotes = [];
   bool _isRecording = false;
   int _startTimeStamp = 0;
@@ -236,13 +238,14 @@ class PianoProvider extends ChangeNotifier {
     createMidiFile();
   }
 
-  void recordingAddNote(int midiNote) {
-    _recordedNotes.add([midiNote, _elapsedTime]);
+  void recordingAddNote(int octaveIndex,int midiNote) {
+    _recordedNotes.add([midiNote + (octaveIndex * Piano.keysPerOctave), _elapsedTime]);
   }
 
   // ----------------------------------------------------------------
 
   Future<void> startVisualizeMidi() async {
+    // TODO: fix for displaying on the correct keys & the correct octave
     if (!isVisualizeMidiActive || visualizeMidiPath == null) {
       return;
     }

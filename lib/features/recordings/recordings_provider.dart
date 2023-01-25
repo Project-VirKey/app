@@ -301,16 +301,25 @@ class RecordingsProvider extends ChangeNotifier {
           return (pianoKeyBlack[1] + Piano.midiOffset) == midiEvent.noteNumber;
         });
 
+        int octaveIndex = 0;
+        if (midiEvent.noteNumber >= Piano.midiOffset && midiEvent.noteNumber < (Piano.midiOffset + Piano.keysPerOctave)) {
+          octaveIndex = 0;
+        } else if (midiEvent.noteNumber + Piano.keysPerOctave >= Piano.midiOffset && midiEvent.noteNumber < (Piano.midiOffset + 2 * Piano.keysPerOctave)) {
+          octaveIndex = 1;
+        } else if (midiEvent.noteNumber + 2 * Piano.keysPerOctave >= Piano.midiOffset && midiEvent.noteNumber < (Piano.midiOffset + 3 * Piano.keysPerOctave)) {
+          octaveIndex = 2;
+        }
+
         print(midiEvent.deltaTime);
 
         await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
 
         if (playedPianoKeyWhite >= 0) {
-          Piano.playPianoNote(playedPianoKeyWhite);
+          Piano.playPianoNote(octaveIndex, playedPianoKeyWhite);
         }
 
         if (playedPianoKeyBlack >= 0) {
-          Piano.playPianoNote(playedPianoKeyBlack, true);
+          Piano.playPianoNote(octaveIndex, playedPianoKeyBlack, true);
         }
       }
     }

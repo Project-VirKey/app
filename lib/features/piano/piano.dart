@@ -14,87 +14,72 @@ class Piano {
   // C# D# F# G# A#
   // Db Eb Gb Ab Bb
 
-  // C5
-  static const midiOffset = 60;
+  //   0 = 48 => C3
+  // +12 = 60 => C4
+  // +12 = 72 => C5
+  static const midiOffset = 48;
+  static const keysPerOctave = 12;
+
+  // list of 3 entries for each octave
+  // each containing a list of two entries for the audio data & audio player
+  static List whiteKeyData = [];
+  static List whiteKeyPlayer = [];
+
+  static List blackKeyData = [];
+  static List blackKeyPlayer = [];
 
   static List white = [
     [
       ['C'],
-      0,
-      null,
-      null
+      0
     ],
     [
       ['D'],
-      2,
-      null,
-      null
+      2
     ],
     [
       ['E'],
-      4,
-      null,
-      null
+      4
     ],
     [
       ['F'],
-      5,
-      null,
-      null
+      5
     ],
     [
       ['G'],
-      7,
-      null,
-      null
+      7
     ],
     [
       ['A'],
-      9,
-      null,
-      null
+      9
     ],
     [
       ['B'],
-      11,
-      null,
-      null
+      11
     ]
   ];
-
-  // static List whiteData = List.
 
   static List black = [
     [
       ['C#', 'Db'],
-      1,
-      null,
-      null
+      1
     ],
     [
       ['D#', 'Eb'],
-      3,
-      null,
-      null
+      3
     ],
     [],
     [
       ['F#', 'Gb'],
-      6,
-      null,
-      null
+      6
     ],
     [
       ['G#', 'Ab'],
-      8,
-      null,
-      null
+      8
     ],
     [
       ['A#', 'Bb'],
-      10,
-      null,
-      null
+      10
     ]
   ];
 
@@ -123,21 +108,34 @@ class Piano {
           enableReverbAndChorus: true,
         ));
 
-    for (var wK = 0; wK < white.length; wK++) {
-      white[wK][2] = loadPianoKeyPcm(white[wK][1] + midiOffset);
-      white[wK][3] = AudioPlayer();
-      white[wK][3].setAudioSource(
-          MyCustomSource(wrapAudioDataInWavFileFormat(white[wK][2])));
-    }
+    for (int o = 0; o < 3; o++) {
+      whiteKeyData.add([]);
+      whiteKeyPlayer.add([]);
 
-    for (var bK = 0; bK < black.length; bK++) {
-      if (black[bK].isEmpty) {
-        continue;
+      for (var wK = 0; wK < white.length; wK++) {
+        whiteKeyData[o].add(
+            loadPianoKeyPcm(white[wK][1] + midiOffset + (o * keysPerOctave)));
+        whiteKeyPlayer[o].add(AudioPlayer());
+        whiteKeyPlayer[o][wK].setAudioSource(
+            MyCustomSource(wrapAudioDataInWavFileFormat(whiteKeyData[o][wK])));
       }
-      black[bK][2] = loadPianoKeyPcm(black[bK][1] + midiOffset);
-      black[bK][3] = AudioPlayer();
-      black[bK][3].setAudioSource(
-          MyCustomSource(wrapAudioDataInWavFileFormat(black[bK][2])));
+
+      blackKeyData.add([]);
+      blackKeyPlayer.add([]);
+
+      for (var bK = 0; bK < black.length; bK++) {
+        if (black[bK].isEmpty) {
+          blackKeyData[o].add(null);
+          blackKeyPlayer[o].add(null);
+          continue;
+        }
+
+        blackKeyData[o].add(
+            loadPianoKeyPcm(black[bK][1] + midiOffset + (o * keysPerOctave)));
+        blackKeyPlayer[o].add(AudioPlayer());
+        blackKeyPlayer[o][bK].setAudioSource(
+            MyCustomSource(wrapAudioDataInWavFileFormat(blackKeyData[o][bK])));
+      }
     }
   }
 
@@ -223,17 +221,16 @@ class Piano {
           .reversed
           .toList();
 
-  static AudioPlayer notePlayer = AudioPlayer();
-
-  static void playPianoNote(int arIndex, [bool isBlackKey = false]) {
+  static void playPianoNote(int octaveIndex, int arIndex,
+      [bool isBlackKey = false]) {
     // initiate AudioPlayer and use WAV-File-Byte-Data as source
 
     if (isBlackKey) {
-      black[arIndex][3].seek(const Duration(seconds: 0));
-      black[arIndex][3].play();
+      blackKeyPlayer[octaveIndex][arIndex].seek(const Duration(seconds: 0));
+      blackKeyPlayer[octaveIndex][arIndex].play();
     } else {
-      white[arIndex][3].seek(const Duration(seconds: 0));
-      white[arIndex][3].play();
+      whiteKeyPlayer[octaveIndex][arIndex].seek(const Duration(seconds: 0));
+      whiteKeyPlayer[octaveIndex][arIndex].play();
     }
   }
 
