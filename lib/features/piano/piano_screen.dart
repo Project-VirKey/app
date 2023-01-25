@@ -84,44 +84,89 @@ class _PianoScreenState extends State<PianoScreen>
                         children: [
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Wrap(
-                                spacing: 15,
-                                children: [
-                                  const SizedBox(
-                                    width: 5,
-                                  ),
-                                  AppIcon(
-                                    icon: HeroIcons.arrowUturnLeft,
-                                    color: AppColors.secondary,
-                                    onPressed: () {
-                                      if (pianoProvider.isRecording) {
-                                        AppSnackBar(
-                                                message: 'Active Recording!',
-                                                context: context,
-                                                vsync: this)
-                                            .open();
-                                      } else {
-                                        context.go('/');
-                                      }
-                                    },
-                                    size: 30,
-                                  ),
-                                  AppIcon(
-                                    icon: HeroIcons.arrowDownTray,
-                                    color: AppColors.secondary,
-                                    onPressed: () => _importOverlay.open(),
-                                    size: 30,
-                                  ),
-                                  AppIcon(
-                                    icon: HeroIcons.cog6Tooth,
-                                    color: AppColors.secondary,
-                                    onPressed: () => _settingsOverlay.open(),
-                                    size: 30,
-                                  ),
-                                ],
-                              ),
+                            child: Wrap(
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              spacing: 15,
+                              children: [
+                                const SizedBox(
+                                  width: 5,
+                                ),
+                                AppIcon(
+                                  icon: HeroIcons.arrowUturnLeft,
+                                  color: AppColors.secondary,
+                                  onPressed: () {
+                                    if (pianoProvider.isRecording) {
+                                      AppSnackBar(
+                                              message: 'Active Recording!',
+                                              context: context,
+                                              vsync: this)
+                                          .open();
+                                    } else {
+                                      context.go('/');
+                                    }
+                                  },
+                                  size: 30,
+                                ),
+                                AppIcon(
+                                  icon: HeroIcons.arrowDownTray,
+                                  color: AppColors.secondary,
+                                  onPressed: () => _importOverlay.open(),
+                                  size: 30,
+                                ),
+                                AppIcon(
+                                  icon: HeroIcons.cog6Tooth,
+                                  color: AppColors.secondary,
+                                  onPressed: () => _settingsOverlay.open(),
+                                  size: 30,
+                                ),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    AppIcon(
+                                      icon: HeroIcons.chevronLeft,
+                                      color: AppColors.secondary,
+                                      onPressed: () {
+                                        if (pianoProvider.currentOctaveIndex >=
+                                            1) {
+                                          pianoProvider.currentOctaveIndex--;
+                                          pianoProvider.notify();
+                                        }
+                                      },
+                                      size: 30,
+                                    ),
+                                    SizedBox(
+                                      width: 40,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          AppText(
+                                            text:
+                                                '${pianoProvider.currentOctaveIndex == 2 ? '+' : ''}${pianoProvider.currentOctaveIndex - 1}',
+                                            size: 25,
+                                            color: AppColors.secondary,
+                                            weight: AppFonts.weightLight,
+                                            letterSpacing: 4,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    AppIcon(
+                                      icon: HeroIcons.chevronRight,
+                                      color: AppColors.secondary,
+                                      onPressed: () {
+                                        if (pianoProvider.currentOctaveIndex <=
+                                            1) {
+                                          pianoProvider.currentOctaveIndex++;
+                                          pianoProvider.notify();
+                                        }
+                                      },
+                                      size: 30,
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                           const Align(
@@ -162,7 +207,8 @@ class _PianoScreenState extends State<PianoScreen>
                                         context: context,
                                         vsync: this,
                                       ).open();
-                                      recordingsProvider.refreshRecordingsFolderFiles();
+                                      recordingsProvider
+                                          .refreshRecordingsFolderFiles();
                                     } else {
                                       RecordingTitleOverlay(
                                               context: context, vsync: this)

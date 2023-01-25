@@ -182,10 +182,12 @@ class PianoKeyWhite extends StatelessWidget {
                   ),
                   onPressed: () async {
                     if (pianoProvider.isRecording) {
-                      pianoProvider.recordingAddNote(midiNoteNumber);
+                      pianoProvider.recordingAddNote(
+                          pianoProvider.currentOctaveIndex, midiNoteNumber);
                     }
 
-                    Piano.playPianoNote(index);
+                    Piano.playPianoNote(
+                        pianoProvider.currentOctaveIndex, index);
                   },
                   child: Container(
                     alignment: Alignment.bottomCenter,
@@ -262,10 +264,12 @@ class PianoKeyBlack extends StatelessWidget {
               ),
               onPressed: () {
                 if (pianoProvider.isRecording) {
-                  pianoProvider.recordingAddNote(midiNoteNumber);
+                  pianoProvider.recordingAddNote(
+                      pianoProvider.currentOctaveIndex, midiNoteNumber);
                 }
 
-                Piano.playPianoNote(index, true);
+                Piano.playPianoNote(
+                    pianoProvider.currentOctaveIndex, index, true);
               },
               child: Container(
                 alignment: Alignment.bottomCenter,
