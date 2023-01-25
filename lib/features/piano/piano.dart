@@ -108,6 +108,11 @@ class Piano {
           enableReverbAndChorus: true,
         ));
 
+    whiteKeyData.clear();
+    blackKeyData.clear();
+    whiteKeyPlayer.clear();
+    blackKeyPlayer.clear();
+
     for (int o = 0; o < 3; o++) {
       whiteKeyData.add([]);
       whiteKeyPlayer.add([]);
