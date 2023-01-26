@@ -51,7 +51,9 @@ class RecordingsProvider extends ChangeNotifier {
 
   Future<void> loadRecordings() async {
     AppFileSystem.basePath =
-        (await AppSharedPreferences.loadData())?['settings']?.defaultFolder.path;
+        (await AppSharedPreferences.loadData())?['settings']
+            ?.defaultFolder
+            .path;
     if (AppFileSystem.basePath == null || AppFileSystem.basePath == '') {
       await AppFileSystem.loadBasePath();
     }
@@ -291,24 +293,24 @@ class RecordingsProvider extends ChangeNotifier {
 
         midiPlayCurrentEventPos = i;
 
+        int octaveIndex =
+            Piano.getOctaveIndexFromMidiNote(midiEvent.noteNumber);
+
         int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
-            pianoKeyWhite[1] + Piano.midiOffset == midiEvent.noteNumber);
+            pianoKeyWhite[1] +
+                Piano.midiOffset +
+                (octaveIndex * Piano.keysPerOctave) ==
+            midiEvent.noteNumber);
 
         int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
           if (pianoKeyBlack.isEmpty) {
             return false;
           }
-          return (pianoKeyBlack[1] + Piano.midiOffset) == midiEvent.noteNumber;
+          return (pianoKeyBlack[1] +
+                  Piano.midiOffset +
+                  (octaveIndex * Piano.keysPerOctave)) ==
+              midiEvent.noteNumber;
         });
-
-        int octaveIndex = 0;
-        if (midiEvent.noteNumber >= Piano.midiOffset && midiEvent.noteNumber < (Piano.midiOffset + Piano.keysPerOctave)) {
-          octaveIndex = 0;
-        } else if (midiEvent.noteNumber + Piano.keysPerOctave >= Piano.midiOffset && midiEvent.noteNumber < (Piano.midiOffset + 2 * Piano.keysPerOctave)) {
-          octaveIndex = 1;
-        } else if (midiEvent.noteNumber + 2 * Piano.keysPerOctave >= Piano.midiOffset && midiEvent.noteNumber < (Piano.midiOffset + 3 * Piano.keysPerOctave)) {
-          octaveIndex = 2;
-        }
 
         print(midiEvent.deltaTime);
 

@@ -239,6 +239,21 @@ class Piano {
     }
   }
 
+  static int getOctaveIndexFromMidiNote(int midiNote) {
+    if (midiNote >= Piano.midiOffset &&
+        midiNote < (Piano.midiOffset + Piano.keysPerOctave)) {
+      return 0;
+    } else if (midiNote + Piano.keysPerOctave >= Piano.midiOffset &&
+        midiNote < (Piano.midiOffset + 2 * Piano.keysPerOctave)) {
+      return 1;
+    } else if (midiNote + 2 * Piano.keysPerOctave >= Piano.midiOffset &&
+        midiNote < (Piano.midiOffset + 3 * Piano.keysPerOctave)) {
+      return 2;
+    } else {
+      return 1;
+    }
+  }
+
   static MidiParser midiParser = MidiParser();
 
   static Future<void> midiToWav(

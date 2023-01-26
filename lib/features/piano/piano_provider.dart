@@ -238,8 +238,9 @@ class PianoProvider extends ChangeNotifier {
     createMidiFile();
   }
 
-  void recordingAddNote(int octaveIndex,int midiNote) {
-    _recordedNotes.add([midiNote + (octaveIndex * Piano.keysPerOctave), _elapsedTime]);
+  void recordingAddNote(int octaveIndex, int midiNote) {
+    _recordedNotes
+        .add([midiNote + (octaveIndex * Piano.keysPerOctave), _elapsedTime]);
   }
 
   // ----------------------------------------------------------------
@@ -271,15 +272,27 @@ class PianoProvider extends ChangeNotifier {
 
         visualizeMidiCurrentEventPos = i;
 
+        int octaveIndex =
+            Piano.getOctaveIndexFromMidiNote(midiEvent.noteNumber);
+
         int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
-            pianoKeyWhite[1] + Piano.midiOffset == midiEvent.noteNumber);
+            pianoKeyWhite[1] +
+                Piano.midiOffset +
+                (octaveIndex * Piano.keysPerOctave) ==
+            midiEvent.noteNumber);
 
         int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
           if (pianoKeyBlack.isEmpty) {
             return false;
           }
-          return (pianoKeyBlack[1] + Piano.midiOffset) == midiEvent.noteNumber;
+          return (pianoKeyBlack[1] +
+                  Piano.midiOffset +
+                  (octaveIndex * Piano.keysPerOctave)) ==
+              midiEvent.noteNumber;
         });
+
+        // TODO: fix visual playback
+        print(playedPianoKeyWhite);
 
         await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
 
@@ -348,8 +361,8 @@ class PianoProvider extends ChangeNotifier {
           volume: volume);
     });
 
-    File outputFile = File(
-        '${AppFileSystem.recordingsFolderPath}$recordingTitle.mid');
+    File outputFile =
+        File('${AppFileSystem.recordingsFolderPath}$recordingTitle.mid');
 
     midiFile.writeFile(outputFile);
   }

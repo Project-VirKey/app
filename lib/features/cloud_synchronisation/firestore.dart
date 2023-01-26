@@ -50,6 +50,10 @@ class AppFirestore {
   }
 
   static Future<void> initialLoad() async {
+    if (FirebaseAuth.instance.currentUser?.uid == null) {
+      return;
+    }
+
     if (await checkUserDocumentExists()) {
       document = (await getDocument())!;
     } else {
