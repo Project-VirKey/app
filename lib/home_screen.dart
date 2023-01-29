@@ -92,8 +92,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             borderRadius: BorderRadius.all(
                                                 AppRadius.radius)),
                                       ),
-                                      // TODO: stop playing recording when changing routes
-                                      onPressed: () => context.go('/piano'),
+                                      onPressed: () {
+                                        context.go('/piano');
+                                        recordingsProvider.pauseRecording();
+                                        // TODO: stop playing recording when changing routes: stop midi playback at correct time
+                                      },
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -168,7 +171,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ],
                   ),
                 ),
-                const TempMidiStatus(),
+                // const TempMidiStatus(),
                 const SizedBox(
                   height: 20,
                 ),
