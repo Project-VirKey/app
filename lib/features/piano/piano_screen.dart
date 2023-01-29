@@ -103,6 +103,9 @@ class _PianoScreenState extends State<PianoScreen>
                                           .open();
                                     } else {
                                       context.go('/');
+                                      if (pianoProvider.isSomethingPlaying) {
+                                        pianoProvider.playPause();
+                                      }
                                     }
                                   },
                                   size: 30,

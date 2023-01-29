@@ -165,12 +165,7 @@ class PianoKeyWhite extends StatelessWidget {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     foregroundColor: AppColors.dark,
-                    backgroundColor: AppColors.white,
-                    // backgroundColor: longPress
-                    //     ? const Color(0xffdedede)
-                    //     : (pianoProvider.pianoKeysWhite[widget.index][2]
-                    //         ? AppColors.primary
-                    //         : AppColors.white),
+                    backgroundColor: pianoProvider.pianoWhiteKeyColor(index),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.only(
                         bottomLeft: AppRadius.radius,
@@ -195,7 +190,7 @@ class PianoKeyWhite extends StatelessWidget {
                     child: AppText(
                       text: name,
                       size: parentWidth * .04,
-                      color: AppColors.dark,
+                      color: pianoProvider.pianoWhiteKeyTextColor(index),
                       family: AppFonts.secondary,
                     ),
                   ),
@@ -249,12 +244,7 @@ class PianoKeyBlack extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.zero,
                 foregroundColor: AppColors.white,
-                backgroundColor: AppColors.dark,
-                // backgroundColor: longPress
-                //     ? const Color(0xff454545)
-                //     : (pianoProvider.pianoKeysBlack[widget.index][3]
-                //         ? AppColors.primary
-                //         : AppColors.dark),
+                backgroundColor: pianoProvider.pianoBlackKeyColor(index),
                 shape: const RoundedRectangleBorder(
                   borderRadius: BorderRadius.only(
                     bottomLeft: AppRadius.radius,
@@ -280,7 +270,7 @@ class PianoKeyBlack extends StatelessWidget {
                     AppText(
                       text: name,
                       size: parentWidth * .045,
-                      color: AppColors.secondary,
+                      color: pianoProvider.pianoBlackKeyTextColor(index),
                       family: AppFonts.secondary,
                     ),
                     const SizedBox(
@@ -289,7 +279,7 @@ class PianoKeyBlack extends StatelessWidget {
                     AppText(
                       text: secondName,
                       size: parentWidth * .033,
-                      color: AppColors.secondary,
+                      color: pianoProvider.pianoBlackKeyTextColor(index),
                       family: AppFonts.secondary,
                     ),
                   ],
