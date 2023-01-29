@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:dart_midi/dart_midi.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:midi_util/midi_util.dart';
 import 'package:virkey/constants/colors.dart';
@@ -12,11 +13,55 @@ import 'package:virkey/utils/timestamp.dart';
 
 class PianoProvider extends ChangeNotifier {
   // background colors
-  List pianoKeysWhite =
-      List.generate(7, (_) => {'visualize': false, 'hardware': false});
+  // [visualize, hardware]
+  List pianoKeysWhite = List.generate(7, (_) => [false, false]);
 
-  List pianoKeysBlack = List.generate(
-      6, (i) => i == 2 ? null : {'visualize': false, 'hardware': false});
+  List pianoKeysBlack = List.generate(6, (i) => i == 2 ? null : [false, false]);
+
+  // qwert    => black keys
+  // asdfghj  => white keys
+  late Map<PhysicalKeyboardKey, dynamic> keyboardKeyPianoKey = {
+    PhysicalKeyboardKey.keyQ: () => {keyboardPianoKeyPress(0, true)},
+    PhysicalKeyboardKey.keyW: () => {keyboardPianoKeyPress(1, true)},
+    PhysicalKeyboardKey.keyE: () => {keyboardPianoKeyPress(3, true)},
+    PhysicalKeyboardKey.keyR: () => {keyboardPianoKeyPress(4, true)},
+    PhysicalKeyboardKey.keyT: () => {keyboardPianoKeyPress(5, true)},
+    PhysicalKeyboardKey.keyA: () => {keyboardPianoKeyPress(0)},
+    PhysicalKeyboardKey.keyS: () => {keyboardPianoKeyPress(1)},
+    PhysicalKeyboardKey.keyD: () => {keyboardPianoKeyPress(2)},
+    PhysicalKeyboardKey.keyF: () => {keyboardPianoKeyPress(3)},
+    PhysicalKeyboardKey.keyG: () => {keyboardPianoKeyPress(4)},
+    PhysicalKeyboardKey.keyH: () => {keyboardPianoKeyPress(5)},
+    PhysicalKeyboardKey.keyJ: () => {keyboardPianoKeyPress(6)},
+  };
+
+  void keyboardPianoKeyPress(int keyIndex, [black = false]) {
+    if (isRecording) {
+      recordingAddNote(
+          currentOctaveIndex,
+          black
+              ? Piano.black[keyIndex][1]
+              : Piano.white[keyIndex][1] + Piano.midiOffset);
+    }
+
+    Piano.playPianoNote(currentOctaveIndex, keyIndex, black);
+
+    if (black) {
+      pianoKeysBlack[keyIndex][1] = true;
+    } else {
+      pianoKeysWhite[keyIndex][1] = true;
+    }
+    Future.delayed(const Duration(milliseconds: 150), () {
+      if (black) {
+        pianoKeysBlack[keyIndex][1] = false;
+      } else {
+        pianoKeysWhite[keyIndex][1] = false;
+      }
+      notifyListeners();
+    });
+
+    notifyListeners();
+  }
 
   int currentOctaveIndex = 1;
 
@@ -234,9 +279,9 @@ class PianoProvider extends ChangeNotifier {
   // ----------------------------------------------------------------
 
   Color pianoWhiteKeyColor(int keyIndex) {
-    if (pianoKeysWhite[keyIndex]['visualize']) {
+    if (pianoKeysWhite[keyIndex][0]) {
       return AppColors.primary;
-    } else if (pianoKeysWhite[keyIndex]['hardware']) {
+    } else if (pianoKeysWhite[keyIndex][1]) {
       return AppColors.black50;
     } else {
       return AppColors.white;
@@ -244,8 +289,7 @@ class PianoProvider extends ChangeNotifier {
   }
 
   Color pianoWhiteKeyTextColor(int keyIndex) {
-    if (!pianoKeysWhite[keyIndex]['visualize'] &&
-        pianoKeysWhite[keyIndex]['hardware']) {
+    if (!pianoKeysWhite[keyIndex][0] && pianoKeysWhite[keyIndex][1]) {
       return AppColors.white;
     } else {
       return AppColors.dark;
@@ -253,18 +297,17 @@ class PianoProvider extends ChangeNotifier {
   }
 
   Color pianoBlackKeyColor(int keyIndex) {
-    if (pianoKeysBlack[keyIndex]['visualize']) {
+    if (pianoKeysBlack[keyIndex][0]) {
       return AppColors.primary;
-    } else if (pianoKeysBlack[keyIndex]['hardware']) {
-      return AppColors.white50;
+    } else if (pianoKeysBlack[keyIndex][1]) {
+      return AppColors.tertiary;
     } else {
       return AppColors.dark;
     }
   }
 
   Color pianoBlackKeyTextColor(int keyIndex) {
-    if (!pianoKeysBlack[keyIndex]['visualize'] &&
-        pianoKeysBlack[keyIndex]['hardware']) {
+    if (!pianoKeysBlack[keyIndex][0] && pianoKeysBlack[keyIndex][1]) {
       return AppColors.dark;
     } else {
       return AppColors.secondary;
@@ -325,19 +368,21 @@ class PianoProvider extends ChangeNotifier {
         await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
 
         if (playedPianoKeyWhite >= 0) {
-          pianoKeysWhite[playedPianoKeyWhite]['visualize'] = true;
+          currentOctaveIndex = octaveIndex;
+          pianoKeysWhite[playedPianoKeyWhite][0] = true;
           notifyListeners();
           Future.delayed(Duration(milliseconds: midiEvent.duration), () {
-            pianoKeysWhite[playedPianoKeyWhite]['visualize'] = false;
+            pianoKeysWhite[playedPianoKeyWhite][0] = false;
             notifyListeners();
           });
         }
 
         if (playedPianoKeyBlack >= 0) {
-          pianoKeysBlack[playedPianoKeyBlack]['visualize'] = true;
+          currentOctaveIndex = octaveIndex;
+          pianoKeysBlack[playedPianoKeyBlack][0] = true;
           notifyListeners();
           Future.delayed(Duration(milliseconds: midiEvent.duration), () {
-            pianoKeysBlack[playedPianoKeyBlack]['visualize'] = false;
+            pianoKeysBlack[playedPianoKeyBlack][0] = false;
             notifyListeners();
           });
         }

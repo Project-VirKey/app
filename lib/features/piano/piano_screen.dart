@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
+import 'package:virkey/common_widgets/app_keyboard_shortcut.dart';
 import 'package:virkey/common_widgets/app_play_pause_button.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
@@ -41,6 +42,8 @@ class _PianoScreenState extends State<PianoScreen>
 
   int prevValue = -1;
 
+  final FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     _recordButtonAnimation.addListener(() {
@@ -69,213 +72,220 @@ class _PianoScreenState extends State<PianoScreen>
                   PianoProvider pianoProvider,
                   RecordingsProvider recordingsProvider,
                   Widget? child) =>
-              Column(
-            children: [
-              Container(
-                color: AppColors.dark,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Wrap(
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 15,
-                          children: [
-                            const SizedBox(
-                              width: 5,
-                            ),
-                            AppIcon(
-                              icon: HeroIcons.arrowUturnLeft,
-                              color: AppColors.secondary,
-                              onPressed: () {
-                                if (pianoProvider.isRecording) {
-                                  AppSnackBar(
-                                          message: 'Active Recording!',
-                                          context: context,
-                                          vsync: this)
-                                      .open();
-                                } else {
-                                  context.go('/');
-                                  if (pianoProvider.isSomethingPlaying) {
-                                    pianoProvider.playPause();
-                                  }
-                                }
-                              },
-                              size: 30,
-                            ),
-                            AppIcon(
-                              icon: HeroIcons.arrowDownTray,
-                              color: AppColors.secondary,
-                              onPressed: () => _importOverlay.open(),
-                              size: 30,
-                            ),
-                            AppIcon(
-                              icon: HeroIcons.cog6Tooth,
-                              color: AppColors.secondary,
-                              onPressed: () => _settingsOverlay.open(),
-                              size: 30,
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                AppIcon(
-                                  icon: HeroIcons.chevronLeft,
-                                  color: AppColors.secondary,
-                                  onPressed: () {
-                                    if (pianoProvider.currentOctaveIndex >= 1) {
-                                      pianoProvider.currentOctaveIndex--;
-                                      pianoProvider.notify();
-                                    }
-                                  },
-                                  size: 30,
-                                ),
-                                SizedBox(
-                                  width: 40,
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      AppText(
-                                        text:
-                                            '${pianoProvider.currentOctaveIndex == 2 ? '+' : ''}${pianoProvider.currentOctaveIndex - 1}',
-                                        size: 25,
-                                        color: AppColors.secondary,
-                                        weight: AppFonts.weightLight,
-                                        letterSpacing: 4,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                AppIcon(
-                                  icon: HeroIcons.chevronRight,
-                                  color: AppColors.secondary,
-                                  onPressed: () {
-                                    if (pianoProvider.currentOctaveIndex <= 1) {
-                                      pianoProvider.currentOctaveIndex++;
-                                      pianoProvider.notify();
-                                    }
-                                  },
-                                  size: 30,
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Align(
-                          alignment: Alignment.center,
-                          child: Padding(
-                            padding: EdgeInsets.only(top: 5),
-                            child: AppText(
-                              text: 'ViRKEY',
-                              size: 28,
-                              letterSpacing: 4,
-                              family: AppFonts.secondary,
-                              color: AppColors.secondary,
-                            ),
-                          )),
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Wrap(
-                          // vertical centering of containing widgets
-                          crossAxisAlignment: WrapCrossAlignment.center,
-                          spacing: 15,
-                          children: [
-                            AppText(
-                              text: pianoProvider.displayTime,
-                              size: 20,
-                              color: AppColors.secondary,
-                              weight: AppFonts.weightLight,
-                              letterSpacing: 4,
-                            ),
-                            AppIcon(
-                              icon: Icons.radio_button_checked,
-                              color: _recordButtonAnimation.value,
-                              onPressed: () {
-                                if (pianoProvider.isRecording) {
-                                  pianoProvider.toggleRecording();
-                                  AppSnackBar(
-                                    message:
-                                        'Saved "${pianoProvider.recordingTitle}"',
-                                    context: context,
-                                    vsync: this,
-                                  ).open();
-                                  recordingsProvider
-                                      .refreshRecordingsFolderFiles();
-                                } else {
-                                  RecordingTitleOverlay(
-                                          context: context, vsync: this)
-                                      .open();
-                                }
-                              },
-                              size: 30,
-                            ),
-                            AppPlayPauseButton(
-                              value: pianoProvider.isSomethingPlaying,
-                              light: true,
-                              onPressed: () => pianoProvider.playPause(),
-                            ),
-                            AppIcon(
-                              icon: HeroIcons.stop,
-                              color: AppColors.secondary,
-                              size: 30,
-                              onPressed: () {
-                                pianoProvider.stop();
-                              },
-                            ),
-                            const SizedBox(
-                              width: 5,
-                            )
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Align(
-                  alignment: Alignment.center,
-                  child: GestureDetector(
-                    onVerticalDragUpdate: (DragUpdateDetails details) {
-                      if (PlatformHelper.isDesktop) {
-                        return;
-                      }
-
-                      int keyIndex = (details.globalPosition.dx /
-                              (MediaQuery.of(context).size.width) *
-                              7)
-                          .floor();
-
-                      if (keyIndex != prevValue) {
-                        // FlutterMidi().playMidiNote(
-                        //     midi: PianoKeys.white[keyIndex][1] +
-                        //         PianoKeys.midiOffset);
-                        prevValue = keyIndex;
-                      }
-                    },
-                    onVerticalDragEnd: (DragEndDetails details) =>
-                        {prevValue = -1},
+              AppKeyboardShortcut(
+            focusNode: _focusNode,
+            shortcuts: pianoProvider.keyboardKeyPianoKey,
+            child: Column(
+              children: [
+                Container(
+                  color: AppColors.dark,
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                     child: Stack(
-                      // alignment: Alignment.topCenter,
-                      children: const [
-                        PianoKeysWhite(),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          top: 0,
-                          child: PianoKeysBlack(),
-                        )
+                      alignment: Alignment.center,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 15,
+                            children: [
+                              const SizedBox(
+                                width: 5,
+                              ),
+                              AppIcon(
+                                icon: HeroIcons.arrowUturnLeft,
+                                color: AppColors.secondary,
+                                onPressed: () {
+                                  if (pianoProvider.isRecording) {
+                                    AppSnackBar(
+                                            message: 'Active Recording!',
+                                            context: context,
+                                            vsync: this)
+                                        .open();
+                                  } else {
+                                    context.go('/');
+                                    if (pianoProvider.isSomethingPlaying) {
+                                      pianoProvider.playPause();
+                                    }
+                                  }
+                                },
+                                size: 30,
+                              ),
+                              AppIcon(
+                                icon: HeroIcons.arrowDownTray,
+                                color: AppColors.secondary,
+                                onPressed: () => _importOverlay.open(),
+                                size: 30,
+                              ),
+                              AppIcon(
+                                icon: HeroIcons.cog6Tooth,
+                                color: AppColors.secondary,
+                                onPressed: () => _settingsOverlay.open(),
+                                size: 30,
+                              ),
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  AppIcon(
+                                    icon: HeroIcons.chevronLeft,
+                                    color: AppColors.secondary,
+                                    onPressed: () {
+                                      if (pianoProvider.currentOctaveIndex >=
+                                          1) {
+                                        pianoProvider.currentOctaveIndex--;
+                                        pianoProvider.notify();
+                                      }
+                                    },
+                                    size: 30,
+                                  ),
+                                  SizedBox(
+                                    width: 40,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        AppText(
+                                          text:
+                                              '${pianoProvider.currentOctaveIndex == 2 ? '+' : ''}${pianoProvider.currentOctaveIndex - 1}',
+                                          size: 25,
+                                          color: AppColors.secondary,
+                                          weight: AppFonts.weightLight,
+                                          letterSpacing: 4,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  AppIcon(
+                                    icon: HeroIcons.chevronRight,
+                                    color: AppColors.secondary,
+                                    onPressed: () {
+                                      if (pianoProvider.currentOctaveIndex <=
+                                          1) {
+                                        pianoProvider.currentOctaveIndex++;
+                                        pianoProvider.notify();
+                                      }
+                                    },
+                                    size: 30,
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.only(top: 5),
+                              child: AppText(
+                                text: 'ViRKEY',
+                                size: 28,
+                                letterSpacing: 4,
+                                family: AppFonts.secondary,
+                                color: AppColors.secondary,
+                              ),
+                            )),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: Wrap(
+                            // vertical centering of containing widgets
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 15,
+                            children: [
+                              AppText(
+                                text: pianoProvider.displayTime,
+                                size: 20,
+                                color: AppColors.secondary,
+                                weight: AppFonts.weightLight,
+                                letterSpacing: 4,
+                              ),
+                              AppIcon(
+                                icon: Icons.radio_button_checked,
+                                color: _recordButtonAnimation.value,
+                                onPressed: () {
+                                  if (pianoProvider.isRecording) {
+                                    pianoProvider.toggleRecording();
+                                    AppSnackBar(
+                                      message:
+                                          'Saved "${pianoProvider.recordingTitle}"',
+                                      context: context,
+                                      vsync: this,
+                                    ).open();
+                                    recordingsProvider
+                                        .refreshRecordingsFolderFiles();
+                                  } else {
+                                    RecordingTitleOverlay(
+                                            context: context, vsync: this)
+                                        .open();
+                                  }
+                                },
+                                size: 30,
+                              ),
+                              AppPlayPauseButton(
+                                value: pianoProvider.isSomethingPlaying,
+                                light: true,
+                                onPressed: () => pianoProvider.playPause(),
+                              ),
+                              AppIcon(
+                                icon: HeroIcons.stop,
+                                color: AppColors.secondary,
+                                size: 30,
+                                onPressed: () {
+                                  pianoProvider.stop();
+                                },
+                              ),
+                              const SizedBox(
+                                width: 5,
+                              )
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: GestureDetector(
+                      onVerticalDragUpdate: (DragUpdateDetails details) {
+                        if (PlatformHelper.isDesktop) {
+                          return;
+                        }
+
+                        int keyIndex = (details.globalPosition.dx /
+                                (MediaQuery.of(context).size.width) *
+                                7)
+                            .floor();
+
+                        if (keyIndex != prevValue) {
+                          // FlutterMidi().playMidiNote(
+                          //     midi: PianoKeys.white[keyIndex][1] +
+                          //         PianoKeys.midiOffset);
+                          prevValue = keyIndex;
+                        }
+                      },
+                      onVerticalDragEnd: (DragEndDetails details) =>
+                          {prevValue = -1},
+                      child: Stack(
+                        // alignment: Alignment.topCenter,
+                        children: const [
+                          PianoKeysWhite(),
+                          Positioned(
+                            left: 0,
+                            right: 0,
+                            top: 0,
+                            child: PianoKeysBlack(),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -28,7 +28,7 @@ class Piano {
   static List blackKeyData = [];
   static List blackKeyPlayer = [];
 
-  static List white = [
+  static const List white = [
     [
       ['C'],
       0
@@ -59,7 +59,7 @@ class Piano {
     ]
   ];
 
-  static List black = [
+  static const List black = [
     [
       ['C#', 'Db'],
       1
