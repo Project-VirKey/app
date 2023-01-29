@@ -42,179 +42,172 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        // ignore resizing due to system-ui elements (e.g. on-screen keyboard)
-        resizeToAvoidBottomInset: false,
-        backgroundColor: AppColors.secondary,
-        body: Consumer<RecordingsProvider>(
-          builder: (BuildContext context, RecordingsProvider recordingsProvider,
-                  Widget? child) =>
-              Consumer<SettingsProvider>(
-            builder: (BuildContext context, SettingsProvider settingsProvider,
-                    Widget? child) =>
-                Column(
-              children: <Widget>[
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 11, horizontal: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      AppIcon(
-                        icon: HeroIcons.cog6Tooth,
-                        color: AppColors.dark,
-                        onPressed: () => _settingsOverlay.open(),
-                        size: 30,
-                      ),
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(top: 5),
-                          child: Row(
-                            children: [
-                              if (PlatformHelper.isDesktop)
-                                AnimatedCrossFade(
-                                  crossFadeState:
-                                      recordingsProvider.listExpanded
-                                          ? CrossFadeState.showSecond
-                                          : CrossFadeState.showFirst,
-                                  duration: RecordingsProvider.expandDuration,
-                                  firstChild: const SizedBox(
-                                    width: 0,
-                                    height: 65,
+      // ignore resizing due to system-ui elements (e.g. on-screen keyboard)
+      resizeToAvoidBottomInset: false,
+      backgroundColor: AppColors.secondary,
+      body: Consumer2<RecordingsProvider, SettingsProvider>(
+        builder: (BuildContext context, RecordingsProvider recordingsProvider,
+                SettingsProvider settingsProvider, Widget? child) =>
+            Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 11, horizontal: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  AppIcon(
+                    icon: HeroIcons.cog6Tooth,
+                    color: AppColors.dark,
+                    onPressed: () => _settingsOverlay.open(),
+                    size: 30,
+                  ),
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: Row(
+                        children: [
+                          if (PlatformHelper.isDesktop)
+                            AnimatedCrossFade(
+                              crossFadeState: recordingsProvider.listExpanded
+                                  ? CrossFadeState.showSecond
+                                  : CrossFadeState.showFirst,
+                              duration: RecordingsProvider.expandDuration,
+                              firstChild: const SizedBox(
+                                width: 0,
+                                height: 65,
+                              ),
+                              secondChild: Container(
+                                height: 65,
+                                margin: const EdgeInsets.only(right: 35),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.dark,
+                                    foregroundColor: AppColors.tertiary,
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.all(AppRadius.radius)),
                                   ),
-                                  secondChild: Container(
-                                    height: 65,
-                                    margin: const EdgeInsets.only(right: 35),
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: AppColors.dark,
-                                        foregroundColor: AppColors.tertiary,
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.all(
-                                                AppRadius.radius)),
+                                  onPressed: () {
+                                    context.go('/piano');
+                                    recordingsProvider.pauseRecording();
+                                    // TODO: stop playing recording when changing routes: stop midi playback at correct time
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      SvgPicture.asset(
+                                        'assets/images/VIK_Logo_v2.svg',
+                                        height: 45,
                                       ),
-                                      onPressed: () {
-                                        context.go('/piano');
-                                        recordingsProvider.pauseRecording();
-                                        // TODO: stop playing recording when changing routes: stop midi playback at correct time
-                                      },
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          SvgPicture.asset(
-                                            'assets/images/VIK_Logo_v2.svg',
-                                            height: 45,
-                                          ),
-                                          const Padding(
-                                            padding: EdgeInsets.only(left: 7.5),
-                                            child: AppText(
-                                              text: 'Play',
-                                              family: AppFonts.secondary,
-                                              color: AppColors.secondary,
-                                              letterSpacing: 6,
-                                              size: 28,
-                                            ),
-                                          ),
-                                        ],
+                                      const Padding(
+                                        padding: EdgeInsets.only(left: 7.5),
+                                        child: AppText(
+                                          text: 'Play',
+                                          family: AppFonts.secondary,
+                                          color: AppColors.secondary,
+                                          letterSpacing: 6,
+                                          size: 28,
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                              AnimatedDefaultTextStyle(
-                                style: TextStyle(
-                                    fontSize: recordingsProvider.listExpanded
-                                        ? 40
-                                        : 45),
-                                duration: RecordingsProvider.expandDuration,
-                                child: const Text(
-                                  'ViRKEY',
-                                  style: TextStyle(
-                                    fontFamily: AppFonts.secondary,
-                                    letterSpacing: 4,
-                                    color: AppColors.dark,
-                                    shadows: [AppShadows.title],
+                                    ],
                                   ),
                                 ),
                               ),
-                            ],
+                            ),
+                          AnimatedDefaultTextStyle(
+                            style: TextStyle(
+                                fontSize:
+                                    recordingsProvider.listExpanded ? 40 : 45),
+                            duration: RecordingsProvider.expandDuration,
+                            child: const Text(
+                              'ViRKEY',
+                              style: TextStyle(
+                                fontFamily: AppFonts.secondary,
+                                letterSpacing: 4,
+                                color: AppColors.dark,
+                                shadows: [AppShadows.title],
+                              ),
+                            ),
                           ),
-                        ),
+                        ],
                       ),
-                      Consumer<CloudProvider>(
-                        builder: (BuildContext context,
-                                CloudProvider cloudProvider, Widget? child) =>
-                            AppIcon(
-                          icon: HeroIcons.arrowPathRoundedSquare,
-                          color: AppColors.dark,
-                          onPressed: () {
-                            if (cloudProvider.loggedIn) {
-                              AppConfirmOverlay(
-                                      context: context,
-                                      displayText: 'Synchronise with the Cloud',
-                                      confirmButtonText: 'Synchronise',
-                                      onConfirm: () {
-                                        cloudProvider.synchronise();
-                                      },
-                                      vsync: this)
-                                  .open();
-                            } else {
-                              AppSnackBar(
-                                      message: 'Login to synchronise!',
-                                      context: context,
-                                      vsync: this)
-                                  .open();
-                            }
-                          },
-                          size: 30,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // const TempMidiStatus(),
-                const SizedBox(
-                  height: 20,
-                ),
-                AnimatedCrossFade(
-                  // https://www.geeksforgeeks.org/flutter-animatedcrossfade-widget
-                  crossFadeState: recordingsProvider.listExpanded
-                      ? CrossFadeState.showFirst
-                      : CrossFadeState.showSecond,
-                  duration: RecordingsProvider.expandDuration,
-                  firstChild: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    height: 0,
-                  ),
-                  secondChild: SizedBox(
-                    width: MediaQuery.of(context).size.width,
-                    child: Column(
-                      mainAxisSize: MainAxisSize.max,
-                      children: const [
-                        SizedBox(
-                          height: 40,
-                        ),
-                        PianoPlayButton(),
-                        SizedBox(
-                          height: 25,
-                        ),
-                        AppText(
-                          text: 'Find Device ...',
-                          size: 20,
-                          weight: AppFonts.weightLight,
-                          letterSpacing: 3,
-                        ),
-                        SizedBox(
-                          height: 60,
-                        ),
-                      ],
                     ),
                   ),
-                ),
-                const RecordingsTitleBar(),
-                const Expanded(child: RecordingsList()),
-              ],
+                  Consumer<CloudProvider>(
+                    builder: (BuildContext context, CloudProvider cloudProvider,
+                            Widget? child) =>
+                        AppIcon(
+                      icon: HeroIcons.arrowPathRoundedSquare,
+                      color: AppColors.dark,
+                      onPressed: () {
+                        if (cloudProvider.loggedIn) {
+                          AppConfirmOverlay(
+                                  context: context,
+                                  displayText: 'Synchronise with the Cloud',
+                                  confirmButtonText: 'Synchronise',
+                                  onConfirm: () {
+                                    cloudProvider.synchronise();
+                                  },
+                                  vsync: this)
+                              .open();
+                        } else {
+                          AppSnackBar(
+                                  message: 'Login to synchronise!',
+                                  context: context,
+                                  vsync: this)
+                              .open();
+                        }
+                      },
+                      size: 30,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ));
+            // const TempMidiStatus(),
+            const SizedBox(
+              height: 20,
+            ),
+            AnimatedCrossFade(
+              // https://www.geeksforgeeks.org/flutter-animatedcrossfade-widget
+              crossFadeState: recordingsProvider.listExpanded
+                  ? CrossFadeState.showFirst
+                  : CrossFadeState.showSecond,
+              duration: RecordingsProvider.expandDuration,
+              firstChild: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: 0,
+              ),
+              secondChild: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  children: const [
+                    SizedBox(
+                      height: 40,
+                    ),
+                    PianoPlayButton(),
+                    SizedBox(
+                      height: 25,
+                    ),
+                    AppText(
+                      text: 'Find Device ...',
+                      size: 20,
+                      weight: AppFonts.weightLight,
+                      letterSpacing: 3,
+                    ),
+                    SizedBox(
+                      height: 60,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const RecordingsTitleBar(),
+            const Expanded(child: RecordingsList()),
+          ],
+        ),
+      ),
+    );
   }
 }
