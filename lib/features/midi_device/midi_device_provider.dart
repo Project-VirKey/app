@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
-import 'package:libserialport/libserialport.dart';
+// import 'package:libserialport/libserialport.dart';
 
 class MidiDeviceProvider extends ChangeNotifier {
   MidiCommand midiCommand = MidiCommand();
@@ -19,25 +19,25 @@ class MidiDeviceProvider extends ChangeNotifier {
 
   MidiDeviceProvider() {
     // initialLoad();
-    initialLoad1();
+    // initialLoad1();
   }
 
-  Future<void> initialLoad1() async {
-    final ports = SerialPort.availablePorts;
-    print(ports);
-    final name = ports.first;
-    final port = SerialPort(name);
-
-    if (!port.openReadWrite()) {
-      print(SerialPort.lastError);
-      return;
-    }
-
-    final reader = SerialPortReader(port);
-    reader.stream.listen((data) {
-      print('received: $data');
-    });
-  }
+  // Future<void> initialLoad1() async {
+  //   final ports = SerialPort.availablePorts;
+  //   print(ports);
+  //   final name = ports.first;
+  //   final port = SerialPort(name);
+  //
+  //   if (!port.openReadWrite()) {
+  //     print(SerialPort.lastError);
+  //     return;
+  //   }
+  //
+  //   final reader = SerialPortReader(port);
+  //   reader.stream.listen((data) {
+  //     print('received: $data');
+  //   });
+  // }
 
   Future<void> initialLoad() async {
     midiSetupStream = midiCommand.onMidiSetupChanged?.listen((data) async {

@@ -74,7 +74,7 @@ dependencies:
       url: https://github.com/genit-jp/dart_midi
       path: .
   flutter_midi_command_platform_interface: ^0.4.0
-  flutter_midi_command: ^0.4.9
+  flutter_midi_command: ^0.4.10
   ffmpeg_cli: ^0.1.0
   archive: ^3.3.5
   loading_animation_widget: ^1.2.0+4
