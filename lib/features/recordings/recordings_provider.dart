@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dart_midi/dart_midi.dart';
 import 'package:flutter/material.dart';
@@ -275,6 +276,17 @@ class RecordingsProvider extends ChangeNotifier {
 
     isRecordingPlaying = true;
 
+
+    print('---');
+    print(parsedRecordingMidi!.header.format); // is set
+    print(parsedRecordingMidi!.header.framesPerSecond);
+    print(parsedRecordingMidi!.header.numTracks); // is set
+    print(parsedRecordingMidi!.header.ticksPerBeat); // is set
+    print(parsedRecordingMidi!.header.ticksPerFrame);
+    print(parsedRecordingMidi!.header.timeDivision);
+    print(parsedRecordingMidi!.header);
+    print('---');
+
     midiEventTrackLoop:
     for (List<MidiEvent> track in parsedRecordingMidi!.tracks) {
       for (int i = 0; i < track.length; i++) {
@@ -312,7 +324,12 @@ class RecordingsProvider extends ChangeNotifier {
               midiEvent.noteNumber;
         });
 
+        // TODO: interpret deltaTime correctly
         print(midiEvent.deltaTime);
+        print('-');
+        print(int16bytes(midiEvent.deltaTime));
+        print('###');
+
 
         await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
 
@@ -326,6 +343,12 @@ class RecordingsProvider extends ChangeNotifier {
       }
     }
   }
+
+  int int16bytes(int value) =>
+      (Int8List(2)..buffer.asInt16List()[0] = value).buffer.asByteData().getInt8(0);
+
+  // static List<int> int8ToUint8ListWith4BytesToList(int input) =>
+  //     (Uint8List(4)..buffer.asByteData().setUint8(0, input));
 
   void pauseRecording() {
     isRecordingPlaying = false;
