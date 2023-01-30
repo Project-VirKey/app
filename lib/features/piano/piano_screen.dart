@@ -131,13 +131,8 @@ class _PianoScreenState extends State<PianoScreen>
                                   AppIcon(
                                     icon: HeroIcons.chevronLeft,
                                     color: AppColors.secondary,
-                                    onPressed: () {
-                                      if (pianoProvider.currentOctaveIndex >=
-                                          1) {
-                                        pianoProvider.currentOctaveIndex--;
-                                        pianoProvider.notify();
-                                      }
-                                    },
+                                    onPressed: () =>
+                                        pianoProvider.decrementOctaveIndex(),
                                     size: 30,
                                   ),
                                   SizedBox(
@@ -161,13 +156,8 @@ class _PianoScreenState extends State<PianoScreen>
                                   AppIcon(
                                     icon: HeroIcons.chevronRight,
                                     color: AppColors.secondary,
-                                    onPressed: () {
-                                      if (pianoProvider.currentOctaveIndex <=
-                                          1) {
-                                        pianoProvider.currentOctaveIndex++;
-                                        pianoProvider.notify();
-                                      }
-                                    },
+                                    onPressed: () =>
+                                        pianoProvider.incrementOctaveIndex(),
                                     size: 30,
                                   ),
                                 ],

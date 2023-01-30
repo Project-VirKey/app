@@ -20,6 +20,7 @@ class PianoProvider extends ChangeNotifier {
 
   // qwert    => black keys
   // asdfghj  => white keys
+  // german keyboard layout: Z = Y and Y = Z
   late Map<PhysicalKeyboardKey, dynamic> keyboardKeyPianoKey = {
     PhysicalKeyboardKey.keyQ: () => {keyboardPianoKeyPress(0, true)},
     PhysicalKeyboardKey.keyW: () => {keyboardPianoKeyPress(1, true)},
@@ -33,7 +34,23 @@ class PianoProvider extends ChangeNotifier {
     PhysicalKeyboardKey.keyG: () => {keyboardPianoKeyPress(4)},
     PhysicalKeyboardKey.keyH: () => {keyboardPianoKeyPress(5)},
     PhysicalKeyboardKey.keyJ: () => {keyboardPianoKeyPress(6)},
+    PhysicalKeyboardKey.keyZ: () => decrementOctaveIndex(),
+    PhysicalKeyboardKey.keyX: () => incrementOctaveIndex(),
   };
+
+  void incrementOctaveIndex() {
+    if (currentOctaveIndex <= 1) {
+      currentOctaveIndex++;
+      notifyListeners();
+    }
+  }
+
+  void decrementOctaveIndex() {
+    if (currentOctaveIndex >= 1) {
+      currentOctaveIndex--;
+      notifyListeners();
+    }
+  }
 
   void keyboardPianoKeyPress(int keyIndex, [black = false]) {
     if (isRecording) {
