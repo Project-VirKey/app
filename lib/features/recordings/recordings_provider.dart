@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:dart_midi/dart_midi.dart';
 import 'package:flutter/material.dart';
@@ -260,32 +259,33 @@ class RecordingsProvider extends ChangeNotifier {
       return;
     }
 
-    List<MidiEvent>? midiTrack = parsedRecordingMidi?.tracks
-        .reduce((a, b) => a.length > b.length ? a : b);
-    // TODO: don't reduce by length of tracks, but instead by the highest sum of deltaTime
-    if (midiTrack == null) {
-      return;
-    } else {
-      // TODO: convert deltaTime to milliSeconds
-      // midiTrack.retainWhere((MidiEvent midiEvent) => midiEvent is NoteOnEvent);
-      // print('---');
-      // print(parsedRecordingMidi?.header.ticksPerBeat * midiTrack[0].deltaTime);
-      // print('---');
-      // print(midiTrack.map((e) => e.deltaTime).reduce((int a, int b) => a + b));
-    }
-
     isRecordingPlaying = true;
 
+    // with MIDI files generated through the app:
+    // parsedRecordingMidi!.header.ticksPerBeat -> value is not null
+    // and contains ticks per quarter-note
 
-    print('---');
-    print(parsedRecordingMidi!.header.format); // is set
-    print(parsedRecordingMidi!.header.framesPerSecond);
-    print(parsedRecordingMidi!.header.numTracks); // is set
-    print(parsedRecordingMidi!.header.ticksPerBeat); // is set
-    print(parsedRecordingMidi!.header.ticksPerFrame);
-    print(parsedRecordingMidi!.header.timeDivision);
-    print(parsedRecordingMidi!.header);
-    print('---');
+    // Converting MIDI ticks to actual playback seconds
+    // https://stackoverflow.com/a/54754549/17399214, 30.01.2023
+    // ticks_per_quarter = <PPQ from the header>
+    // µs_per_quarter = <Tempo in latest Set Tempo event>
+    // µs_per_tick = µs_per_quarter / ticks_per_quarter
+    // seconds_per_tick = µs_per_tick / 1.000.000
+    // seconds = ticks * seconds_per_tick
+
+    // milliSeconds = ticks * milliSecondsPerTick
+    // deltaTime -> ticks per quarter-note
+    // conclusion: dart_midi provides an actual deltaTime in milliseconds,
+    // but when calculating manually -> the milliseconds value is slightly higher
+    int ticksPerQuarter = parsedRecordingMidi!.header.ticksPerBeat as int;
+    int microSecondsPerQuarter = 0;
+    double microSecondsPerTick = 0;
+    double milliSecondsPerTick = 0;
+
+    // Standard MIDI-File Format Spec. 1.1
+    // https://www.cs.cmu.edu/~music/cmsip/readings/Standard-MIDI-file-format-updated.pdf, 30.01.2023
+    // description of chunks, chunk types (MThd -> Header, MTrk -> Track)
+    // SetTempoEvent -> 0x FF 51 03 -> Tempo of MIDI Track
 
     midiEventTrackLoop:
     for (List<MidiEvent> track in parsedRecordingMidi!.tracks) {
@@ -297,7 +297,14 @@ class RecordingsProvider extends ChangeNotifier {
           break midiEventTrackLoop;
         }
 
-        // print(midiPlayCurrentEventPos);
+        // dart_midi: SetTempoEvent
+        // https://pub.dev/documentation/dart_midi/latest/midi/SetTempoEvent-class.html, 30.01.2023
+        if (midiEvent is SetTempoEvent) {
+          microSecondsPerQuarter = midiEvent.microsecondsPerBeat;
+          microSecondsPerTick = microSecondsPerQuarter / ticksPerQuarter;
+          milliSecondsPerTick = microSecondsPerTick / 1000;
+        }
+
         if (midiEvent is! NoteOnEvent ||
             (midiPlayCurrentEventPos ?? -1) + 1 > i) {
           continue;
@@ -324,14 +331,9 @@ class RecordingsProvider extends ChangeNotifier {
               midiEvent.noteNumber;
         });
 
-        // TODO: interpret deltaTime correctly
-        print(midiEvent.deltaTime);
-        print('-');
-        print(int16bytes(midiEvent.deltaTime));
-        print('###');
+        int milliSeconds = (midiEvent.deltaTime * milliSecondsPerTick).round();
 
-
-        await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
+        await Future.delayed(Duration(milliseconds: milliSeconds));
 
         if (playedPianoKeyWhite >= 0) {
           Piano.playPianoNote(octaveIndex, playedPianoKeyWhite);
@@ -343,12 +345,6 @@ class RecordingsProvider extends ChangeNotifier {
       }
     }
   }
-
-  int int16bytes(int value) =>
-      (Int8List(2)..buffer.asInt16List()[0] = value).buffer.asByteData().getInt8(0);
-
-  // static List<int> int8ToUint8ListWith4BytesToList(int input) =>
-  //     (Uint8List(4)..buffer.asByteData().setUint8(0, input));
 
   void pauseRecording() {
     isRecordingPlaying = false;
