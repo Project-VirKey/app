@@ -268,8 +268,6 @@ class Piano {
       return;
     }
 
-    List<NoteOnEvent> noteOnEvents =
-        midiFile.tracks[1].whereType<NoteOnEvent>().toList();
     int previousDeltaTime = 0;
     int index = 0;
 
@@ -277,76 +275,78 @@ class Piano {
     int microSecondsPerQuarter = 0;
     double microSecondsPerTick = 0;
     double milliSecondsPerTick = 0;
-    // loop for midiEvent
 
-    for (int i = 0; i < midiFile.tracks[1].length; i++) {
-      MidiEvent midiEvent = midiFile.tracks[1][i];
+    for (List<MidiEvent> track in midiFile.tracks) {
+      for (int i = 0; i < track.length; i++) {
+        MidiEvent midiEvent = track[i];
 
-      if (midiEvent is SetTempoEvent) {
-        microSecondsPerQuarter = midiEvent.microsecondsPerBeat;
-        microSecondsPerTick = microSecondsPerQuarter / ticksPerQuarter;
-        milliSecondsPerTick = microSecondsPerTick / 1000;
-      }
-
-      if (midiEvent is! NoteOnEvent) {
-        continue;
-      }
-
-      int octaveIndex = Piano.getOctaveIndexFromMidiNote(midiEvent.noteNumber);
-
-      int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
-          pianoKeyWhite[1] +
-              Piano.midiOffset +
-              (octaveIndex * Piano.keysPerOctave) ==
-          midiEvent.noteNumber);
-
-      int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
-        if (pianoKeyBlack.isEmpty) {
-          return false;
+        if (midiEvent is SetTempoEvent) {
+          microSecondsPerQuarter = midiEvent.microsecondsPerBeat;
+          microSecondsPerTick = microSecondsPerQuarter / ticksPerQuarter;
+          milliSecondsPerTick = microSecondsPerTick / 1000;
         }
-        return (pianoKeyBlack[1] +
+
+        if (midiEvent is! NoteOnEvent) {
+          continue;
+        }
+
+        int octaveIndex =
+            Piano.getOctaveIndexFromMidiNote(midiEvent.noteNumber);
+
+        int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
+            pianoKeyWhite[1] +
                 Piano.midiOffset +
-                (octaveIndex * Piano.keysPerOctave)) ==
-            midiEvent.noteNumber;
-      });
+                (octaveIndex * Piano.keysPerOctave) ==
+            midiEvent.noteNumber);
 
-      if (playedPianoKeyWhite >= 0 || playedPianoKeyBlack >= 0) {
-        previousDeltaTime +=
-            (midiEvent.deltaTime * milliSecondsPerTick).round();
-        index++;
-      }
+        int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
+          if (pianoKeyBlack.isEmpty) {
+            return false;
+          }
+          return (pianoKeyBlack[1] +
+                  Piano.midiOffset +
+                  (octaveIndex * Piano.keysPerOctave)) ==
+              midiEvent.noteNumber;
+        });
 
-      int neededEmptyBytes =
-          (sampleRate * 2 * (previousDeltaTime / 1000)).round();
-      if (neededEmptyBytes.isOdd) {
-        neededEmptyBytes--;
-      }
-      List<int> emptyBytes = List.filled(neededEmptyBytes, 0);
+        if (playedPianoKeyWhite >= 0 || playedPianoKeyBlack >= 0) {
+          previousDeltaTime +=
+              (midiEvent.deltaTime * milliSecondsPerTick).round();
+          index++;
+        }
 
-      if (playedPianoKeyWhite >= 0) {
-        File wavFile =
-            File('$tempDirPath${Platform.pathSeparator}temp_white_$index.wav');
-        wavFile.writeAsBytesSync(wrapAudioDataInWavFileFormat(
-            Uint8List.fromList([
-          ...emptyBytes,
-          ...whiteKeyData[octaveIndex][playedPianoKeyWhite]
-        ])));
-        tempFilePaths.add(wavFile.path);
-      }
+        int neededEmptyBytes =
+            (sampleRate * 2 * (previousDeltaTime / 1000)).round();
+        if (neededEmptyBytes.isOdd) {
+          neededEmptyBytes--;
+        }
+        List<int> emptyBytes = List.filled(neededEmptyBytes, 0);
 
-      if (playedPianoKeyBlack >= 0) {
-        File wavFile =
-            File('$tempDirPath${Platform.pathSeparator}temp_black_$index.wav');
-        wavFile.writeAsBytesSync(wrapAudioDataInWavFileFormat(
-            Uint8List.fromList([
-          ...emptyBytes,
-          ...blackKeyData[octaveIndex][playedPianoKeyBlack]
-        ])));
-        tempFilePaths.add(wavFile.path);
+        if (playedPianoKeyWhite >= 0) {
+          File wavFile = File(
+              '$tempDirPath${Platform.pathSeparator}temp_white_$index.wav');
+          wavFile.writeAsBytesSync(wrapAudioDataInWavFileFormat(
+              Uint8List.fromList([
+            ...emptyBytes,
+            ...whiteKeyData[octaveIndex][playedPianoKeyWhite]
+          ])));
+          tempFilePaths.add(wavFile.path);
+        }
+
+        if (playedPianoKeyBlack >= 0) {
+          File wavFile = File(
+              '$tempDirPath${Platform.pathSeparator}temp_black_$index.wav');
+          wavFile.writeAsBytesSync(wrapAudioDataInWavFileFormat(
+              Uint8List.fromList([
+            ...emptyBytes,
+            ...blackKeyData[octaveIndex][playedPianoKeyBlack]
+          ])));
+          tempFilePaths.add(wavFile.path);
+        }
       }
     }
 
-    print(destinationPath);
+    // print(destinationPath);
     await combineAudioFiles(destinationPath, tempFilePaths);
   }
 
@@ -366,7 +366,13 @@ class Piano {
       outputFilepath: outputFilepath,
     );
 
-    print(ffmpegCommand.toCli());
+    // print(ffmpegCommand.toCli());
+
+    File outputFile = File(outputFilepath);
+    if (outputFile.existsSync()) {
+      outputFile.deleteSync();
+    }
+
     await Ffmpeg().run(ffmpegCommand);
   }
 }
@@ -380,18 +386,11 @@ class CustomAMixFilter implements Filter {
 
   @override
   String toCli() {
-    // FFMPEG amix filter volume issue with inputs of different duration
-    // https://stackoverflow.com/a/38714779/17399214, 31.01.2023
-    // solution: add dynaudnorm filter after the amix filter
-    // ffmpeg dynaudnorm filter (Dynamic Audio Normalizer)
-    // https://ffmpeg.org/ffmpeg-filters.html#dynaudnorm, 31.01.2023
-    // TODO: test dynaudnorm filter
-
     // ffmpeg amix filter: for combining all generated audio files to one
     // duration=longest -> resulting audio file has the length of the longest audio file
-    // normalize -> is active by default: normalizes the audio inputs
+    // normalize=0 -> is active by default: normalizes the audio inputs; deactivated: =0
     // https://ffmpeg.org/ffmpeg-filters.html#amix, 30.01.2023
-    return 'amix=inputs=$inputCount:duration=longest,dynaudnorm';
+    return 'amix=inputs=$inputCount:duration=longest:normalize=0';
   }
 }
 
