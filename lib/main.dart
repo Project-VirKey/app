@@ -53,7 +53,14 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ChangeNotifierProvider(create: (_) => RecordingsProvider()),
-      ChangeNotifierProvider(create: (_) => PianoProvider()),
+      ChangeNotifierProxyProvider<SettingsProvider, PianoProvider>(
+          create: (BuildContext context) => PianoProvider(
+              Provider.of<SettingsProvider>(context, listen: false)),
+          update: (BuildContext context, SettingsProvider settingsProvider,
+              PianoProvider? pianoProvider) {
+            pianoProvider?.setSettingsProvider(settingsProvider);
+            return pianoProvider ?? PianoProvider(settingsProvider);
+          }),
       ChangeNotifierProvider(create: (_) => MidiDeviceProvider()),
       ChangeNotifierProxyProvider<SettingsProvider, CloudProvider>(
           create: (BuildContext context) => CloudProvider(

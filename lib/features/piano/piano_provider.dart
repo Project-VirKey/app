@@ -8,6 +8,7 @@ import 'package:just_audio/just_audio.dart';
 import 'package:midi_util/midi_util.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/features/piano/piano.dart';
+import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/timestamp.dart';
 
@@ -116,8 +117,15 @@ class PianoProvider extends ChangeNotifier {
 
   bool get isSomethingPlaying => isPlaybackPlaying || isVisualizeMidiPlaying;
 
-  PianoProvider() {
+  PianoProvider(this.settingsProvider) {
     displayTime = _resetDisplayTime;
+  }
+
+  SettingsProvider settingsProvider;
+
+  setSettingsProvider(SettingsProvider sP) {
+    settingsProvider = sP;
+    notifyListeners();
   }
 
   void notify() {
@@ -285,7 +293,27 @@ class PianoProvider extends ChangeNotifier {
       AppFileSystem.savePlaybackFile(File(playbackPath!), recordingTitle);
     }
 
-    createMidiFile();
+    String midiFilePath =
+        '${AppFileSystem.recordingsFolderPath}$recordingTitle.mid';
+
+    createMidiFile(midiFilePath);
+
+    // TODO: test automatic wav/(wav+playback) export
+    if (settingsProvider.settings.defaultSavedFiles.wav) {
+      String exportRecordingPath =
+          '${AppFileSystem.recordingsFolderPath}${recordingTitle}_Export.wav';
+
+      Piano.midiToWav(midiFilePath, exportRecordingPath);
+    }
+
+    if (settingsProvider.settings.defaultSavedFiles.wavAndPlayback &&
+        playbackPath != null) {
+      String exportRecordingPlaybackPath =
+          '${AppFileSystem.recordingsFolderPath}${recordingTitle}_Export-Playback.wav';
+
+      await Piano.midiToWav(
+          midiFilePath, exportRecordingPlaybackPath, playbackPath);
+    }
   }
 
   void recordingAddNote(int octaveIndex, int midiNote) {
@@ -418,7 +446,7 @@ class PianoProvider extends ChangeNotifier {
 
   // ----------------------------------------------------------------
 
-  void createMidiFile() {
+  void createMidiFile(String midiFilePath) {
     int track = 0;
     int channel = 0;
     num time = 0; //    # In beats
@@ -451,8 +479,7 @@ class PianoProvider extends ChangeNotifier {
           volume: volume);
     });
 
-    File outputFile =
-        File('${AppFileSystem.recordingsFolderPath}$recordingTitle.mid');
+    File outputFile = File(midiFilePath);
 
     midiFile.writeFile(outputFile);
   }
