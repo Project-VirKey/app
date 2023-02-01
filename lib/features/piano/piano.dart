@@ -256,8 +256,8 @@ class Piano {
 
   static MidiParser midiParser = MidiParser();
 
-  static Future<void> midiToWav(
-      String midiFilePath, String destinationPath) async {
+  static Future<void> midiToWav(String midiFilePath, String destinationPath,
+      [String? playbackPath]) async {
     MidiFile midiFile = midiParser.parseMidiFromFile(File(midiFilePath));
 
     String tempDirPath = (await getTemporaryDirectory()).path;
@@ -347,6 +347,10 @@ class Piano {
     }
 
     // print(destinationPath);
+    if (playbackPath != null) {
+      tempFilePaths.add(playbackPath);
+    }
+
     await combineAudioFiles(destinationPath, tempFilePaths);
   }
 
@@ -369,8 +373,8 @@ class Piano {
     // print(ffmpegCommand.toCli());
 
     File outputFile = File(outputFilepath);
-    if (outputFile.existsSync()) {
-      outputFile.deleteSync();
+    if (await outputFile.exists()) {
+      await outputFile.delete();
     }
 
     await Ffmpeg().run(ffmpegCommand);

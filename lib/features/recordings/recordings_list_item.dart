@@ -145,7 +145,11 @@ class RecordingsListItem extends StatelessWidget {
                         ),
                         AppSlider(
                           value: recordingsProvider.relativePlayingPosition,
-                          onChanged: (value) {},
+                          onChanged: (value) => print('onChanged $value'),
+                          onChangeStart: (value) =>
+                              print('onChangeStart $value'),
+                          onChangedEnd: (value) =>
+                              print('onChangedEnd $value'),
                         ),
                         PropertyDescriptionActionCombination(
                           title: '',
@@ -330,20 +334,13 @@ class RecordingsListItem extends StatelessWidget {
                               icon: HeroIcons.arrowUpTray,
                               color: AppColors.dark,
                               onPressed: () async {
-                                String exportRecordingPath =
-                                    '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
-
                                 String exportRecordingPlaybackPath =
                                     '${AppFileSystem.recordingsFolderPath}${recording.title}_Export-Playback.wav';
 
                                 await Piano.midiToWav(
-                                    recording.path, exportRecordingPath);
-
-                                await Piano.combineAudioFiles(
-                                    exportRecordingPlaybackPath, [
-                                  exportRecordingPath,
-                                  recording.playbackPath!
-                                ]);
+                                    recording.path,
+                                    exportRecordingPlaybackPath,
+                                    recording.playbackPath!);
 
                                 AppFileSystem.exportFile(
                                     path: exportRecordingPlaybackPath,
