@@ -161,38 +161,35 @@ class PianoKeyWhite extends StatelessWidget {
             child: Consumer<PianoProvider>(
               builder: (BuildContext context, PianoProvider pianoProvider,
                       Widget? child) =>
-                  GestureDetector(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: AppColors.dark,
-                    backgroundColor: pianoProvider.pianoWhiteKeyColor(index),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: AppRadius.radius,
-                        bottomRight: AppRadius.radius,
-                        topLeft: topLeft,
-                        topRight: topRight,
-                      ),
+                  ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: AppColors.dark,
+                  backgroundColor: pianoProvider.pianoWhiteKeyColor(index),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: AppRadius.radius,
+                      bottomRight: AppRadius.radius,
+                      topLeft: topLeft,
+                      topRight: topRight,
                     ),
                   ),
-                  onPressed: () async {
-                    if (pianoProvider.isRecording) {
-                      pianoProvider.recordingAddNote(
-                          pianoProvider.currentOctaveIndex, midiNoteNumber);
-                    }
+                ),
+                onPressed: () async {
+                  if (pianoProvider.isRecording) {
+                    pianoProvider.recordingAddNote(
+                        pianoProvider.currentOctaveIndex, midiNoteNumber);
+                  }
 
-                    Piano.playPianoNote(
-                        pianoProvider.currentOctaveIndex, index);
-                  },
-                  child: Container(
-                    alignment: Alignment.bottomCenter,
-                    padding: const EdgeInsets.only(bottom: 25),
-                    child: AppText(
-                      text: name,
-                      size: parentWidth * .04,
-                      color: pianoProvider.pianoWhiteKeyTextColor(index),
-                      family: AppFonts.secondary,
-                    ),
+                  Piano.playPianoNote(pianoProvider.currentOctaveIndex, index);
+                },
+                child: Container(
+                  alignment: Alignment.bottomCenter,
+                  padding: const EdgeInsets.only(bottom: 25),
+                  child: AppText(
+                    text: name,
+                    size: parentWidth * .04,
+                    color: pianoProvider.pianoWhiteKeyTextColor(index),
+                    family: AppFonts.secondary,
                   ),
                 ),
               ),
@@ -239,51 +236,49 @@ class PianoKeyBlack extends StatelessWidget {
         child: Consumer<PianoProvider>(
           builder: (BuildContext context, PianoProvider pianoProvider,
                   Widget? child) =>
-              GestureDetector(
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.zero,
-                foregroundColor: AppColors.white,
-                backgroundColor: pianoProvider.pianoBlackKeyColor(index),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: AppRadius.radius,
-                    bottomRight: AppRadius.radius,
-                  ),
+              ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.zero,
+              foregroundColor: AppColors.white,
+              backgroundColor: pianoProvider.pianoBlackKeyColor(index),
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: AppRadius.radius,
+                  bottomRight: AppRadius.radius,
                 ),
               ),
-              onPressed: () {
-                if (pianoProvider.isRecording) {
-                  pianoProvider.recordingAddNote(
-                      pianoProvider.currentOctaveIndex, midiNoteNumber);
-                }
+            ),
+            onPressed: () {
+              if (pianoProvider.isRecording) {
+                pianoProvider.recordingAddNote(
+                    pianoProvider.currentOctaveIndex, midiNoteNumber);
+              }
 
-                Piano.playPianoNote(
-                    pianoProvider.currentOctaveIndex, index, true);
-              },
-              child: Container(
-                alignment: Alignment.bottomCenter,
-                padding: const EdgeInsets.only(bottom: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    AppText(
-                      text: name,
-                      size: parentWidth * .045,
-                      color: pianoProvider.pianoBlackKeyTextColor(index),
-                      family: AppFonts.secondary,
-                    ),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    AppText(
-                      text: secondName,
-                      size: parentWidth * .033,
-                      color: pianoProvider.pianoBlackKeyTextColor(index),
-                      family: AppFonts.secondary,
-                    ),
-                  ],
-                ),
+              Piano.playPianoNote(
+                  pianoProvider.currentOctaveIndex, index, true);
+            },
+            child: Container(
+              alignment: Alignment.bottomCenter,
+              padding: const EdgeInsets.only(bottom: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  AppText(
+                    text: name,
+                    size: parentWidth * .045,
+                    color: pianoProvider.pianoBlackKeyTextColor(index),
+                    family: AppFonts.secondary,
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  AppText(
+                    text: secondName,
+                    size: parentWidth * .033,
+                    color: pianoProvider.pianoBlackKeyTextColor(index),
+                    family: AppFonts.secondary,
+                  ),
+                ],
               ),
             ),
           ),

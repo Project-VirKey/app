@@ -271,20 +271,9 @@ class Piano {
     int previousDeltaTime = 0;
     int index = 0;
 
-    int ticksPerQuarter = midiFile.header.ticksPerBeat as int;
-    int microSecondsPerQuarter = 0;
-    double microSecondsPerTick = 0;
-    double milliSecondsPerTick = 0;
-
     for (List<MidiEvent> track in midiFile.tracks) {
       for (int i = 0; i < track.length; i++) {
         MidiEvent midiEvent = track[i];
-
-        if (midiEvent is SetTempoEvent) {
-          microSecondsPerQuarter = midiEvent.microsecondsPerBeat;
-          microSecondsPerTick = microSecondsPerQuarter / ticksPerQuarter;
-          milliSecondsPerTick = microSecondsPerTick / 1000;
-        }
 
         if (midiEvent is! NoteOnEvent) {
           continue;
@@ -310,16 +299,21 @@ class Piano {
         });
 
         if (playedPianoKeyWhite >= 0 || playedPianoKeyBlack >= 0) {
-          previousDeltaTime +=
-              (midiEvent.deltaTime * milliSecondsPerTick).round();
+          previousDeltaTime += midiEvent.deltaTime;
           index++;
         }
 
         int neededEmptyBytes =
-            (sampleRate * 2 * (previousDeltaTime / 1000)).round();
+            (sampleRate * (previousDeltaTime / 1000)).round();
         if (neededEmptyBytes.isOdd) {
           neededEmptyBytes--;
         }
+
+        if (playedPianoKeyWhite >= 0 || playedPianoKeyBlack >= 0) {
+          // deltaTime + duration => time position of the NoteOffEvent
+          previousDeltaTime += midiEvent.duration;
+        }
+
         List<int> emptyBytes = List.filled(neededEmptyBytes, 0);
 
         if (playedPianoKeyWhite >= 0) {
@@ -346,7 +340,6 @@ class Piano {
       }
     }
 
-    // print(destinationPath);
     if (playbackPath != null) {
       tempFilePaths.add(playbackPath);
     }
