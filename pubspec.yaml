@@ -143,8 +143,8 @@ flutter_icons:
     generate: false
   windows:
     generate: true
-    image_path: assets/icons/icon_border.png
+    image_path: assets/icons/icon_border_round.png
     icon_size: 256
   macos:
     generate: true
-    image_path: assets/icons/icon_border.png
+    image_path: assets/icons/icon_border_round_small.png

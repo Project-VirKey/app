@@ -9,5 +9,5 @@ create-dmg \
   --icon "VirKey.app" 140 200 \
   --icon-size 100 \
   --app-drop-link 433 200 \
-  "VirKey.dmg" \
+  "VirKey Installer.dmg" \
   "VirKey.app"
