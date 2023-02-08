@@ -254,6 +254,30 @@ class Piano {
     }
   }
 
+  static int getPianoKeyWhiteIndex(int midiNote, [int octaveIndex = -1]) {
+    if (octaveIndex == -1) {
+      octaveIndex = getOctaveIndexFromMidiNote(midiNote);
+    }
+
+    return white.indexWhere((pianoKeyWhite) =>
+        pianoKeyWhite[1] + midiOffset + (octaveIndex * keysPerOctave) ==
+        midiNote);
+  }
+
+  static int getPianoKeyBlackIndex(int midiNote, [int octaveIndex = -1]) {
+    if (octaveIndex == -1) {
+      octaveIndex = getOctaveIndexFromMidiNote(midiNote);
+    }
+
+    return black.indexWhere((pianoKeyBlack) {
+      if (pianoKeyBlack.isEmpty) {
+        return false;
+      }
+      return (pianoKeyBlack[1] + midiOffset + (octaveIndex * keysPerOctave)) ==
+          midiNote;
+    });
+  }
+
   static MidiParser midiParser = MidiParser();
 
   static Future<void> midiToWav(String midiFilePath, String destinationPath,
@@ -282,21 +306,11 @@ class Piano {
         int octaveIndex =
             Piano.getOctaveIndexFromMidiNote(midiEvent.noteNumber);
 
-        int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
-            pianoKeyWhite[1] +
-                Piano.midiOffset +
-                (octaveIndex * Piano.keysPerOctave) ==
-            midiEvent.noteNumber);
+        int playedPianoKeyWhite =
+            getPianoKeyWhiteIndex(midiEvent.noteNumber, octaveIndex);
 
-        int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
-          if (pianoKeyBlack.isEmpty) {
-            return false;
-          }
-          return (pianoKeyBlack[1] +
-                  Piano.midiOffset +
-                  (octaveIndex * Piano.keysPerOctave)) ==
-              midiEvent.noteNumber;
-        });
+        int playedPianoKeyBlack =
+            getPianoKeyBlackIndex(midiEvent.noteNumber, octaveIndex);
 
         if (playedPianoKeyWhite >= 0 || playedPianoKeyBlack >= 0) {
           previousDeltaTime += midiEvent.deltaTime;

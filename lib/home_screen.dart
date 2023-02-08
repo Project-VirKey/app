@@ -3,7 +3,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
-import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
@@ -11,6 +10,7 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/constants/shadows.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
+import 'package:virkey/features/midi_device/midi_device_provider.dart';
 import 'package:virkey/features/midi_device/temp_midi_status.dart';
 import 'package:virkey/features/piano/piano_play_button.dart';
 import 'package:virkey/features/recordings/recordings_list.dart';
@@ -164,7 +164,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ],
               ),
             ),
-            // const TempMidiStatus(),
+            const TempMidiStatus(),
             const SizedBox(
               height: 20,
             ),
@@ -182,21 +182,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 width: MediaQuery.of(context).size.width,
                 child: Column(
                   mainAxisSize: MainAxisSize.max,
-                  children: const [
-                    SizedBox(
+                  children: [
+                    const SizedBox(
                       height: 40,
                     ),
-                    PianoPlayButton(),
-                    SizedBox(
+                    const PianoPlayButton(),
+                    const SizedBox(
                       height: 25,
                     ),
                     AppText(
-                      text: 'Find Device ...',
+                      text: Provider.of<MidiDeviceProvider>(context).connected
+                          ? 'Device Connected'
+                          : 'Find Device ...',
                       size: 20,
                       weight: AppFonts.weightLight,
                       letterSpacing: 3,
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 60,
                     ),
                   ],

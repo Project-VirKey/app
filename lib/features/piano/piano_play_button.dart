@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
+import 'package:virkey/features/midi_device/midi_device_provider.dart';
 
 class PianoPlayButton extends StatefulWidget {
   const PianoPlayButton({Key? key}) : super(key: key);
@@ -20,8 +22,7 @@ class _PianoPlayButtonState extends State<PianoPlayButton>
   // glow animation
   // adapted from https://mightytechno.com/flutter-glow-pulse-animation, 01.01.2023
   late final AnimationController _animationController =
-      AnimationController(vsync: this, duration: const Duration(seconds: 1))
-        ..repeat(reverse: true);
+      AnimationController(vsync: this, duration: const Duration(seconds: 1));
   late final Animation _animation =
       Tween(begin: 2.0, end: 6.0).animate(_animationController);
 
@@ -42,15 +43,26 @@ class _PianoPlayButtonState extends State<PianoPlayButton>
 
   @override
   Widget build(BuildContext context) {
+    if (Provider.of<MidiDeviceProvider>(context).connected) {
+      if (!_animationController.isAnimating) {
+        _animationController.repeat(reverse: true);
+      }
+    } else {
+      if (_animationController.isAnimating) {
+        _animationController.reset();
+      }
+    }
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.all(AppRadius.radius),
         boxShadow: [
-          BoxShadow(
-            color: AppColors.primary,
-            blurRadius: _animation.value,
-            spreadRadius: _animation.value,
-          ),
+          if (_animationController.isAnimating)
+            BoxShadow(
+              color: AppColors.primary,
+              blurRadius: _animation.value,
+              spreadRadius: _animation.value,
+            ),
         ],
       ),
       child: SizedBox(
