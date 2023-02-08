@@ -18,8 +18,6 @@ class AppSlider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // print(value);
-
     return SliderTheme(
       data: SliderTheme.of(context).copyWith(
           thumbShape: CircleSliderThumb(thumbRadius: 18, sliderValue: value),
@@ -81,12 +79,12 @@ class CircleSliderThumb extends SliderComponentShape {
     final Canvas canvas = context.canvas;
 
     // outer path
-    final outerPathColor = Paint()
+    final Paint outerPathColor = Paint()
       ..color = AppColors.dark
       ..style = PaintingStyle.stroke
       ..strokeWidth = 3;
 
-    var outerPath = Path();
+    Path outerPath = Path();
 
     outerPath.addOval(Rect.fromCircle(
       center: center,
@@ -97,11 +95,11 @@ class CircleSliderThumb extends SliderComponentShape {
     canvas.drawPath(outerPath, outerPathColor);
 
     // inner Path
-    final innerPathColor = Paint()
+    Paint innerPathColor = Paint()
       ..color = AppColors.secondary
       ..style = PaintingStyle.fill;
 
-    var innerPath = Path();
+    Path innerPath = Path();
 
     innerPath.addOval(Rect.fromCircle(
       center: center,

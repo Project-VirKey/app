@@ -19,15 +19,16 @@ class PianoProvider extends ChangeNotifier {
 
   List pianoKeysBlack = List.generate(6, (i) => i == 2 ? null : [false, false]);
 
-  // qwert    => black keys
+  // wetzu    => black keys
   // asdfghj  => white keys
+  // yx       => change octave
   // german keyboard layout: Z = Y and Y = Z
   late Map<PhysicalKeyboardKey, dynamic> keyboardKeyPianoKey = {
-    PhysicalKeyboardKey.keyQ: () => {keyboardPianoKeyPress(0, true)},
-    PhysicalKeyboardKey.keyW: () => {keyboardPianoKeyPress(1, true)},
-    PhysicalKeyboardKey.keyE: () => {keyboardPianoKeyPress(3, true)},
-    PhysicalKeyboardKey.keyR: () => {keyboardPianoKeyPress(4, true)},
-    PhysicalKeyboardKey.keyT: () => {keyboardPianoKeyPress(5, true)},
+    PhysicalKeyboardKey.keyW: () => {keyboardPianoKeyPress(0, true)},
+    PhysicalKeyboardKey.keyE: () => {keyboardPianoKeyPress(1, true)},
+    PhysicalKeyboardKey.keyT: () => {keyboardPianoKeyPress(3, true)},
+    PhysicalKeyboardKey.keyY: () => {keyboardPianoKeyPress(4, true)},
+    PhysicalKeyboardKey.keyU: () => {keyboardPianoKeyPress(5, true)},
     PhysicalKeyboardKey.keyA: () => {keyboardPianoKeyPress(0)},
     PhysicalKeyboardKey.keyS: () => {keyboardPianoKeyPress(1)},
     PhysicalKeyboardKey.keyD: () => {keyboardPianoKeyPress(2)},
@@ -298,7 +299,6 @@ class PianoProvider extends ChangeNotifier {
 
     createMidiFile(midiFilePath);
 
-    // TODO: test automatic wav/(wav+playback) export
     if (settingsProvider.settings.defaultSavedFiles.wav) {
       String exportRecordingPath =
           '${AppFileSystem.recordingsFolderPath}${recordingTitle}_Export.wav';
@@ -362,7 +362,6 @@ class PianoProvider extends ChangeNotifier {
   // ----------------------------------------------------------------
 
   Future<void> startVisualizeMidi() async {
-    // TODO: fix for displaying on the correct keys & the correct octave
     if (!isVisualizeMidiActive || visualizeMidiPath == null) {
       return;
     }
@@ -407,10 +406,21 @@ class PianoProvider extends ChangeNotifier {
               midiEvent.noteNumber;
         });
 
-        // TODO: interpret deltaTime correctly
-        print(playedPianoKeyWhite);
+        await Future.delayed(Duration(milliseconds: midiEvent.deltaTime - 100));
 
-        await Future.delayed(Duration(milliseconds: midiEvent.deltaTime));
+        // reset key 50ms before setting to blue again (otherwise the key would constantly be blue)
+
+        if (playedPianoKeyWhite >= 0) {
+          pianoKeysWhite[playedPianoKeyWhite][0] = false;
+          notifyListeners();
+        }
+
+        if (playedPianoKeyBlack >= 0) {
+          pianoKeysBlack[playedPianoKeyBlack][0] = false;
+          notifyListeners();
+        }
+
+        await Future.delayed(const Duration(milliseconds: 50));
 
         if (playedPianoKeyWhite >= 0) {
           currentOctaveIndex = octaveIndex;
