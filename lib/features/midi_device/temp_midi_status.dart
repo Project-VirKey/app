@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_midi_command/flutter_midi_command.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +28,7 @@ class TempMidiStatus extends StatelessWidget {
               AppButton(
                   appText: const AppText(text: 'Connect First Device'),
                   onPressed: () {
-                    midiDeviceProvider.connectToFirstDevice();
+                    midiDeviceProvider.connectToDevice();
                   }),
               AppButton(
                   appText: const AppText(text: 'Disconnect'),
@@ -62,10 +64,8 @@ class TempMidiStatus extends StatelessWidget {
               SingleChildScrollView(
                 child: Column(
                   children: [
-                    for (MidiPacket midiPacket in midiDeviceProvider.midiEvents)
-                      AppText(
-                          text:
-                              'Timestamp: ${midiPacket.timestamp} | Device Name: ${midiPacket.device.name} | Data: ${midiPacket.data.toString()}'),
+                    for (Uint8List data in midiDeviceProvider.midiEvents)
+                      AppText(text: data.toString()),
                   ],
                 ),
               ),

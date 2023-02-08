@@ -390,21 +390,11 @@ class PianoProvider extends ChangeNotifier {
         int octaveIndex =
             Piano.getOctaveIndexFromMidiNote(midiEvent.noteNumber);
 
-        int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
-            pianoKeyWhite[1] +
-                Piano.midiOffset +
-                (octaveIndex * Piano.keysPerOctave) ==
-            midiEvent.noteNumber);
+        int playedPianoKeyWhite =
+            Piano.getPianoKeyWhiteIndex(midiEvent.noteNumber, octaveIndex);
 
-        int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
-          if (pianoKeyBlack.isEmpty) {
-            return false;
-          }
-          return (pianoKeyBlack[1] +
-                  Piano.midiOffset +
-                  (octaveIndex * Piano.keysPerOctave)) ==
-              midiEvent.noteNumber;
-        });
+        int playedPianoKeyBlack =
+            Piano.getPianoKeyBlackIndex(midiEvent.noteNumber, octaveIndex);
 
         await Future.delayed(Duration(milliseconds: midiEvent.deltaTime - 100));
 
