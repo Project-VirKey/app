@@ -8,6 +8,7 @@ import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/features/midi_device/midi_device_provider.dart';
 import 'package:virkey/features/piano/import_overlay.dart';
 import 'package:virkey/features/piano/piano_key.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
@@ -124,6 +125,22 @@ class _PianoScreenState extends State<PianoScreen>
                                 color: AppColors.secondary,
                                 onPressed: () => _settingsOverlay.open(),
                                 size: 30,
+                              ),
+                              // Selector -> only listens to one value of MidiDeviceProvider
+                              Selector<MidiDeviceProvider, bool>(
+                                selector: (_, midiDeviceProvider) =>
+                                    midiDeviceProvider.connected,
+                                builder: (_, midiDeviceConnected, __) {
+                                  return AppIcon(
+                                    icon: midiDeviceConnected
+                                        ? Icons.usb
+                                        : Icons.usb_off,
+                                    color: midiDeviceConnected
+                                        ? AppColors.primary
+                                        : AppColors.secondary,
+                                    size: 30,
+                                  );
+                                },
                               ),
                               Row(
                                 mainAxisSize: MainAxisSize.min,
