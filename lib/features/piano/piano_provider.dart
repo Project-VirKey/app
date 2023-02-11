@@ -310,7 +310,11 @@ class PianoProvider extends ChangeNotifier {
           '${AppFileSystem.recordingsFolderPath}${recordingTitle}_Export-Playback.wav';
 
       await Piano.midiToWav(
-          midiFilePath, exportRecordingPlaybackPath, playbackPath);
+          midiFilePath,
+          exportRecordingPlaybackPath,
+          playbackPath,
+          settingsProvider.settings.audioVolume.soundLibrary,
+          settingsProvider.settings.audioVolume.audioPlayback);
     }
   }
 
