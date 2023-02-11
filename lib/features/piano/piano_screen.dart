@@ -130,17 +130,16 @@ class _PianoScreenState extends State<PianoScreen>
                               Selector<MidiDeviceProvider, bool>(
                                 selector: (_, midiDeviceProvider) =>
                                     midiDeviceProvider.connected,
-                                builder: (_, midiDeviceConnected, __) {
-                                  return AppIcon(
-                                    icon: midiDeviceConnected
-                                        ? Icons.usb
-                                        : Icons.usb_off,
-                                    color: midiDeviceConnected
-                                        ? AppColors.primary
-                                        : AppColors.secondary,
-                                    size: 30,
-                                  );
-                                },
+                                builder: (_, midiDeviceConnected, __) =>
+                                    AppIcon(
+                                  icon: midiDeviceConnected
+                                      ? Icons.usb
+                                      : Icons.usb_off,
+                                  color: midiDeviceConnected
+                                      ? AppColors.primary
+                                      : AppColors.secondary,
+                                  size: 30,
+                                ),
                               ),
                               Row(
                                 mainAxisSize: MainAxisSize.min,

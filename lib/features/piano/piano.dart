@@ -300,12 +300,15 @@ class Piano {
   static MidiParser midiParser = MidiParser();
 
   static Future<void> midiToWav(String midiFilePath, String destinationPath,
-      [String? playbackPath]) async {
+      [String? playbackPath,
+      int? soundLibraryVolume,
+      int? audioPlaybackVolume]) async {
     MidiFile midiFile = midiParser.parseMidiFromFile(File(midiFilePath));
 
     String tempDirPath = (await getTemporaryDirectory()).path;
 
     List<String> tempFilePaths = [];
+    List<double> weights = [];
 
     if (midiFile.tracks.length < 2 || midiFile.header.ticksPerBeat == null) {
       return;
@@ -373,25 +376,45 @@ class Piano {
       }
     }
 
-    if (playbackPath != null) {
+    if (playbackPath != null &&
+        soundLibraryVolume != null &&
+        audioPlaybackVolume != null) {
       tempFilePaths.add(playbackPath);
+      List<double> wavWeights =
+          getKeyboardAndPlaybackWeight(soundLibraryVolume, audioPlaybackVolume);
+
+      weights = [
+        ...List.filled(tempFilePaths.length - 2, wavWeights[0]),
+        wavWeights[1]
+      ];
+    } else {
+      weights = List.filled(tempFilePaths.length, 1);
     }
 
-    await combineAudioFiles(destinationPath, tempFilePaths);
+    await combineAudioFiles(destinationPath, tempFilePaths, weights);
   }
 
-  static Future<void> combineAudioFiles(
-      String outputFilepath, List<String> inputFilePaths) async {
+  static List<double> getKeyboardAndPlaybackWeight(
+      int soundLibraryVolume, int playbackVolume) {
+    int volumeDifference = soundLibraryVolume - playbackVolume;
+    if (volumeDifference.isNegative) {
+      return [soundLibraryVolume / playbackVolume, 1];
+    } else {
+      return [1, playbackVolume / soundLibraryVolume];
+    }
+  }
+
+  static Future<void> combineAudioFiles(String outputFilepath,
+      List<String> inputFilePaths, List<double> weights) async {
     final FfmpegCommand ffmpegCommand = FfmpegCommand(
       inputs: [],
       args: [
         for (final arg in inputFilePaths) ...[CliArg(name: 'i', value: arg)],
       ],
       filterGraph: FilterGraph(chains: [
-        FilterChain(
-            inputs: [],
-            filters: [CustomAMixFilter(inputCount: inputFilePaths.length)],
-            outputs: [])
+        FilterChain(inputs: [], filters: [
+          CustomAMixFilter(inputCount: inputFilePaths.length, weights: weights)
+        ], outputs: [])
       ]),
       outputFilepath: outputFilepath,
     );
@@ -410,9 +433,11 @@ class Piano {
 class CustomAMixFilter implements Filter {
   const CustomAMixFilter({
     required this.inputCount,
+    required this.weights,
   });
 
   final int inputCount;
+  final List<double> weights;
 
   @override
   String toCli() {
@@ -420,7 +445,7 @@ class CustomAMixFilter implements Filter {
     // duration=longest -> resulting audio file has the length of the longest audio file
     // normalize=0 -> is active by default: normalizes the audio inputs; deactivated: =0
     // https://ffmpeg.org/ffmpeg-filters.html#amix, 30.01.2023
-    return 'amix=inputs=$inputCount:duration=longest:normalize=0';
+    return 'amix=inputs=$inputCount:duration=longest:normalize=0:weights="${weights.join(' ')}"';
   }
 }
 
