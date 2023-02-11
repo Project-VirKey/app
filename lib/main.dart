@@ -52,7 +52,14 @@ Future<void> main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => SettingsProvider()),
-      ChangeNotifierProvider(create: (_) => RecordingsProvider()),
+      ChangeNotifierProxyProvider<SettingsProvider, RecordingsProvider>(
+          create: (BuildContext context) => RecordingsProvider(
+              Provider.of<SettingsProvider>(context, listen: false)),
+          update: (BuildContext context, SettingsProvider settingsProvider,
+              RecordingsProvider? recordingsProvider) {
+            recordingsProvider?.setSettingsProvider(settingsProvider);
+            return recordingsProvider ?? RecordingsProvider(settingsProvider);
+          }),
       ChangeNotifierProxyProvider<SettingsProvider, PianoProvider>(
           create: (BuildContext context) => PianoProvider(
               Provider.of<SettingsProvider>(context, listen: false)),

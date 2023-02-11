@@ -91,7 +91,10 @@ class Piano {
   static late ByteData bytes;
   static late Synthesizer synth;
 
-  static void loadLibrary(String path, [bool isAsset = false]) async {
+  static void loadLibrary(String path, int volume,
+      [bool isAsset = false]) async {
+    double soundLibraryVolume = volume / 100;
+
     if (isAsset) {
       bytes = await rootBundle.load(path);
     } else {
@@ -120,7 +123,7 @@ class Piano {
       for (var wK = 0; wK < white.length; wK++) {
         whiteKeyData[o].add(
             loadPianoKeyPcm(white[wK][1] + midiOffset + (o * keysPerOctave)));
-        whiteKeyPlayer[o].add(AudioPlayer());
+        whiteKeyPlayer[o].add(AudioPlayer()..setVolume(soundLibraryVolume));
         whiteKeyPlayer[o][wK].setAudioSource(
             MyCustomSource(wrapAudioDataInWavFileFormat(whiteKeyData[o][wK])));
       }
@@ -137,7 +140,7 @@ class Piano {
 
         blackKeyData[o].add(
             loadPianoKeyPcm(black[bK][1] + midiOffset + (o * keysPerOctave)));
-        blackKeyPlayer[o].add(AudioPlayer());
+        blackKeyPlayer[o].add(AudioPlayer()..setVolume(soundLibraryVolume));
         blackKeyPlayer[o][bK].setAudioSource(
             MyCustomSource(wrapAudioDataInWavFileFormat(blackKeyData[o][bK])));
       }
@@ -236,6 +239,22 @@ class Piano {
     } else {
       whiteKeyPlayer[octaveIndex][arIndex].seek(const Duration(seconds: 0));
       whiteKeyPlayer[octaveIndex][arIndex].play();
+    }
+  }
+
+  static void changeNotePlayerVolume(int volume) {
+    double soundLibraryVolume = volume / 100;
+
+    for (List octave in whiteKeyPlayer) {
+      for (AudioPlayer keyPlayer in octave) {
+        keyPlayer.setVolume(soundLibraryVolume);
+      }
+    }
+
+    for (List octave in blackKeyPlayer) {
+      for (AudioPlayer? keyPlayer in octave) {
+        keyPlayer?.setVolume(soundLibraryVolume);
+      }
     }
   }
 

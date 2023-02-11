@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/features/piano/piano.dart';
+import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/timestamp.dart';
@@ -28,9 +29,10 @@ class RecordingsProvider extends ChangeNotifier {
   List<List<int>> noteOnEvents = [];
   int midiMilliSecondsDuration = 0;
   int midiMilliSecondsPosition = 0;
-  int relativePlayingPosition = 0;
+  double relativePlayingPosition = 0;
   Timer? _playingPositionTimer;
   int _startTimeStamp = 0;
+  Duration playingDuration = const Duration();
 
   int get _currentPosition =>
       (relativePlayingPosition * .01 * playingDuration.inMilliseconds).round();
@@ -41,8 +43,16 @@ class RecordingsProvider extends ChangeNotifier {
 
   List<Recording> get recordings => _recordings;
 
-  RecordingsProvider() {
+  RecordingsProvider(this.settingsProvider) {
     refreshRecordingsFolderFiles();
+  }
+
+  SettingsProvider settingsProvider;
+
+  setSettingsProvider(SettingsProvider sP) {
+    settingsProvider = sP;
+    setPlaybackVolume(settingsProvider.settings.audioVolume.audioPlayback);
+    notifyListeners();
   }
 
   void notify() {
@@ -219,8 +229,8 @@ class RecordingsProvider extends ChangeNotifier {
   void setRelativePlayingPosition(double value) {
     int intValue = value.toInt();
 
-    if (relativePlayingPosition != intValue) {
-      relativePlayingPosition = intValue;
+    if (relativePlayingPosition.round() != intValue) {
+      relativePlayingPosition = value;
       notifyListeners();
     }
   }
@@ -231,7 +241,7 @@ class RecordingsProvider extends ChangeNotifier {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  Duration get playingDuration {
+  Duration _playingDuration() {
     Duration midiDuration = Duration(milliseconds: midiMilliSecondsDuration);
 
     if (playbackPlayer.duration == null) {
@@ -252,11 +262,14 @@ class RecordingsProvider extends ChangeNotifier {
 
   Future<void> setupRecordingPlayer(Recording recording) async {
     playbackPlayer = AudioPlayer();
+    setPlaybackVolume(settingsProvider.settings.audioVolume.audioPlayback);
 
     if (recording.playbackActive && recording.playbackPath != null) {
       await playbackPlayer
           .setAudioSource(AudioSource.file(recording.playbackPath!));
     }
+
+    playingDuration = _playingDuration();
 
     midiPlayCurrentEventPos = null;
     parsedRecordingMidi = AppFileSystem.midiFileFromRecording(recording.path);
@@ -301,6 +314,8 @@ class RecordingsProvider extends ChangeNotifier {
     return milliSeconds ~/ 2;
   }
 
+  void setPlaybackVolume(int volume) => playbackPlayer.setVolume(volume / 100);
+
   Future<void> playRecording(Recording recording) async {
     if (parsedRecordingMidi == null) {
       return;
@@ -315,25 +330,17 @@ class RecordingsProvider extends ChangeNotifier {
     if (recording.playbackActive && recording.playbackPath != null) {
       playbackPlayer.seek(Duration(milliseconds: _currentPosition));
       playbackPlayer.play();
-      playbackPlayer
-          .createPositionStream(
-              minPeriod: const Duration(milliseconds: 500),
-              maxPeriod: const Duration(seconds: 1))
-          .listen((event) {
-        notifyListeners();
-      });
     }
 
     _playingPositionTimer =
-        Timer.periodic(const Duration(milliseconds: 20), (timer) {
+        Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (isRecordingPlaying && relativePlayingPosition < 100) {
         relativePlayingPosition =
-            ((_elapsedTime / playingDuration.inMilliseconds) * 100).toInt();
-        notifyListeners();
+            ((_elapsedTime / playingDuration.inMilliseconds) * 100);
       } else {
         pauseRecording();
-        notifyListeners();
       }
+      notifyListeners();
     });
 
     // ----

@@ -126,6 +126,7 @@ class PianoProvider extends ChangeNotifier {
 
   setSettingsProvider(SettingsProvider sP) {
     settingsProvider = sP;
+    setPlaybackVolume(settingsProvider.settings.audioVolume.audioPlayback);
     notifyListeners();
   }
 
@@ -144,11 +145,6 @@ class PianoProvider extends ChangeNotifier {
       startVisualizeMidi();
     }
 
-    // print('---');
-    // print(isPlaybackPlaying);
-    // print(isVisualizeMidiPlaying);
-    // print(isRecording);
-    // print('---');
     if (!isRecording) {
       if (_displayTimeTimer == null) {
         if (isPlaybackPlaying || isVisualizeMidiPlaying) {
@@ -251,6 +247,8 @@ class PianoProvider extends ChangeNotifier {
       isPlaybackPlaying = true;
     }
   }
+
+  void setPlaybackVolume(int volume) => playbackPlayer.setVolume(volume / 100);
 
   // ----------------------------------------------------------------
 
