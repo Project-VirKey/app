@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dart_midi/dart_midi.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
@@ -7,6 +9,7 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/features/piano/piano.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/file_system.dart';
+import 'package:virkey/utils/timestamp.dart';
 
 class RecordingsProvider extends ChangeNotifier {
   final List<Recording> _recordings = [];
@@ -22,6 +25,17 @@ class RecordingsProvider extends ChangeNotifier {
   int? midiPlayCurrentEventPos;
   bool isRecordingSliderModeManual = false;
   MidiFile? parsedRecordingMidi;
+  List<List<int>> noteOnEvents = [];
+  int midiMilliSecondsDuration = 0;
+  int midiMilliSecondsPosition = 0;
+  int relativePlayingPosition = 0;
+  Timer? _playingPositionTimer;
+  int _startTimeStamp = 0;
+
+  int get _currentPosition =>
+      (relativePlayingPosition * .01 * playingDuration.inMilliseconds).round();
+
+  int get _elapsedTime => AppTimestamp.now - _startTimeStamp;
 
   static List<FileSystemEntity> _recordingsFolderFiles = [];
 
@@ -202,62 +216,127 @@ class RecordingsProvider extends ChangeNotifier {
 
   // ----------------------------------------------------------------
 
+  void setRelativePlayingPosition(double value) {
+    int intValue = value.toInt();
+
+    if (relativePlayingPosition != intValue) {
+      relativePlayingPosition = intValue;
+      notifyListeners();
+    }
+  }
+
   String getFormattedTime(Duration duration) {
     int minutes = duration.inMinutes;
     int seconds = duration.inSeconds - (minutes * 60);
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  String get formattedPlayingLength {
+  Duration get playingDuration {
+    Duration midiDuration = Duration(milliseconds: midiMilliSecondsDuration);
+
     if (playbackPlayer.duration == null) {
-      return '00:00';
+      return midiDuration;
     } else {
-      return getFormattedTime(playbackPlayer.duration!);
+      if (midiMilliSecondsDuration > playbackPlayer.duration!.inMilliseconds) {
+        return midiDuration;
+      } else {
+        return playbackPlayer.duration!;
+      }
     }
   }
 
-  String get formattedPlayingPosition {
-    return getFormattedTime(playbackPlayer.position);
-  }
+  String get formattedPlayingDuration => getFormattedTime(playingDuration);
 
-  double get relativePlayingPosition {
-    if (playbackPlayer.duration == null) {
-      return 0;
-    } else {
-      return ((playbackPlayer.position.inSeconds /
-              playbackPlayer.duration!.inSeconds) *
-          100);
-    }
-  }
+  String get formattedPlayingPosition =>
+      getFormattedTime(Duration(milliseconds: _currentPosition));
 
   Future<void> setupRecordingPlayer(Recording recording) async {
+    playbackPlayer = AudioPlayer();
+
     if (recording.playbackActive && recording.playbackPath != null) {
-      // await playbackPlayer.dispose();
-      // playbackPlayer.seek(const Duration(seconds: 0));
-      playbackPlayer.setAudioSource(AudioSource.file(recording.playbackPath!));
+      await playbackPlayer
+          .setAudioSource(AudioSource.file(recording.playbackPath!));
     }
 
     midiPlayCurrentEventPos = null;
     parsedRecordingMidi = AppFileSystem.midiFileFromRecording(recording.path);
+    noteOnEvents.clear();
+    for (List<MidiEvent> track in parsedRecordingMidi!.tracks) {
+      int absolutePosition = 0;
+      for (int i = 0; i < track.length; i++) {
+        MidiEvent midiEvent = track[i];
+
+        if (midiEvent is! NoteOnEvent) {
+          continue;
+        }
+
+        absolutePosition += midiEvent.deltaTime + midiEvent.duration;
+
+        noteOnEvents.add([
+          midiEvent.noteNumber,
+          (absolutePosition - midiEvent.duration) ~/ 2,
+          midiEvent.deltaTime,
+          midiEvent.duration
+        ]);
+      }
+    }
+
+    midiMilliSecondsDuration = getMidiMilliSecondsDuration();
+    relativePlayingPosition = 0;
+
+    notifyListeners();
+  }
+
+  int getMidiMilliSecondsDuration() {
+    int milliSeconds = 0;
+
+    for (List<MidiEvent> track in parsedRecordingMidi!.tracks) {
+      milliSeconds += track
+          .map((MidiEvent midiEvent) => midiEvent is NoteOnEvent
+              ? midiEvent.deltaTime + midiEvent.duration
+              : 0)
+          .sum;
+    }
+
+    return milliSeconds ~/ 2;
   }
 
   Future<void> playRecording(Recording recording) async {
+    if (parsedRecordingMidi == null) {
+      return;
+    }
+
+    if (relativePlayingPosition == 100) {
+      relativePlayingPosition = 0;
+    }
+
+    _startTimeStamp = AppTimestamp.now - _currentPosition;
+
     if (recording.playbackActive && recording.playbackPath != null) {
+      playbackPlayer.seek(Duration(milliseconds: _currentPosition));
       playbackPlayer.play();
-      print(playbackPlayer.duration?.inSeconds);
       playbackPlayer
           .createPositionStream(
               minPeriod: const Duration(milliseconds: 500),
               maxPeriod: const Duration(seconds: 1))
           .listen((event) {
-        print(event.inMilliseconds);
         notifyListeners();
       });
     }
 
-    if (parsedRecordingMidi == null) {
-      return;
-    }
+    _playingPositionTimer =
+        Timer.periodic(const Duration(milliseconds: 20), (timer) {
+      if (isRecordingPlaying && relativePlayingPosition < 100) {
+        relativePlayingPosition =
+            ((_elapsedTime / playingDuration.inMilliseconds) * 100).toInt();
+        notifyListeners();
+      } else {
+        pauseRecording();
+        notifyListeners();
+      }
+    });
+
+    // ----
 
     isRecordingPlaying = true;
 
@@ -277,71 +356,45 @@ class RecordingsProvider extends ChangeNotifier {
     // deltaTime -> ticks per quarter-note
     // conclusion: dart_midi provides an actual deltaTime in milliseconds,
     // but when calculating manually -> the milliseconds value is slightly higher
-    int ticksPerQuarter = parsedRecordingMidi!.header.ticksPerBeat as int;
-    int microSecondsPerQuarter = 0;
-    double microSecondsPerTick = 0;
-    double milliSecondsPerTick = 0;
 
     // Standard MIDI-File Format Spec. 1.1
     // https://www.cs.cmu.edu/~music/cmsip/readings/Standard-MIDI-file-format-updated.pdf, 30.01.2023
     // description of chunks, chunk types (MThd -> Header, MTrk -> Track)
     // SetTempoEvent -> 0x FF 51 03 -> Tempo of MIDI Track
 
-    midiEventTrackLoop:
-    for (List<MidiEvent> track in parsedRecordingMidi!.tracks) {
-      for (int i = 0; i < track.length; i++) {
-        MidiEvent midiEvent = track[i];
+    // dart_midi: SetTempoEvent
+    // https://pub.dev/documentation/dart_midi/latest/midi/SetTempoEvent-class.html, 30.01.2023
 
-        if (!isRecordingPlaying) {
-          // if playing is set to false during midi playback -> break out of the complete loop
-          break midiEventTrackLoop;
-        }
+    for (int i = 0; i < noteOnEvents.length; i++) {
+      if (!isRecordingPlaying) {
+        // if playing is set to false during midi playback -> break out of the complete loop
+        break;
+      }
 
-        // dart_midi: SetTempoEvent
-        // https://pub.dev/documentation/dart_midi/latest/midi/SetTempoEvent-class.html, 30.01.2023
-        if (midiEvent is SetTempoEvent) {
-          microSecondsPerQuarter = midiEvent.microsecondsPerBeat;
-          microSecondsPerTick = microSecondsPerQuarter / ticksPerQuarter;
-          milliSecondsPerTick = microSecondsPerTick / 1000;
-        }
+      if (_currentPosition > noteOnEvents[i][1]) {
+        continue;
+      } else {
+        await Future.delayed(
+            Duration(milliseconds: noteOnEvents[i][1] - _currentPosition));
+      }
 
-        if (midiEvent is! NoteOnEvent ||
-            (midiPlayCurrentEventPos ?? -1) + 1 > i) {
-          continue;
-        }
+      int octaveIndex = Piano.getOctaveIndexFromMidiNote(noteOnEvents[i][0]);
 
-        midiPlayCurrentEventPos = i;
+      int playedPianoKeyWhite =
+          Piano.getPianoKeyWhiteIndex(noteOnEvents[i][0], octaveIndex);
 
-        int octaveIndex =
-            Piano.getOctaveIndexFromMidiNote(midiEvent.noteNumber);
+      int playedPianoKeyBlack =
+          Piano.getPianoKeyBlackIndex(noteOnEvents[i][0], octaveIndex);
 
-        int playedPianoKeyWhite = Piano.white.indexWhere((pianoKeyWhite) =>
-            pianoKeyWhite[1] +
-                Piano.midiOffset +
-                (octaveIndex * Piano.keysPerOctave) ==
-            midiEvent.noteNumber);
+      int milliSeconds = noteOnEvents[i][2] + noteOnEvents[i][3];
+      midiMilliSecondsPosition += milliSeconds;
 
-        int playedPianoKeyBlack = Piano.black.indexWhere((pianoKeyBlack) {
-          if (pianoKeyBlack.isEmpty) {
-            return false;
-          }
-          return (pianoKeyBlack[1] +
-                  Piano.midiOffset +
-                  (octaveIndex * Piano.keysPerOctave)) ==
-              midiEvent.noteNumber;
-        });
+      if (playedPianoKeyWhite >= 0) {
+        Piano.playPianoNote(octaveIndex, playedPianoKeyWhite);
+      }
 
-        int milliSeconds = (midiEvent.deltaTime * milliSecondsPerTick).round();
-
-        await Future.delayed(Duration(milliseconds: milliSeconds));
-
-        if (playedPianoKeyWhite >= 0) {
-          Piano.playPianoNote(octaveIndex, playedPianoKeyWhite);
-        }
-
-        if (playedPianoKeyBlack >= 0) {
-          Piano.playPianoNote(octaveIndex, playedPianoKeyBlack, true);
-        }
+      if (playedPianoKeyBlack >= 0) {
+        Piano.playPianoNote(octaveIndex, playedPianoKeyBlack, true);
       }
     }
   }
@@ -349,6 +402,7 @@ class RecordingsProvider extends ChangeNotifier {
   void pauseRecording() {
     isRecordingPlaying = false;
     playbackPlayer.pause();
+    _playingPositionTimer?.cancel();
   }
 }
 

@@ -42,7 +42,7 @@ class _RecordingsListState extends State<RecordingsList>
           initialItemCount: recordingsProvider.recordings.length,
           itemBuilder: (context, index, animation) {
             return SizeTransition(
-                key: UniqueKey(),
+                // removed "key: UniqueKey()" -> due to it prohibiting rebuilding the containing elements when a slider needs to update its value (and so also call notifyListeners())
                 sizeFactor: animation,
                 child: RecordingsListItem(
                   recording: recordingsProvider.recordings[index],
