@@ -16,6 +16,8 @@ import 'package:virkey/features/cloud_synchronisation/login_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/update_email_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/update_password_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/update_username_overlay.dart';
+import 'package:virkey/features/piano/piano.dart';
+import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
@@ -129,9 +131,11 @@ class SettingsOverlay {
                                   .toDouble(),
                               onChanged: (value) => settingsProvider
                                   .setAudioVolumeSoundLibrary(value),
-                              onChangedEnd: (value) => {
+                              onChangedEnd: (value) {
                                 AppSharedPreferences.saveData(
-                                    settings: settingsProvider.settings)
+                                    settings: settingsProvider.settings);
+                                Piano.changeNotePlayerVolume(settingsProvider
+                                    .settings.audioVolume.soundLibrary);
                               },
                             ),
                           ),
@@ -150,9 +154,17 @@ class SettingsOverlay {
                                   .toDouble(),
                               onChanged: (value) => settingsProvider
                                   .setAudioVolumeAudioPlayback(value),
-                              onChangedEnd: (value) => {
+                              onChangedEnd: (value) {
                                 AppSharedPreferences.saveData(
-                                    settings: settingsProvider.settings)
+                                    settings: settingsProvider.settings);
+                                Provider.of<PianoProvider>(context,
+                                        listen: false)
+                                    .setPlaybackVolume(settingsProvider
+                                        .settings.audioVolume.audioPlayback);
+                                Provider.of<RecordingsProvider>(context,
+                                        listen: false)
+                                    .setPlaybackVolume(settingsProvider
+                                        .settings.audioVolume.audioPlayback);
                               },
                             ),
                           ),
