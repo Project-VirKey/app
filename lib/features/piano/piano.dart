@@ -380,10 +380,13 @@ class Piano {
         soundLibraryVolume != null &&
         audioPlaybackVolume != null) {
       tempFilePaths.add(playbackPath);
+
       List<double> wavWeights =
           getKeyboardAndPlaybackWeight(soundLibraryVolume, audioPlaybackVolume);
 
       weights = [
+        // number of tempFilePaths (stored notes) should be subtracted by 1 (-1), because playback path is added
+        // instead subtraction by 2 (-2) is needed
         ...List.filled(tempFilePaths.length - 2, wavWeights[0]),
         wavWeights[1]
       ];
