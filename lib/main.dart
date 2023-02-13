@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/features/app_introduction/introduction_provider.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_storage.dart';
 import 'package:virkey/features/midi_device/midi_device_provider.dart';
@@ -55,6 +56,7 @@ Future<void> main() async {
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => SettingsProvider()),
+      ChangeNotifierProvider(create: (_) => IntroductionProvider()),
       ChangeNotifierProxyProvider<SettingsProvider, RecordingsProvider>(
           create: (BuildContext context) => RecordingsProvider(
               Provider.of<SettingsProvider>(context, listen: false)),

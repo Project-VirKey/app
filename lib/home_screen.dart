@@ -9,6 +9,7 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/constants/shadows.dart';
+import 'package:virkey/features/app_introduction/introduction_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/features/midi_device/midi_device_provider.dart';
 import 'package:virkey/features/midi_device/temp_midi_status.dart';
@@ -34,9 +35,30 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late final SettingsOverlay _settingsOverlay =
       SettingsOverlay(context: context, vsync: this);
 
+  late final IntroductionOverlay _introductionOverlay =
+      IntroductionOverlay(context: context, vsync: this);
+
   @override
   void initState() {
     super.initState();
+
+    // load function directly after state is initialized
+    // https://pub.dev/packages/after_layout
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _introductionOverlay.open();
+
+      return;
+
+      // check for field in settings -> if introduction overlay should be displayed
+
+      if (!Provider.of<SettingsProvider>(context, listen: false)
+          .settings
+          .introDisplayed) {
+        _introductionOverlay.open();
+        Provider.of<SettingsProvider>(context, listen: false)
+            .setIntroDisplayed(true);
+      }
+    });
   }
 
   @override
