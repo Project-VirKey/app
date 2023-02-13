@@ -56,10 +56,10 @@ class AppCloudStorage {
 
   static Future<void> downloadFile(
       String fileName, String destinationPath) async {
-    final cloudFileRef = storageRef.child(fileName);
-    final file = File('$destinationPath$fileName');
+    Reference cloudFileRef = storageRef.child(fileName);
+    File file = File('$destinationPath$fileName');
 
-    final downloadTask = cloudFileRef.writeToFile(file);
+    DownloadTask downloadTask = cloudFileRef.writeToFile(file);
 
     downloadTask.snapshotEvents.listen((taskSnapshot) {
       switch (taskSnapshot.state) {
@@ -108,7 +108,7 @@ class AppCloudStorage {
   }
 
   static Future<void> listAllFiles() async {
-    final listResult = await storageRef.listAll();
+    ListResult listResult = await storageRef.listAll();
     for (var prefix in listResult.prefixes) {
       // The prefixes under storageRef.
       // You can call listAll() recursively on them.
