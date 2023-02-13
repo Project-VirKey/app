@@ -9,7 +9,7 @@ import 'package:virkey/utils/platform_helper.dart';
 
 class SettingsProvider extends ChangeNotifier {
   final Settings _settings = Settings(
-      audioVolume: AudioVolume(soundLibrary: 0, audioPlayback: 0),
+      audioVolume: AudioVolume(soundLibrary: 100, audioPlayback: 100),
       defaultFolder: DefaultFolder(path: AppFileSystem.basePath ?? ''),
       defaultSavedFiles: DefaultSavedFiles(wav: false, wavAndPlayback: false),
       soundLibraries: []);
