@@ -5,7 +5,8 @@ class AppFirestore {
 // update firebase access rules
 // only the user who created the document is able to delete & update his own document
 // https://stackoverflow.com/a/57511389/17399214, 19.12.2022
-/*
+
+  /* rule for firestore -> permission only for the document with the userId
     rules_version = '2';
     service cloud.firestore {
       match /databases/{database}/documents {
@@ -53,6 +54,8 @@ class AppFirestore {
     if (FirebaseAuth.instance.currentUser?.uid == null) {
       return;
     }
+
+    print('firestore initialLoad');
 
     if (await checkUserDocumentExists()) {
       document = (await getDocument())!;

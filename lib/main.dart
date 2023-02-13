@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
+import 'package:virkey/features/cloud_synchronisation/cloud_storage.dart';
 import 'package:virkey/features/midi_device/midi_device_provider.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
@@ -43,6 +44,8 @@ Future<void> main() async {
   // load firestore document
   await AppFirestore.initialLoad();
   // TODO: what happens if not logged in?
+
+  await AppCloudStorage.initialLoad();
 
   // TODO: load SharedPreferences before initializing NotifierProvider
   AppSharedPreferences.loadedSharedPreferences =

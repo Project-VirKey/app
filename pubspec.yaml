@@ -56,6 +56,7 @@ dependencies:
   firebase_core: ^2.3.0
   firebase_auth: ^4.1.5
   cloud_firestore: ^4.2.0
+  firebase_storage: ^11.0.11
   firebase_core_desktop:
     # using fork of original plugin, due to compatibility with newer version of firebase_core (major version change)
     git:
@@ -78,7 +79,7 @@ dependencies:
   ffmpeg_cli: ^0.1.0
   archive: ^3.3.5
   loading_animation_widget: ^1.2.0+4
-  flutter_libserialport: ^0.3.0
+#  flutter_libserialport: ^0.3.0
 
 dev_dependencies:
   flutter_test:
