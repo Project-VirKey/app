@@ -79,6 +79,8 @@ dependencies:
   ffmpeg_cli: ^0.1.0
   archive: ^3.3.5
   loading_animation_widget: ^1.2.0+4
+  after_layout: ^1.2.0
+  expandable_page_view: ^1.0.17
 #  flutter_libserialport: ^0.3.0
 
 dev_dependencies:

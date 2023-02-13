@@ -276,7 +276,6 @@ class _PianoScreenState extends State<PianoScreen>
                       onVerticalDragEnd: (DragEndDetails details) =>
                           {prevValue = -1},
                       child: Stack(
-                        // alignment: Alignment.topCenter,
                         children: const [
                           PianoKeysWhite(),
                           Positioned(

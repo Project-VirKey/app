@@ -12,7 +12,8 @@ class SettingsProvider extends ChangeNotifier {
       audioVolume: AudioVolume(soundLibrary: 100, audioPlayback: 100),
       defaultFolder: DefaultFolder(path: AppFileSystem.basePath ?? ''),
       defaultSavedFiles: DefaultSavedFiles(wav: false, wavAndPlayback: false),
-      soundLibraries: []);
+      soundLibraries: [],
+      introDisplayed: false);
 
   int lastUpdated = 0;
 
@@ -29,7 +30,8 @@ class SettingsProvider extends ChangeNotifier {
     _settings.defaultFolder.path = AppFileSystem.basePath ?? '';
 
     // load the data from SharedPreferences when the Provider is placed
-    lastUpdated = AppSharedPreferences.loadedSharedPreferences?['lastUpdated'] ?? 0;
+    lastUpdated =
+        AppSharedPreferences.loadedSharedPreferences?['lastUpdated'] ?? 0;
     Settings? loadedSettings =
         AppSharedPreferences.loadedSharedPreferences?['settings'];
 
@@ -60,7 +62,8 @@ class SettingsProvider extends ChangeNotifier {
     SoundLibrary soundLibrary = _settings.soundLibraries
         .where((soundLibrary) => soundLibrary.selected)
         .first;
-    Piano.loadLibrary(soundLibrary.path, _settings.audioVolume.soundLibrary, soundLibrary.defaultLibrary);
+    Piano.loadLibrary(soundLibrary.path, _settings.audioVolume.soundLibrary,
+        soundLibrary.defaultLibrary);
   }
 
   Future<void> loadSoundLibraries() async {
@@ -106,7 +109,9 @@ class SettingsProvider extends ChangeNotifier {
 
     // load the selected sound library
     Piano.loadLibrary(
-        selectedSoundLibrary.path, _settings.audioVolume.soundLibrary, selectedSoundLibrary.defaultLibrary);
+        selectedSoundLibrary.path,
+        _settings.audioVolume.soundLibrary,
+        selectedSoundLibrary.defaultLibrary);
 
     AppSharedPreferences.saveData(settings: _settings);
     notifyListeners();
@@ -153,5 +158,10 @@ class SettingsProvider extends ChangeNotifier {
       _settings.audioVolume.audioPlayback = intValue;
       notifyListeners();
     }
+  }
+
+  void setIntroDisplayed(bool value) {
+    settings.introDisplayed = value;
+    AppSharedPreferences.saveData(settings: settings);
   }
 }

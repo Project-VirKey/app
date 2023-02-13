@@ -10,6 +10,7 @@ import 'package:virkey/common_widgets/app_properties_description_title.dart';
 import 'package:virkey/common_widgets/app_property_description_action_combination.dart';
 import 'package:virkey/common_widgets/app_slider.dart';
 import 'package:virkey/common_widgets/app_switch.dart';
+import 'package:virkey/features/app_introduction/introduction_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/authentication.dart';
 import 'package:virkey/features/cloud_synchronisation/delete_account_overlay.dart';
 import 'package:virkey/features/cloud_synchronisation/login_overlay.dart';
@@ -339,6 +340,21 @@ class SettingsOverlay {
                                   ),
                                 ),
                             ],
+                          ),
+                          const PropertiesDescriptionTitle(
+                              title: 'Introduction'),
+                          PropertyDescriptionActionCombination(
+                            title: 'Open',
+                            child: AppIcon(
+                              icon: HeroIcons.chevronRight,
+                              color: AppColors.dark,
+                              onPressed: () {
+                                close();
+                                IntroductionOverlay(
+                                        context: context, vsync: vsync)
+                                    .open();
+                              },
+                            ),
                           ),
                           const PropertiesDescriptionTitle(
                               title: 'Account Settings'),
