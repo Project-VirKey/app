@@ -14,7 +14,7 @@ packages:
       name: _flutterfire_internals
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.12"
+    version: "1.0.13"
   archive:
     dependency: "direct main"
     description:
@@ -157,13 +157,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.0.11"
-  dylib:
-    dependency: transitive
-    description:
-      name: dylib
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.3"
   email_validator:
     dependency: "direct main"
     description:
@@ -249,7 +242,7 @@ packages:
       name: firebase_core
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.4.1"
+    version: "2.5.0"
   firebase_core_dart:
     dependency: transitive
     description:
@@ -272,14 +265,35 @@ packages:
       name: firebase_core_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.5.2"
+    version: "4.5.3"
   firebase_core_web:
     dependency: transitive
     description:
       name: firebase_core_web
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
+  firebase_storage:
+    dependency: "direct main"
+    description:
+      name: firebase_storage
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "11.0.11"
+  firebase_storage_platform_interface:
+    dependency: transitive
+    description:
+      name: firebase_storage_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.1.27"
+  firebase_storage_web:
+    dependency: transitive
+    description:
+      name: firebase_storage_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.3.20"
   firebaseapis:
     dependency: transitive
     description:
@@ -299,13 +313,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.11.0"
-  flutter_libserialport:
-    dependency: "direct main"
-    description:
-      name: flutter_libserialport
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -442,13 +449,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.2.0"
-  libserialport:
-    dependency: transitive
-    description:
-      name: libserialport
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.0+1"
   lints:
     dependency: transitive
     description:

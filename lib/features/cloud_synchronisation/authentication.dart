@@ -77,6 +77,7 @@ class AppAuthentication {
   }
 
   static Future<List> deleteAccount(String password) async {
+    // only the account is deleted, not the firestore document or the files on cloud storage
     try {
       await reauthenticate(password);
       await FirebaseAuth.instance.currentUser?.delete();

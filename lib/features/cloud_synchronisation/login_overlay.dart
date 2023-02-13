@@ -5,6 +5,8 @@ import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
 import 'package:virkey/common_widgets/app_text_form_field.dart';
 import 'package:virkey/features/cloud_synchronisation/authentication.dart';
+import 'package:virkey/features/cloud_synchronisation/cloud_storage.dart';
+import 'package:virkey/features/cloud_synchronisation/firestore.dart';
 import 'package:virkey/features/cloud_synchronisation/signup_overlay.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/overlay.dart';
@@ -183,6 +185,8 @@ class LoginOverlay {
 
                                         if (response[0]) {
                                           close();
+                                          AppFirestore.initialLoad();
+                                          AppCloudStorage.initialLoad();
                                         }
                                       }
                                     },
