@@ -57,19 +57,8 @@ dependencies:
   firebase_auth: ^4.1.5
   cloud_firestore: ^4.2.0
   firebase_storage: ^11.0.11
-  firebase_core_desktop:
-    # using fork of original plugin, due to compatibility with newer version of firebase_core (major version change)
-    git:
-      url: https://github.com/yegobox/flutterfire_desktop
-      path: packages/firebase_core/firebase_core_desktop
-  firebase_auth_desktop:
-    # using fork of original plugin, due to compatibility with newer version of firebase_auth (major version change)
-    git:
-      url: https://github.com/yegobox/flutterfire_desktop
-      path: packages/firebase_auth/firebase_auth_desktop
   midi_util: ^1.0.2
   just_audio: ^0.9.31
-  just_audio_windows: ^0.2.0
   dart_midi:
     git:
       url: https://github.com/genit-jp/dart_midi
@@ -81,7 +70,7 @@ dependencies:
   loading_animation_widget: ^1.2.0+4
   after_layout: ^1.2.0
   expandable_page_view: ^1.0.17
-#  flutter_libserialport: ^0.3.0
+  dots_indicator: ^2.1.0
 
 dev_dependencies:
   flutter_test:
