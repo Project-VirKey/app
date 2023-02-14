@@ -73,7 +73,6 @@ Future<void> main() async {
             pianoProvider?.setSettingsProvider(settingsProvider);
             return pianoProvider ?? PianoProvider(settingsProvider);
           }),
-      // ChangeNotifierProvider(create: (_) => MidiDeviceProvider()),
       ChangeNotifierProxyProvider<PianoProvider, MidiDeviceProvider>(
           create: (BuildContext context) => MidiDeviceProvider(
               Provider.of<PianoProvider>(context, listen: false)),
