@@ -24,16 +24,16 @@ class TempMidiStatus extends StatelessWidget {
                   Widget? child) =>
               Column(
             children: [
-              AppButton(
-                  appText: const AppText(text: 'Connect First Device'),
-                  onPressed: () {
-                    midiDeviceProvider.connectToDevice();
-                  }),
-              AppButton(
-                  appText: const AppText(text: 'Disconnect'),
-                  onPressed: () {
-                    midiDeviceProvider.disconnectDevice();
-                  }),
+              // AppButton(
+              //     appText: const AppText(text: 'Connect First Device'),
+              //     onPressed: () {
+              //       midiDeviceProvider.connectToDevice();
+              //     }),
+              // AppButton(
+              //     appText: const AppText(text: 'Disconnect'),
+              //     onPressed: () {
+              //       midiDeviceProvider.disconnectDevice();
+              //     }),
               const AppText(
                 text: 'Device Setup',
                 weight: AppFonts.weightMedium,
