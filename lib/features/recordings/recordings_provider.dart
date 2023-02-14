@@ -335,8 +335,16 @@ class RecordingsProvider extends ChangeNotifier {
     _playingPositionTimer =
         Timer.periodic(const Duration(milliseconds: 100), (timer) {
       if (isRecordingPlaying && relativePlayingPosition < 100) {
-        relativePlayingPosition =
+        double newRelativePlayingPosition =
             ((_elapsedTime / playingDuration.inMilliseconds) * 100);
+        if (newRelativePlayingPosition >= 100) {
+          // check if targeted value is over 100
+          // if true then set value manually to 100
+          // otherwise the slider cannot accept the value (slider max value is 100)
+          relativePlayingPosition = 100;
+        } else {
+          relativePlayingPosition = newRelativePlayingPosition;
+        }
       } else {
         pauseRecording();
       }
