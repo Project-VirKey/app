@@ -31,7 +31,9 @@ class MidiDeviceProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  static const deviceName = 'iPhone';
+  // name of the Firmware for Arduino under which the MIDI-device will be listed
+  // https://github.com/kuwatay/mocolufa, 14.02.2023
+  static const deviceName = 'MocoLUFA';
 
   Future<void> initialLoad() async {
     // lookup connected midi devices (at the app startup)
@@ -104,8 +106,12 @@ class MidiDeviceProvider extends ChangeNotifier {
         midiEvents.insert(0, event.data);
         notifyListeners();
 
+        if (AppRouter.router.location != '/piano') {
+          return;
+        }
+
         // if event id not NoteOn or NoteOff -> return
-        if (event.data[0] != 144 || AppRouter.router.location != '/piano') {
+        if (event.data[0] != 144 && event.data[0] != 128) {
           return;
         }
 
