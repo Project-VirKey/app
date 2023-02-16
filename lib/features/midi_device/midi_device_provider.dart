@@ -34,6 +34,7 @@ class MidiDeviceProvider extends ChangeNotifier {
   // name of the Firmware for Arduino under which the MIDI-device will be listed
   // https://github.com/kuwatay/mocolufa, 14.02.2023
   static const deviceName = 'MocoLUFA';
+  static const deviceNameAndroid = 'kuwatay@nifty.com MocoLUFA';
 
   Future<void> initialLoad() async {
     // lookup connected midi devices (at the app startup)
@@ -75,7 +76,7 @@ class MidiDeviceProvider extends ChangeNotifier {
     }
 
     Iterable<MidiDevice>? devices =
-        midiDevices?.where((MidiDevice mD) => mD.name == deviceName);
+        midiDevices?.where((MidiDevice mD) => mD.name == deviceName || mD.name == deviceNameAndroid);
     if (devices == null) {
       return null;
     } else {
@@ -142,12 +143,20 @@ class MidiDeviceProvider extends ChangeNotifier {
 
           if (playedPianoKeyWhite >= 0) {
             pianoProvider.pianoKeysWhite[playedPianoKeyWhite][1] = true;
+            if (pianoProvider.isRecording) {
+              pianoProvider.recordingAddNote(
+                  pianoProvider.currentOctaveIndex, event.data[1]);
+            }
             pianoProvider.notify();
             Piano.playPianoNote(octaveIndex, playedPianoKeyWhite);
           }
 
           if (playedPianoKeyBlack >= 0) {
             pianoProvider.pianoKeysBlack[playedPianoKeyBlack][1] = true;
+            if (pianoProvider.isRecording) {
+              pianoProvider.recordingAddNote(
+                  pianoProvider.currentOctaveIndex, event.data[1]);
+            }
             pianoProvider.notify();
             Piano.playPianoNote(octaveIndex, playedPianoKeyBlack, true);
           }
