@@ -3,7 +3,10 @@ import 'dart:io';
 
 import 'package:dart_melty_soundfont/dart_melty_soundfont.dart';
 import 'package:dart_midi/dart_midi.dart';
-import 'package:ffmpeg_cli/ffmpeg_cli.dart' hide Stream;
+import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter/return_code.dart';
+
+// import 'package:ffmpeg_cli/ffmpeg_cli.dart' hide Stream;
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -409,6 +412,33 @@ class Piano {
 
   static Future<void> combineAudioFiles(String outputFilepath,
       List<String> inputFilePaths, List<double> weights) async {
+    // print(
+    //     '-i ${inputFilePaths.join(' -i ')} amix=inputs=${inputFilePaths.length}:duration=longest:normalize=0:weights="${weights.join(' ')}" $outputFilepath');
+
+    FFmpegKit.executeAsync(
+            '-i ${inputFilePaths.join(' -i ')} amix=inputs=${inputFilePaths.length}:duration=longest:normalize=0:weights="${weights.join(' ')}" $outputFilepath')
+        .then((dynamic session) async {
+      final returnCode = await session.getReturnCode();
+
+      print(session.getArguments());
+      print(await session.getOutput());
+
+      if (ReturnCode.isSuccess(returnCode)) {
+        // SUCCESS
+        print('FFMPEG yay');
+      } else if (ReturnCode.isCancel(returnCode)) {
+        // CANCEL
+        print('FFMPEG cancel');
+      } else {
+        // ERROR
+        print('FFMPEG error');
+      }
+    });
+  }
+
+/*
+  static Future<void> combineAudioFiles(String outputFilepath,
+      List<String> inputFilePaths, List<double> weights) async {
     final FfmpegCommand ffmpegCommand = FfmpegCommand(
       inputs: [],
       args: [
@@ -431,9 +461,10 @@ class Piano {
 
     await Ffmpeg().run(ffmpegCommand);
   }
+   */
 }
 
-class CustomAMixFilter implements Filter {
+/*class CustomAMixFilter implements Filter {
   const CustomAMixFilter({
     required this.inputCount,
     required this.weights,
@@ -450,7 +481,7 @@ class CustomAMixFilter implements Filter {
     // https://ffmpeg.org/ffmpeg-filters.html#amix, 30.01.2023
     return 'amix=inputs=$inputCount:duration=longest:normalize=0:weights="${weights.join(' ')}"';
   }
-}
+}*/
 
 // Feed your own stream of bytes into the player
 class MyCustomSource extends StreamAudioSource {

@@ -315,6 +315,8 @@ class RecordingsListItem extends StatelessWidget {
                               await Piano.midiToWav(
                                   recording.path, exportRecordingPath);
 
+                              print('export - ${File(exportRecordingPath).existsSync()}');
+
                               // appLoadingOverlay.close();
 
                               AppFileSystem.exportFile(
