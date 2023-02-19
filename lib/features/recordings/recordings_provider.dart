@@ -269,11 +269,10 @@ class RecordingsProvider extends ChangeNotifier {
           .setAudioSource(AudioSource.file(recording.playbackPath!));
     }
 
-    playingDuration = _playingDuration();
-
     midiPlayCurrentEventPos = null;
     parsedRecordingMidi = AppFileSystem.midiFileFromRecording(recording.path);
     noteOnEvents.clear();
+
     for (List<MidiEvent> track in parsedRecordingMidi!.tracks) {
       int absolutePosition = 0;
       for (int i = 0; i < track.length; i++) {
@@ -296,6 +295,7 @@ class RecordingsProvider extends ChangeNotifier {
 
     midiMilliSecondsDuration = getMidiMilliSecondsDuration();
     relativePlayingPosition = 0;
+    playingDuration = _playingDuration();
 
     notifyListeners();
   }
