@@ -44,12 +44,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // load function directly after state is initialized
     // https://pub.dev/packages/after_layout
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _introductionOverlay.open();
-
-      return;
-
       // check for field in settings -> if introduction overlay should be displayed
-
       if (!Provider.of<SettingsProvider>(context, listen: false)
           .settings
           .introDisplayed) {

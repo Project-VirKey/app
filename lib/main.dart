@@ -16,9 +16,6 @@ import 'package:window_size/window_size.dart';
 import 'features/settings/settings_shared_preferences.dart';
 
 Future<void> main() async {
-  int start = AppTimestamp.now;
-  int duration = 0;
-
   WidgetsFlutterBinding.ensureInitialized();
 
   if (PlatformHelper.isDesktop) {
@@ -28,19 +25,11 @@ Future<void> main() async {
     }
   }
 
-  duration = AppTimestamp.now - start - duration;
-  print('after - window-size/WidgetsFlutterBinding - $duration');
-
   // initialize folders for user content (recordings, ...)
   await AppFileSystem.initFolders();
 
-  duration = AppTimestamp.now - start - duration;
-  print('after - folders - $duration');
-
   AppSharedPreferences.loadedSharedPreferences =
       await AppSharedPreferences.loadData();
-  duration = AppTimestamp.now - start - duration;
-  print('after - AppSharedPreferences - $duration');
 
   // run the app
   runApp(MultiProvider(
@@ -82,16 +71,6 @@ Future<void> main() async {
     ],
     child: const App(),
   ));
-
-  duration = AppTimestamp.now - start - duration;
-  print('after - state loading - $duration');
-
-  // duration = AppTimestamp.now - start - duration;
-  // print('after - init Firebase - $duration');
-  // duration = AppTimestamp.now - start - duration;
-  // print('after - auth - $duration');
-
-  print('complete duration - ${AppTimestamp.now - start}');
 }
 
 class App extends StatelessWidget {
