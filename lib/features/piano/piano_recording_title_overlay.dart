@@ -105,9 +105,6 @@ class RecordingTitleOverlay {
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter a title!';
-                                      } else if (value.length < 2) {
-                                        // TODO: implement check for existing titles
-                                        return '...';
                                       }
                                       return null;
                                     },

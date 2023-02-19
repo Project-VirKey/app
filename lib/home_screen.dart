@@ -109,7 +109,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   onPressed: () {
                                     context.go('/piano');
                                     recordingsProvider.pauseRecording();
-                                    // TODO: stop playing recording when changing routes: stop midi playback at correct time
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
