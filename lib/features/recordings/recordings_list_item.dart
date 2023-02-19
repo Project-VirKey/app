@@ -357,55 +357,56 @@ class RecordingsListItem extends StatelessWidget {
                               ),
                             ),
                           ),
-                        Consumer<SettingsProvider>(
-                          builder: (BuildContext context,
-                                  SettingsProvider settingsProvider,
-                                  Widget? child) =>
-                              PropertyDescriptionActionCombination(
-                            title: 'All Files (ZIP)',
-                            child: AppIcon(
-                              icon: HeroIcons.arrowUpTray,
-                              color: AppColors.dark,
-                              onPressed: () async {
-                                String exportRecordingPath =
-                                    '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
-                                await Piano.midiToWav(
-                                    recording.path, exportRecordingPath);
-
-                                List<String> filePaths = [
-                                  recording.path,
-                                  exportRecordingPath
-                                ];
-                                if (recording.playbackPath != null) {
-                                  String exportRecordingPlaybackPath =
-                                      '${AppFileSystem.recordingsFolderPath}${recording.title}_Export-Playback.wav';
-
+                        if (PlatformHelper.isDesktop)
+                          Consumer<SettingsProvider>(
+                            builder: (BuildContext context,
+                                    SettingsProvider settingsProvider,
+                                    Widget? child) =>
+                                PropertyDescriptionActionCombination(
+                              title: 'All Files (ZIP)',
+                              child: AppIcon(
+                                icon: HeroIcons.arrowUpTray,
+                                color: AppColors.dark,
+                                onPressed: () async {
+                                  String exportRecordingPath =
+                                      '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
                                   await Piano.midiToWav(
-                                      recording.path,
-                                      exportRecordingPlaybackPath,
-                                      recording.playbackPath!,
-                                      settingsProvider
-                                          .settings.audioVolume.soundLibrary,
-                                      settingsProvider
-                                          .settings.audioVolume.audioPlayback);
+                                      recording.path, exportRecordingPath);
 
-                                  filePaths.add(recording.playbackPath!);
-                                  filePaths.add(exportRecordingPlaybackPath);
-                                }
+                                  List<String> filePaths = [
+                                    recording.path,
+                                    exportRecordingPath
+                                  ];
+                                  if (recording.playbackPath != null) {
+                                    String exportRecordingPlaybackPath =
+                                        '${AppFileSystem.recordingsFolderPath}${recording.title}_Export-Playback.wav';
 
-                                String exportZipPath =
-                                    '${AppFileSystem.recordingsFolderPath}${recording.title}.zip';
+                                    await Piano.midiToWav(
+                                        recording.path,
+                                        exportRecordingPlaybackPath,
+                                        recording.playbackPath!,
+                                        settingsProvider
+                                            .settings.audioVolume.soundLibrary,
+                                        settingsProvider.settings.audioVolume
+                                            .audioPlayback);
 
-                                await AppFileSystem.createZipFile(
-                                    exportZipPath, filePaths);
+                                    filePaths.add(recording.playbackPath!);
+                                    filePaths.add(exportRecordingPlaybackPath);
+                                  }
 
-                                AppFileSystem.exportFile(
-                                    path: exportZipPath,
-                                    dialogTitle: 'Export all Files (ZIP)');
-                              },
+                                  String exportZipPath =
+                                      '${AppFileSystem.recordingsFolderPath}${recording.title}.zip';
+
+                                  await AppFileSystem.createZipFile(
+                                      exportZipPath, filePaths);
+
+                                  AppFileSystem.exportFile(
+                                      path: exportZipPath,
+                                      dialogTitle: 'Export all Files (ZIP)');
+                                },
+                              ),
                             ),
                           ),
-                        ),
                         const PropertiesDescriptionTitle(
                           title: 'Delete',
                         ),
