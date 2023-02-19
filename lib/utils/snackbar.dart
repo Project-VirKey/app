@@ -24,15 +24,15 @@ class AppSnackBar {
 
   void open() {
     _animationController.addListener(() {
-      _overlayState?.setState(() {});
+      _overlayState.setState(() {});
     });
-    _overlayState?.insert(_overlay);
+    _overlayState.insert(_overlay);
     _animationController.forward();
 
     Future.delayed(const Duration(seconds: 5), () => close());
   }
 
-  late final OverlayState? _overlayState = Overlay.of(context);
+  late final OverlayState _overlayState = Overlay.of(context);
 
   late final AnimationController _animationController = AnimationController(
     vsync: vsync,
