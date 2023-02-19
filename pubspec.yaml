@@ -70,7 +70,17 @@ dependencies:
   expandable_page_view: ^1.0.17
   dots_indicator: ^2.1.0
   collection: ^1.17.0
-#  ffmpeg_kit_flutter_min: ^4.4.0-LTS
+  # ffmpeg_kit_flutter_min
+  # minimal version of ffmpeg
+  # in quotes -> otherwise "-LTS" would not be detected
+  # LTS (Latest Stable Release) is needed to meet the target macos version
+  # https://github.com/arthenica/ffmpeg-kit/wiki/Packages, 19.02.2023
+  # https://github.com/arthenica/ffmpeg-kit/wiki/LTS-Releases, 19.02.2023
+  # "Quotes"-Problem solved with (Troubleshooting Guide from another plugin, which uses ffmpeg_kit): https://github.com/sbis04/video_trimmer#troubleshooting, 19.02.2023
+  ffmpeg_kit_flutter_min: "5.1.0-LTS"
+
+  # reinstall dependencies with:
+  # pod install
 
 dev_dependencies:
   flutter_test:

@@ -304,10 +304,10 @@ class RecordingsListItem extends StatelessWidget {
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
                             onPressed: () async {
-                              // AppLoadingOverlay appLoadingOverlay =
-                              //     AppLoadingOverlay(
-                              //         context: context, vsync: vsync)
-                              //       ..open();
+                              AppLoadingOverlay appLoadingOverlay =
+                                  AppLoadingOverlay(
+                                      context: context, vsync: vsync)
+                                    ..open();
 
                               String exportRecordingPath =
                                   '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
@@ -315,9 +315,7 @@ class RecordingsListItem extends StatelessWidget {
                               await Piano.midiToWav(
                                   recording.path, exportRecordingPath);
 
-                              print('export - ${File(exportRecordingPath).existsSync()}');
-
-                              // appLoadingOverlay.close();
+                              appLoadingOverlay.close();
 
                               AppFileSystem.exportFile(
                                   path: exportRecordingPath,
@@ -348,6 +346,11 @@ class RecordingsListItem extends StatelessWidget {
                                 icon: HeroIcons.arrowUpTray,
                                 color: AppColors.dark,
                                 onPressed: () async {
+                                  AppLoadingOverlay appLoadingOverlay =
+                                  AppLoadingOverlay(
+                                      context: context, vsync: vsync)
+                                    ..open();
+
                                   String exportRecordingPlaybackPath =
                                       '${AppFileSystem.recordingsFolderPath}${recording.title}_Export-Playback.wav';
 
@@ -359,6 +362,8 @@ class RecordingsListItem extends StatelessWidget {
                                           .settings.audioVolume.soundLibrary,
                                       settingsProvider
                                           .settings.audioVolume.audioPlayback);
+
+                                  appLoadingOverlay.close();
 
                                   AppFileSystem.exportFile(
                                       path: exportRecordingPlaybackPath,
