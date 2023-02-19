@@ -3,8 +3,6 @@ import 'dart:io';
 
 import 'package:dart_melty_soundfont/dart_melty_soundfont.dart';
 import 'package:dart_midi/dart_midi.dart';
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
 
 // import 'package:ffmpeg_cli/ffmpeg_cli.dart' hide Stream;
 import 'package:flutter/services.dart';
@@ -415,6 +413,8 @@ class Piano {
     // print(
     //     '-i ${inputFilePaths.join(' -i ')} amix=inputs=${inputFilePaths.length}:duration=longest:normalize=0:weights="${weights.join(' ')}" $outputFilepath');
 
+    return;
+    /*
     FFmpegKit.executeAsync(
             '-i ${inputFilePaths.join(' -i ')} amix=inputs=${inputFilePaths.length}:duration=longest:normalize=0:weights="${weights.join(' ')}" $outputFilepath')
         .then((dynamic session) async {
@@ -434,6 +434,8 @@ class Piano {
         print('FFMPEG error');
       }
     });
+
+     */
   }
 
 /*
