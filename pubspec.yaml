@@ -65,7 +65,6 @@ dependencies:
       path: .
   flutter_midi_command: ^0.4.10
   archive: ^3.3.5
-  loading_animation_widget: ^1.2.0+4
   after_layout: ^1.2.0
   expandable_page_view: ^1.0.17
   dots_indicator: ^2.1.0

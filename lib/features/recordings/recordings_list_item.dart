@@ -18,7 +18,6 @@ import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/file_system.dart';
-import 'package:virkey/utils/loading_overlay.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
 class RecordingsListItem extends StatelessWidget {
@@ -304,18 +303,11 @@ class RecordingsListItem extends StatelessWidget {
                             icon: HeroIcons.arrowUpTray,
                             color: AppColors.dark,
                             onPressed: () async {
-                              AppLoadingOverlay appLoadingOverlay =
-                                  AppLoadingOverlay(
-                                      context: context, vsync: vsync)
-                                    ..open();
-
                               String exportRecordingPath =
                                   '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
 
                               await Piano.midiToWav(
                                   recording.path, exportRecordingPath);
-
-                              appLoadingOverlay.close();
 
                               AppFileSystem.exportFile(
                                   path: exportRecordingPath,
@@ -346,11 +338,6 @@ class RecordingsListItem extends StatelessWidget {
                                 icon: HeroIcons.arrowUpTray,
                                 color: AppColors.dark,
                                 onPressed: () async {
-                                  AppLoadingOverlay appLoadingOverlay =
-                                  AppLoadingOverlay(
-                                      context: context, vsync: vsync)
-                                    ..open();
-
                                   String exportRecordingPlaybackPath =
                                       '${AppFileSystem.recordingsFolderPath}${recording.title}_Export-Playback.wav';
 
@@ -362,8 +349,6 @@ class RecordingsListItem extends StatelessWidget {
                                           .settings.audioVolume.soundLibrary,
                                       settingsProvider
                                           .settings.audioVolume.audioPlayback);
-
-                                  appLoadingOverlay.close();
 
                                   AppFileSystem.exportFile(
                                       path: exportRecordingPlaybackPath,
@@ -382,11 +367,6 @@ class RecordingsListItem extends StatelessWidget {
                               icon: HeroIcons.arrowUpTray,
                               color: AppColors.dark,
                               onPressed: () async {
-                                AppLoadingOverlay appLoadingOverlay =
-                                    AppLoadingOverlay(
-                                        context: context, vsync: vsync);
-                                await appLoadingOverlay.open();
-
                                 String exportRecordingPath =
                                     '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
                                 await Piano.midiToWav(
@@ -418,8 +398,6 @@ class RecordingsListItem extends StatelessWidget {
 
                                 await AppFileSystem.createZipFile(
                                     exportZipPath, filePaths);
-
-                                appLoadingOverlay.close();
 
                                 AppFileSystem.exportFile(
                                     path: exportZipPath,
