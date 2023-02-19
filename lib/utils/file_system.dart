@@ -238,7 +238,8 @@ class AppFileSystem {
   }
 
   static String getFilenameWithoutExtension(String path) {
-    return path.split(Platform.pathSeparator).last.split('.').first;
+    return (path.split(Platform.pathSeparator).last.split('.')..removeLast())
+        .join('.');
   }
 
   static String getFileExtensionFromPath(String path) {
