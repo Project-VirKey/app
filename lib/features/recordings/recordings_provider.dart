@@ -151,6 +151,7 @@ class RecordingsProvider extends ChangeNotifier {
   }
 
   Future<void> contractRecordingItem() async {
+    pauseRecording();
     removeAllRecordingItems();
     for (var element
         in AppFileSystem.filterFilesList(_recordingsFolderFiles, ['mid'])

@@ -60,6 +60,7 @@ class IntroductionOverlay {
         padding: const EdgeInsets.symmetric(horizontal: 11),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: _maxWidthDesktop),
+          // TODO: make introduction screen scrollable
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

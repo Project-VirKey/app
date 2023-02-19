@@ -16,8 +16,10 @@ import 'package:virkey/features/piano/piano_play_button.dart';
 import 'package:virkey/features/recordings/recordings_list.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/recordings/recordings_title_bar.dart';
+import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
+import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/platform_helper.dart';
 import 'package:virkey/utils/snackbar.dart';
@@ -43,11 +45,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     // load function directly after state is initialized
     // https://pub.dev/packages/after_layout
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       // check for field in settings -> if introduction overlay should be displayed
-      if (!Provider.of<SettingsProvider>(context, listen: false)
-          .settings
-          .introDisplayed) {
+      Settings? loadedSettings =
+          AppSharedPreferences.loadedSharedPreferences?['settings'];
+
+      if (loadedSettings != null && !loadedSettings.introDisplayed) {
         _introductionOverlay.open();
         Provider.of<SettingsProvider>(context, listen: false)
             .setIntroDisplayed(true);

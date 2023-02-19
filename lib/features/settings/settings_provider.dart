@@ -161,7 +161,7 @@ class SettingsProvider extends ChangeNotifier {
   }
 
   void setIntroDisplayed(bool value) {
-    settings.introDisplayed = value;
-    AppSharedPreferences.saveData(settings: settings);
+    _settings.introDisplayed = value;
+    AppSharedPreferences.saveData(settings: _settings);
   }
 }
