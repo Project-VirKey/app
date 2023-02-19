@@ -1,11 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/app_introduction/introduction_provider.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
-import 'package:virkey/features/cloud_synchronisation/cloud_storage.dart';
 import 'package:virkey/features/midi_device/midi_device_provider.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
@@ -13,44 +11,36 @@ import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/routing/router.dart';
 import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/platform_helper.dart';
+import 'package:virkey/utils/timestamp.dart';
 import 'package:window_size/window_size.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'features/cloud_synchronisation/firestore.dart';
 import 'features/settings/settings_shared_preferences.dart';
-import 'firebase_options.dart';
 
 Future<void> main() async {
-  // define minimal window size for desktop
+  int start = AppTimestamp.now;
+  int duration = 0;
+
   WidgetsFlutterBinding.ensureInitialized();
 
   if (PlatformHelper.isDesktop) {
-    setWindowMinSize(const Size(830, 580));
+    // define minimal window size for desktop
+    if (PlatformHelper.isDesktop) {
+      setWindowMinSize(const Size(830, 580));
+    }
   }
+
+  duration = AppTimestamp.now - start - duration;
+  print('after - window-size/WidgetsFlutterBinding - $duration');
 
   // initialize folders for user content (recordings, ...)
   await AppFileSystem.initFolders();
 
-  // cloud-synchronization
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  duration = AppTimestamp.now - start - duration;
+  print('after - folders - $duration');
 
-  // reload authentication on start-up
-  try {
-    await FirebaseAuth.instance.currentUser?.reload();
-  } catch (e) {
-    print(e);
-  }
-
-  // load firestore document
-  await AppFirestore.initialLoad();
-  // TODO: what happens if not logged in?
-
-  await AppCloudStorage.initialLoad();
-
-  // TODO: load SharedPreferences before initializing NotifierProvider
   AppSharedPreferences.loadedSharedPreferences =
       await AppSharedPreferences.loadData();
+  duration = AppTimestamp.now - start - duration;
+  print('after - AppSharedPreferences - $duration');
 
   // run the app
   runApp(MultiProvider(
@@ -92,6 +82,16 @@ Future<void> main() async {
     ],
     child: const App(),
   ));
+
+  duration = AppTimestamp.now - start - duration;
+  print('after - state loading - $duration');
+
+  // duration = AppTimestamp.now - start - duration;
+  // print('after - init Firebase - $duration');
+  // duration = AppTimestamp.now - start - duration;
+  // print('after - auth - $duration');
+
+  print('complete duration - ${AppTimestamp.now - start}');
 }
 
 class App extends StatelessWidget {

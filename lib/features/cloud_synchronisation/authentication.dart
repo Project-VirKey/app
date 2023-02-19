@@ -2,7 +2,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class AppAuthentication {
   static User? user() {
-    return FirebaseAuth.instance.currentUser;
+    try {
+      return FirebaseAuth.instance.currentUser;
+    } catch (e) {
+      return null;
+    }
   }
 
   static Future<List> logIn(String emailAddress, String password) async {

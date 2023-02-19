@@ -1,7 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:virkey/features/cloud_synchronisation/firestore.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
+import 'package:virkey/firebase_options.dart';
+
+import 'cloud_storage.dart';
 
 class CloudProvider extends ChangeNotifier {
   final Cloud _cloud = Cloud(loggedIn: false);
@@ -11,8 +15,31 @@ class CloudProvider extends ChangeNotifier {
   bool get loggedIn => _cloud.loggedIn;
 
   CloudProvider(this.settingsProvider) {
-    checkAuthStatus();
+    initialLoad();
     // test();
+  }
+
+  Future<void> initialLoad() async {
+    // cloud-synchronization
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // reload authentication on start-up
+    try {
+      await FirebaseAuth.instance.currentUser?.reload();
+    } catch (e) {
+      print(e);
+    }
+
+    checkAuthStatus();
+
+    // load firestore document
+    await AppFirestore.initialLoad();
+
+    await AppCloudStorage.initialLoad();
+
+    print('after - cloud provider - initial load');
   }
 
   SettingsProvider settingsProvider;
@@ -72,9 +99,11 @@ class CloudProvider extends ChangeNotifier {
       print('check most recent Update');
 
       // TODO: isLocalLatest is not actually the correct timestamp -> correction needed
-      print('----- ${settingsProvider.lastUpdated} * ${AppFirestore.document!['lastUpdated']} -----');
+      print(
+          '----- ${settingsProvider.lastUpdated} * ${AppFirestore.document!['lastUpdated']} -----');
 
-      if (settingsProvider.lastUpdated == AppFirestore.document!['lastUpdated']) {
+      if (settingsProvider.lastUpdated ==
+          AppFirestore.document!['lastUpdated']) {
         print('cloud and local state are equal');
         return;
       }

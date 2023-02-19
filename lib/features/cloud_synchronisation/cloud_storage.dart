@@ -37,7 +37,7 @@ class AppCloudStorage {
       return;
     }
 
-    print('cloud storage initialLoad');
+    // print('cloud storage initialLoad');
 
     storageRef =
         storageRef.child(FirebaseAuth.instance.currentUser?.uid as String);
