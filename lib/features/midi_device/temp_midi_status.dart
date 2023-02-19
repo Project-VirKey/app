@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';

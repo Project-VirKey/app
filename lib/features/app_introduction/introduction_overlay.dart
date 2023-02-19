@@ -1,3 +1,4 @@
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
@@ -9,6 +10,7 @@ import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/utils/platform_helper.dart';
 
 class IntroductionOverlay {
   final BuildContext context;
@@ -24,6 +26,8 @@ class IntroductionOverlay {
   }
 
   void open() {
+    Provider.of<IntroductionProvider>(context, listen: false)
+        .currentSlideIndex = 0;
     _overlay.open();
   }
 
@@ -39,17 +43,80 @@ class IntroductionOverlay {
 
   final PageController _pageController = PageController();
 
-  final List<Widget> _slides = [
-    const AppText(
-      text: 'Slide 1',
-    ),
-    const AppText(
-      text: 'Slide 2',
-    ),
-    const AppText(
-      text: 'Slide 3',
-    ),
-  ];
+  static const double _maxWidthDesktop = 574;
+
+  static const _introductionImagesPath = 'assets/images/introduction_overlay/';
+
+  static Image _introductionImage(int index) => Image(
+      image: AssetImage(_introductionImagesPath +
+          (PlatformHelper.isDesktop
+              ? 'desktop/$index.png'
+              : 'mobile/$index.png')));
+
+  static Widget _slide(int imageNumber, String text, [String? optionalText]) {
+    return Flexible(
+      fit: FlexFit.loose,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 11),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: _maxWidthDesktop),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _introductionImage(imageNumber),
+              AppText(
+                size: 19,
+                height: 1.6,
+                letterSpacing: 4,
+                textAlign: TextAlign.center,
+                text: text,
+              ),
+              const SizedBox(height: 35),
+              if (optionalText != null)
+                AppText(
+                  height: 1.5,
+                  textAlign: TextAlign.center,
+                  text: optionalText,
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> get _slides => [
+        _slide(
+          1,
+          "You can start playing by pressing the 'Play' button if a VirKey is connected to your device!",
+          "Note: It is also possible to play without a VirKey connected.",
+        ),
+        _slide(
+          2,
+          "Your recordings can be found underneath the 'Play' button.",
+        ),
+        _slide(
+          3,
+          "In the settings you can change the volume, the sound libraries and log in for cloud synchronization.",
+          "Note: settings, recordings and sound libraries will be synchronized.",
+        ),
+        _slide(
+          4,
+          "After pressing the 'Play' button you access the piano view. Here you are able to see which notes you are playing.",
+        ),
+        _slide(
+          5,
+          "Here you can start recording the notes you play.",
+        ),
+        _slide(
+          6,
+          "Here you can switch between octaves.",
+        ),
+        _slide(
+          7,
+          "And here you can change the output instrument or run a playback track. \n Have fun with VirKey!",
+        ),
+      ];
 
   late final AppOverlay _overlay = AppOverlay(
     context: context,
@@ -67,7 +134,7 @@ class IntroductionOverlay {
                   right: 0,
                   child: Center(
                     child: AppText(
-                      text: 'Intro',
+                      text: 'Welcome!',
                       size: 30,
                       family: AppFonts.secondary,
                     ),
@@ -102,33 +169,26 @@ class IntroductionOverlay {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ExpandablePageView.builder(
-                        controller: _pageController,
-                        itemCount: _slides.length,
-                        onPageChanged: (int index) {
-                          introductionProvider.currentSlideIndex = index;
-                          introductionProvider.notify();
-                        },
-                        itemBuilder: (context, index) {
-                          return Container(
-                            color: Colors.lightBlueAccent,
-                            child: Column(
+                      Expanded(
+                        child: ExpandablePageView.builder(
+                          controller: _pageController,
+                          itemCount: _slides.length,
+                          onPageChanged: (int index) {
+                            introductionProvider.currentSlideIndex = index;
+                            introductionProvider.notify();
+                          },
+                          itemBuilder: (context, index) {
+                            return Column(
                               children: [
                                 Row(
                                   mainAxisSize: MainAxisSize.max,
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 20),
-                                      child: _slides[index],
-                                    )
-                                  ],
+                                  children: [_slides[index]],
                                 ),
                               ],
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ],
                   ),
@@ -136,49 +196,108 @@ class IntroductionOverlay {
               ),
               Padding(
                 padding: const EdgeInsets.all(11),
-                child: Row(
+                child: Column(
                   children: [
-                    Expanded(
-                      child: AppButton(
-                        appText: AppText(
-                          text: introductionProvider.currentSlideIndex == 0
-                              ? 'Skip'
-                              : 'Previous',
-                          color: AppColors.white,
-                          size: 22,
-                          letterSpacing: 5,
-                        ),
-                        onPressed: () {
-                          if (introductionProvider.currentSlideIndex == 0) {
-                            _pageController.jumpToPage(_slides.length - 1);
-                          } else {
-                            _pageController.previousPage(
-                                duration: _slideDuration, curve: _slideCurve);
-                          }
-                        },
+                    if (!PlatformHelper.isDesktop &&
+                        introductionProvider.currentSlideIndex ==
+                            _slides.length - 1)
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: AppButton(
+                                    appText: const AppText(
+                                      text: "Let's Play",
+                                      color: AppColors.white,
+                                      size: 22,
+                                      letterSpacing: 5,
+                                    ),
+                                    onPressed: () {
+                                      close();
+                                    }),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 10)
+                        ],
+                      ),
+                    DotsIndicator(
+                      dotsCount: _slides.length,
+                      position:
+                          introductionProvider.currentSlideIndex.toDouble(),
+                      decorator: const DotsDecorator(
+                        color: AppColors.white,
+                        activeColor: AppColors.primary,
+                        size: Size.square(12),
+                        activeSize: Size.square(12),
+                        spacing:
+                            EdgeInsets.symmetric(horizontal: 3, vertical: 6),
+                        shape: CircleBorder(
+                            side: BorderSide(color: AppColors.primary)),
                       ),
                     ),
-                    Expanded(
-                      child: AppButton(
-                        appText: AppText(
-                          text: introductionProvider.currentSlideIndex ==
-                                  _slides.length - 1
-                              ? 'Done'
-                              : 'Next',
-                          color: AppColors.white,
-                          size: 22,
-                          letterSpacing: 5,
-                        ),
-                        onPressed: () {
-                          if (introductionProvider.currentSlideIndex ==
-                              _slides.length - 1) {
-                            close();
-                          } else {
-                            _pageController.nextPage(
-                                duration: _slideDuration, curve: _slideCurve);
-                          }
-                        },
+                    if (PlatformHelper.isDesktop)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppButton(
+                              appText: AppText(
+                                text:
+                                    introductionProvider.currentSlideIndex == 0
+                                        ? 'Skip'
+                                        : 'Previous',
+                                color: AppColors.white,
+                                size: 22,
+                                letterSpacing: 5,
+                              ),
+                              onPressed: () {
+                                if (introductionProvider.currentSlideIndex ==
+                                    0) {
+                                  _pageController
+                                      .jumpToPage(_slides.length - 1);
+                                } else {
+                                  _pageController.previousPage(
+                                      duration: _slideDuration,
+                                      curve: _slideCurve);
+                                }
+                              },
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          Expanded(
+                            child: AppButton(
+                              appText: AppText(
+                                text: introductionProvider.currentSlideIndex ==
+                                        _slides.length - 1
+                                    ? "Let's Play"
+                                    : 'Next',
+                                color: AppColors.white,
+                                size: 22,
+                                letterSpacing: 5,
+                              ),
+                              onPressed: () {
+                                if (introductionProvider.currentSlideIndex ==
+                                    _slides.length - 1) {
+                                  close();
+                                } else {
+                                  _pageController.nextPage(
+                                      duration: _slideDuration,
+                                      curve: _slideCurve);
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
+                    const SizedBox(height: 15),
+                    const AppText(
+                      textAlign: TextAlign.center,
+                      text: 'www.virkey.at',
+                      letterSpacing: 3,
+                      weight: AppFonts.weightLight,
                     ),
                   ],
                 ),

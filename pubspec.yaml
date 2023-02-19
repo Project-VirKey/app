@@ -71,6 +71,7 @@ dependencies:
   after_layout: ^1.2.0
   expandable_page_view: ^1.0.17
   dots_indicator: ^2.1.0
+  collection: ^1.16.0
 
 dev_dependencies:
   flutter_test:
@@ -99,6 +100,8 @@ flutter:
   assets:
     - assets/images/VIK_Logo_v2.svg
     - assets/sound_libraries/Grand-Piano.sf2
+    - assets/images/introduction_overlay/desktop/
+    - assets/images/introduction_overlay/mobile/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
