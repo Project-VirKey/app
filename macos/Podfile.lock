@@ -610,6 +610,13 @@ PODS:
     - firebase_core
     - FlutterMacOS
     - nanopb (< 2.30910.0, >= 2.30908.0)
+  - ffmpeg-kit-macos-min (5.1.LTS)
+  - ffmpeg_kit_flutter_min (5.1.0.LTS):
+    - ffmpeg_kit_flutter_min/min-lts (= 5.1.0.LTS)
+    - FlutterMacOS
+  - ffmpeg_kit_flutter_min/min-lts (5.1.0.LTS):
+    - ffmpeg-kit-macos-min (= 5.1.LTS)
+    - FlutterMacOS
   - Firebase/Auth (10.3.0):
     - Firebase/CoreOnly
     - FirebaseAuth (~> 10.3.0)
@@ -769,6 +776,7 @@ PODS:
 DEPENDENCIES:
   - audio_session (from `Flutter/ephemeral/.symlinks/plugins/audio_session/macos`)
   - cloud_firestore (from `Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos`)
+  - ffmpeg_kit_flutter_min (from `Flutter/ephemeral/.symlinks/plugins/ffmpeg_kit_flutter_min/macos`)
   - firebase_auth (from `Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos`)
   - firebase_core (from `Flutter/ephemeral/.symlinks/plugins/firebase_core/macos`)
   - firebase_storage (from `Flutter/ephemeral/.symlinks/plugins/firebase_storage/macos`)
@@ -785,6 +793,7 @@ SPEC REPOS:
   trunk:
     - abseil
     - BoringSSL-GRPC
+    - ffmpeg-kit-macos-min
     - Firebase
     - FirebaseAppCheckInterop
     - FirebaseAuth
@@ -808,6 +817,8 @@ EXTERNAL SOURCES:
     :path: Flutter/ephemeral/.symlinks/plugins/audio_session/macos
   cloud_firestore:
     :path: Flutter/ephemeral/.symlinks/plugins/cloud_firestore/macos
+  ffmpeg_kit_flutter_min:
+    :path: Flutter/ephemeral/.symlinks/plugins/ffmpeg_kit_flutter_min/macos
   firebase_auth:
     :path: Flutter/ephemeral/.symlinks/plugins/firebase_auth/macos
   firebase_core:
@@ -836,6 +847,8 @@ SPEC CHECKSUMS:
   audio_session: dea1f41890dbf1718f04a56f1d6150fd50039b72
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   cloud_firestore: 90a2fea19dd028dbeddc546a72df5686e33f6944
+  ffmpeg-kit-macos-min: 7da299c2765234aa12c04023c0ccfefdf29bdf60
+  ffmpeg_kit_flutter_min: 494af7a1f0eb88691b84464f706df2e611676dd2
   Firebase: f92fc551ead69c94168d36c2b26188263860acd9
   firebase_auth: d6a6ead448c11da379b02ccf4fb68908bbc052b8
   firebase_core: 8bcdc56ca0b558785aa19ac6b56a4753b9169813

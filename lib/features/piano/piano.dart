@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:dart_melty_soundfont/dart_melty_soundfont.dart';
 import 'package:dart_midi/dart_midi.dart';
-
-// import 'package:ffmpeg_cli/ffmpeg_cli.dart' hide Stream;
+import 'package:ffmpeg_kit_flutter_min/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_min/return_code.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
@@ -386,9 +386,8 @@ class Piano {
           getKeyboardAndPlaybackWeight(soundLibraryVolume, audioPlaybackVolume);
 
       weights = [
-        // number of tempFilePaths (stored notes) should be subtracted by 1 (-1), because playback path is added
-        // instead subtraction by 2 (-2) is needed
-        ...List.filled(tempFilePaths.length - 2, wavWeights[0]),
+        // number of tempFilePaths (stored notes) subtracted by 1 (-1), because playback path is added
+        ...List.filled(tempFilePaths.length - 1, wavWeights[0]),
         wavWeights[1]
       ];
     } else {
@@ -410,18 +409,15 @@ class Piano {
 
   static Future<void> combineAudioFiles(String outputFilepath,
       List<String> inputFilePaths, List<double> weights) async {
-    // print(
-    //     '-i ${inputFilePaths.join(' -i ')} amix=inputs=${inputFilePaths.length}:duration=longest:normalize=0:weights="${weights.join(' ')}" $outputFilepath');
+    File outputFile = File(outputFilepath);
+    if (await outputFile.exists()) {
+      await outputFile.delete();
+    }
 
-    return;
-    /*
     FFmpegKit.executeAsync(
-            '-i ${inputFilePaths.join(' -i ')} amix=inputs=${inputFilePaths.length}:duration=longest:normalize=0:weights="${weights.join(' ')}" $outputFilepath')
+            '-i "${inputFilePaths.join('" -i "')}" -filter_complex amix=inputs=${inputFilePaths.length}:duration=longest:normalize=0:weights="${weights.join(' ')}" "$outputFilepath"')
         .then((dynamic session) async {
       final returnCode = await session.getReturnCode();
-
-      print(session.getArguments());
-      print(await session.getOutput());
 
       if (ReturnCode.isSuccess(returnCode)) {
         // SUCCESS
@@ -431,11 +427,10 @@ class Piano {
         print('FFMPEG cancel');
       } else {
         // ERROR
-        print('FFMPEG error');
+        // on android simulator error is produces (returnCode is null), but export still works (19.02.2023)
+        print('FFMPEG error - $returnCode');
       }
     });
-
-     */
   }
 
 /*
