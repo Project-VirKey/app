@@ -238,59 +238,65 @@ class IntroductionOverlay {
                       ),
                     ),
                     if (PlatformHelper.isDesktop)
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AppButton(
-                              appText: AppText(
-                                text:
-                                    introductionProvider.currentSlideIndex == 0
-                                        ? 'Skip'
-                                        : 'Previous',
-                                color: AppColors.white,
-                                size: 22,
-                                letterSpacing: 5,
+                      ConstrainedBox(
+                        constraints:
+                            const BoxConstraints(maxWidth: _maxWidthDesktop),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: AppButton(
+                                appText: AppText(
+                                  text:
+                                      introductionProvider.currentSlideIndex ==
+                                              0
+                                          ? 'Skip'
+                                          : 'Previous',
+                                  color: AppColors.white,
+                                  size: 22,
+                                  letterSpacing: 5,
+                                ),
+                                onPressed: () {
+                                  if (introductionProvider.currentSlideIndex ==
+                                      0) {
+                                    _pageController
+                                        .jumpToPage(_slides.length - 1);
+                                  } else {
+                                    _pageController.previousPage(
+                                        duration: _slideDuration,
+                                        curve: _slideCurve);
+                                  }
+                                },
                               ),
-                              onPressed: () {
-                                if (introductionProvider.currentSlideIndex ==
-                                    0) {
-                                  _pageController
-                                      .jumpToPage(_slides.length - 1);
-                                } else {
-                                  _pageController.previousPage(
-                                      duration: _slideDuration,
-                                      curve: _slideCurve);
-                                }
-                              },
                             ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          Expanded(
-                            child: AppButton(
-                              appText: AppText(
-                                text: introductionProvider.currentSlideIndex ==
-                                        _slides.length - 1
-                                    ? "Let's Play"
-                                    : 'Next',
-                                color: AppColors.white,
-                                size: 22,
-                                letterSpacing: 5,
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Expanded(
+                              child: AppButton(
+                                appText: AppText(
+                                  text:
+                                      introductionProvider.currentSlideIndex ==
+                                              _slides.length - 1
+                                          ? "Let's Play"
+                                          : 'Next',
+                                  color: AppColors.white,
+                                  size: 22,
+                                  letterSpacing: 5,
+                                ),
+                                onPressed: () {
+                                  if (introductionProvider.currentSlideIndex ==
+                                      _slides.length - 1) {
+                                    close();
+                                  } else {
+                                    _pageController.nextPage(
+                                        duration: _slideDuration,
+                                        curve: _slideCurve);
+                                  }
+                                },
                               ),
-                              onPressed: () {
-                                if (introductionProvider.currentSlideIndex ==
-                                    _slides.length - 1) {
-                                  close();
-                                } else {
-                                  _pageController.nextPage(
-                                      duration: _slideDuration,
-                                      curve: _slideCurve);
-                                }
-                              },
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     const SizedBox(height: 15),
                     const AppText(
