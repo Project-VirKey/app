@@ -66,6 +66,7 @@ class _PianoScreenState extends State<PianoScreen>
 
     return Scaffold(
       backgroundColor: AppColors.secondary,
+      resizeToAvoidBottomInset: false,
       body: Center(
         child: Consumer3<SettingsProvider, PianoProvider, RecordingsProvider>(
           builder: (BuildContext context,
