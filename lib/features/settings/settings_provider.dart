@@ -41,6 +41,7 @@ class SettingsProvider extends ChangeNotifier {
 
     if (loadedSettings != null) {
       _settings.audioVolume = loadedSettings.audioVolume;
+      _settings.introDisplayed = loadedSettings.introDisplayed;
       if (PlatformHelper.isDesktop &&
           loadedSettings.defaultFolder.path.isNotEmpty) {
         _settings.defaultFolder = loadedSettings.defaultFolder;
@@ -53,8 +54,19 @@ class SettingsProvider extends ChangeNotifier {
           .where((soundLibrary) => soundLibrary.selected)
           .first;
 
-      for (var soundLibrary in _settings.soundLibraries) {
-        soundLibrary.selected = soundLibrary.name == selectedLibrary.name;
+      for (var i = 0; i < _settings.soundLibraries.length; i++) {
+
+        int loadedSoundLibraryIndex = loadedSettings.soundLibraries.indexWhere(
+            (SoundLibrary soundLibrary) =>
+                soundLibrary.name == _settings.soundLibraries[i].name);
+
+        if (loadedSoundLibraryIndex != -1) {
+          _settings.soundLibraries[i].url =
+              loadedSettings.soundLibraries[i].url;
+        }
+
+        _settings.soundLibraries[i].selected =
+            _settings.soundLibraries[i].name == selectedLibrary.name;
       }
     }
 
@@ -64,6 +76,11 @@ class SettingsProvider extends ChangeNotifier {
         .first;
     Piano.loadLibrary(soundLibrary.path, _settings.audioVolume.soundLibrary,
         soundLibrary.defaultLibrary);
+
+    print('------------------');
+    // print(loadedSettings?.toJson());
+    print(_settings.toJson());
+    print('------------------');
   }
 
   Future<void> loadSoundLibraries() async {
