@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
+import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
+import 'package:virkey/constants/radius.dart';
 import 'package:virkey/constants/shadows.dart';
 import 'package:virkey/utils/platform_helper.dart';
-import 'package:virkey/constants/radius.dart';
-import 'package:virkey/common_widgets/app_text.dart';
 
 class AppSnackBar {
   final String message;

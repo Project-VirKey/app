@@ -55,7 +55,6 @@ class SettingsProvider extends ChangeNotifier {
           .first;
 
       for (var i = 0; i < _settings.soundLibraries.length; i++) {
-
         int loadedSoundLibraryIndex = loadedSettings.soundLibraries.indexWhere(
             (SoundLibrary soundLibrary) =>
                 soundLibrary.name == _settings.soundLibraries[i].name);

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
-
-import 'package:virkey/constants/colors.dart';
 import 'package:virkey/common_widgets/app_shadow.dart';
+import 'package:virkey/constants/colors.dart';
 
 class AppCheckbox extends StatefulWidget {
   const AppCheckbox({

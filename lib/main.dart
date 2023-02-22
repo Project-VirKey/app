@@ -8,11 +8,11 @@ import 'package:virkey/features/midi_device/midi_device_provider.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
+import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/routing/router.dart';
 import 'package:virkey/utils/file_system.dart';
 import 'package:virkey/utils/platform_helper.dart';
 import 'package:window_size/window_size.dart';
-import 'features/settings/settings_shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

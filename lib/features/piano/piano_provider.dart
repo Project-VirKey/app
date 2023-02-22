@@ -288,7 +288,8 @@ class PianoProvider extends ChangeNotifier {
   Future<void> stopRecording() async {
     _isRecording = false;
 
-    if (File('${AppFileSystem.recordingsFolderPath}$recordingTitle.mid').existsSync()) {
+    if (File('${AppFileSystem.recordingsFolderPath}$recordingTitle.mid')
+        .existsSync()) {
       recordingTitle = '${recordingTitle}1';
     }
 

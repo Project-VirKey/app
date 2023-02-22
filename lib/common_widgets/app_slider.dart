@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:virkey/constants/colors.dart';
 
 class AppSlider extends StatelessWidget {

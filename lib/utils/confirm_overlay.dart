@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:virkey/common_widgets/app_button.dart';
-import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
 class AppConfirmOverlay {
@@ -45,11 +45,10 @@ class AppConfirmOverlay {
     );
   }
 
-  late final Widget _confirmButton =
-      _button(confirmButtonText, true, () {
-        onConfirm();
-        close();
-      });
+  late final Widget _confirmButton = _button(confirmButtonText, true, () {
+    onConfirm();
+    close();
+  });
   late final Widget _cancelButton = _button('Cancel', false, close);
 
   List<Widget> _buttons() {

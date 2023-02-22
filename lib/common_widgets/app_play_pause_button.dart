@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
-
 import 'package:virkey/constants/colors.dart';
 
 class AppPlayPauseButton extends StatelessWidget {
-   const AppPlayPauseButton({
+  const AppPlayPauseButton({
     Key? key,
     this.value = false,
     this.light = false,
