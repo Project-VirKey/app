@@ -33,10 +33,10 @@ class AppFirestore {
         false;
   }
 
-  static void setDocument(Map<String, dynamic> document) {
+  static Future<void> setDocument(Map<String, dynamic> document) async {
     // create document with userId (uid) as title
     // https://stackoverflow.com/a/61724209/17399214, 19.12.2022
-    db
+    await db
         ?.collection('users')
         .doc(FirebaseAuth.instance.currentUser?.uid as String)
         .set(document);
