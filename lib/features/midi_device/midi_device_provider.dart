@@ -75,8 +75,8 @@ class MidiDeviceProvider extends ChangeNotifier {
       return null;
     }
 
-    Iterable<MidiDevice>? devices =
-        midiDevices?.where((MidiDevice mD) => mD.name == deviceName || mD.name == deviceNameAndroid);
+    Iterable<MidiDevice>? devices = midiDevices?.where((MidiDevice mD) =>
+        mD.name == deviceName || mD.name == deviceNameAndroid);
     if (devices == null) {
       return null;
     } else {

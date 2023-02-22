@@ -1,15 +1,15 @@
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
-import 'package:virkey/features/app_introduction/introduction_provider.dart';
-import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
+import 'package:virkey/features/app_introduction/introduction_provider.dart';
+import 'package:virkey/utils/overlay.dart';
 import 'package:virkey/utils/platform_helper.dart';
 
 class IntroductionOverlay {

@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/fonts.dart';
 
-enum PropertyDescriptionActionCombinationType {
-  onlyChild,
-  titleAndChild
-}
+enum PropertyDescriptionActionCombinationType { onlyChild, titleAndChild }
 
 class PropertyDescriptionActionCombination extends StatelessWidget {
   const PropertyDescriptionActionCombination({
@@ -24,9 +21,10 @@ class PropertyDescriptionActionCombination extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 9),
       child: Row(
-        mainAxisAlignment: type != PropertyDescriptionActionCombinationType.titleAndChild
-            ? MainAxisAlignment.center
-            : MainAxisAlignment.spaceBetween,
+        mainAxisAlignment:
+            type != PropertyDescriptionActionCombinationType.titleAndChild
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.spaceBetween,
         children: [
           if (type != PropertyDescriptionActionCombinationType.onlyChild)
             Expanded(

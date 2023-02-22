@@ -3,13 +3,13 @@ import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
 import 'package:virkey/common_widgets/app_button.dart';
 import 'package:virkey/common_widgets/app_icon.dart';
+import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/common_widgets/app_text_form_field.dart';
+import 'package:virkey/constants/colors.dart';
+import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/cloud_synchronisation/authentication.dart';
 import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/utils/overlay.dart';
-import 'package:virkey/common_widgets/app_text.dart';
-import 'package:virkey/constants/colors.dart';
-import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/utils/platform_helper.dart';
 import 'package:virkey/utils/snackbar.dart';
 
@@ -43,10 +43,7 @@ class UpdateUsernameOverlay {
       Padding(
         padding: const EdgeInsets.all(11),
         child: SizedBox(
-          width: MediaQuery
-              .of(context)
-              .size
-              .width,
+          width: MediaQuery.of(context).size.width,
           height: 40,
           child: Stack(
             children: [
@@ -85,10 +82,7 @@ class UpdateUsernameOverlay {
               Padding(
                 padding: EdgeInsets.symmetric(
                     horizontal: PlatformHelper.isDesktop
-                        ? (MediaQuery
-                        .of(context)
-                        .size
-                        .width * 0.05)
+                        ? (MediaQuery.of(context).size.width * 0.05)
                         : 0),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -108,9 +102,9 @@ class UpdateUsernameOverlay {
                                     focusNode: _updateUsernameFocusNode,
                                     labelText: 'New Username',
                                     onChanged: (value) =>
-                                    {_username = value ?? ''},
+                                        {_username = value ?? ''},
                                     onSaved: (value) =>
-                                    {_username = value ?? ''},
+                                        {_username = value ?? ''},
                                     validator: (value) {
                                       if (value == null || value.isEmpty) {
                                         return 'Please enter a username!';
@@ -141,39 +135,39 @@ class UpdateUsernameOverlay {
           children: [
             Expanded(
               child: Consumer<CloudProvider>(
-                builder: (BuildContext context,
-                    CloudProvider cloudProvider, Widget? child) =>
+                builder: (BuildContext context, CloudProvider cloudProvider,
+                        Widget? child) =>
                     AppButton(
-                      appText: const AppText(
-                        text: 'Update',
-                        color: AppColors.white,
-                        size: 22,
-                        letterSpacing: 5,
-                      ),
-                      onPressed: () async {
-                        FocusManager.instance.primaryFocus?.unfocus();
+                  appText: const AppText(
+                    text: 'Update',
+                    color: AppColors.white,
+                    size: 22,
+                    letterSpacing: 5,
+                  ),
+                  onPressed: () async {
+                    FocusManager.instance.primaryFocus?.unfocus();
 
-                        if (_updateEmailFormKey.currentState!.validate()) {
-                          _updateEmailFormKey.currentState!.save();
+                    if (_updateEmailFormKey.currentState!.validate()) {
+                      _updateEmailFormKey.currentState!.save();
 
-                          List response =
+                      List response =
                           await AppAuthentication.updateUsername(_username);
 
-                          AppSnackBar(
+                      AppSnackBar(
                               message: response[1],
                               context: context,
                               vsync: vsync)
-                              .open();
+                          .open();
 
-                          if (response[0]) {
-                            // reload provider to display updated username
-                            cloudProvider.reload();
+                      if (response[0]) {
+                        // reload provider to display updated username
+                        cloudProvider.reload();
 
-                            close();
-                          }
-                        }
-                      },
-                    ),
+                        close();
+                      }
+                    }
+                  },
+                ),
               ),
             ),
           ],

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'package:virkey/constants/colors.dart';
 import 'package:virkey/common_widgets/app_shadow.dart';
+import 'package:virkey/constants/colors.dart';
 
 class AppSwitch extends StatelessWidget {
   const AppSwitch({
