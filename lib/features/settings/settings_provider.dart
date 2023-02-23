@@ -17,6 +17,8 @@ class SettingsProvider extends ChangeNotifier {
 
   int lastUpdated = 0;
 
+  Settings get settings => _settings;
+
   SettingsProvider() {
     initialLoad();
   }
@@ -113,8 +115,6 @@ class SettingsProvider extends ChangeNotifier {
     // notify listeners to rebuild affected components
     notifyListeners();
   }
-
-  Settings get settings => _settings;
 
   void selectSoundLibrary(SoundLibrary selectedSoundLibrary) {
     for (var soundLibrary in _settings.soundLibraries) {

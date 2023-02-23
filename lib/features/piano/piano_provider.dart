@@ -98,17 +98,17 @@ class PianoProvider extends ChangeNotifier {
   // optional playback while recording/playing
   bool isPlaybackActive = false;
 
-  bool isPlaybackPlaying = false;
+  bool _isPlaybackPlaying = false;
   String? playbackPath;
   String? playbackFileName;
-  AudioPlayer playbackPlayer = AudioPlayer();
+  final AudioPlayer _playbackPlayer = AudioPlayer();
 
   // optional midi file for displaying notes on piano keys
   bool isVisualizeMidiActive = false;
-  bool isVisualizeMidiPlaying = false;
+  bool _isVisualizeMidiPlaying = false;
   String? visualizeMidiPath;
   String? visualizeMidiFileName;
-  int? visualizeMidiCurrentEventPos;
+  int? _visualizeMidiCurrentEventPos;
 
   List get recordedNotes => _recordedNotes;
 
@@ -116,17 +116,17 @@ class PianoProvider extends ChangeNotifier {
 
   int get _elapsedTime => AppTimestamp.now - _startTimeStamp;
 
-  bool get isSomethingPlaying => isPlaybackPlaying || isVisualizeMidiPlaying;
+  bool get isSomethingPlaying => _isPlaybackPlaying || _isVisualizeMidiPlaying;
 
-  PianoProvider(this.settingsProvider) {
+  PianoProvider(this._settingsProvider) {
     displayTime = _resetDisplayTime;
   }
 
-  SettingsProvider settingsProvider;
+  SettingsProvider _settingsProvider;
 
   setSettingsProvider(SettingsProvider sP) {
-    settingsProvider = sP;
-    setPlaybackVolume(settingsProvider.settings.audioVolume.audioPlayback);
+    _settingsProvider = sP;
+    setPlaybackVolume(_settingsProvider.settings.audioVolume.audioPlayback);
     notifyListeners();
   }
 
@@ -139,7 +139,7 @@ class PianoProvider extends ChangeNotifier {
   void playPause() {
     togglePlayback();
 
-    if (isVisualizeMidiPlaying) {
+    if (_isVisualizeMidiPlaying) {
       pauseVisualizeMidi();
     } else {
       startVisualizeMidi();
@@ -147,7 +147,7 @@ class PianoProvider extends ChangeNotifier {
 
     if (!isRecording) {
       if (_displayTimeTimer == null) {
-        if (isPlaybackPlaying || isVisualizeMidiPlaying) {
+        if (_isPlaybackPlaying || _isVisualizeMidiPlaying) {
           setStartTimeStamp();
           startDisplayTimeTimer();
         }
@@ -155,7 +155,7 @@ class PianoProvider extends ChangeNotifier {
         if (_displayTimeTimer!.isActive) {
           pauseDisplayTimeTimer();
         } else {
-          if (isPlaybackPlaying || isVisualizeMidiPlaying) {
+          if (_isPlaybackPlaying || _isVisualizeMidiPlaying) {
             setStartTimeStamp();
             startDisplayTimeTimer();
           }
@@ -174,11 +174,11 @@ class PianoProvider extends ChangeNotifier {
       stopDisplayTimeTimer();
     }
 
-    isVisualizeMidiPlaying = false;
-    visualizeMidiCurrentEventPos = null;
+    _isVisualizeMidiPlaying = false;
+    _visualizeMidiCurrentEventPos = null;
 
     stopPlayback();
-    playbackPlayer.seek(const Duration(seconds: 0));
+    _playbackPlayer.seek(const Duration(seconds: 0));
 
     notifyListeners();
   }
@@ -227,7 +227,7 @@ class PianoProvider extends ChangeNotifier {
   // ----------------------------------------------------------------
 
   void togglePlayback() {
-    if (isPlaybackPlaying) {
+    if (_isPlaybackPlaying) {
       stopPlayback();
     } else {
       startPlayback();
@@ -236,19 +236,19 @@ class PianoProvider extends ChangeNotifier {
 
   void stopPlayback() {
     if (isPlaybackActive && playbackPath != null) {
-      playbackPlayer.stop();
-      isPlaybackPlaying = false;
+      _playbackPlayer.stop();
+      _isPlaybackPlaying = false;
     }
   }
 
   void startPlayback() {
     if (isPlaybackActive && playbackPath != null) {
-      playbackPlayer.play();
-      isPlaybackPlaying = true;
+      _playbackPlayer.play();
+      _isPlaybackPlaying = true;
     }
   }
 
-  void setPlaybackVolume(int volume) => playbackPlayer.setVolume(volume / 100);
+  void setPlaybackVolume(int volume) => _playbackPlayer.setVolume(volume / 100);
 
   // ----------------------------------------------------------------
 
@@ -278,7 +278,7 @@ class PianoProvider extends ChangeNotifier {
     _isRecording = true;
     _recordedNotes.clear();
 
-    playbackPlayer.seek(const Duration(seconds: 0));
+    _playbackPlayer.seek(const Duration(seconds: 0));
     startPlayback();
 
     stopVisualizeMidi();
@@ -302,14 +302,14 @@ class PianoProvider extends ChangeNotifier {
 
     createMidiFile(midiFilePath);
 
-    if (settingsProvider.settings.defaultSavedFiles.wav) {
+    if (_settingsProvider.settings.defaultSavedFiles.wav) {
       String exportRecordingPath =
           '${AppFileSystem.recordingsFolderPath}${recordingTitle}_Export.wav';
 
       Piano.midiToWav(midiFilePath, exportRecordingPath);
     }
 
-    if (settingsProvider.settings.defaultSavedFiles.wavAndPlayback &&
+    if (_settingsProvider.settings.defaultSavedFiles.wavAndPlayback &&
         playbackPath != null) {
       String exportRecordingPlaybackPath =
           '${AppFileSystem.recordingsFolderPath}${recordingTitle}_Export-Playback.wav';
@@ -318,8 +318,8 @@ class PianoProvider extends ChangeNotifier {
           midiFilePath,
           exportRecordingPlaybackPath,
           playbackPath,
-          settingsProvider.settings.audioVolume.soundLibrary,
-          settingsProvider.settings.audioVolume.audioPlayback);
+          _settingsProvider.settings.audioVolume.soundLibrary,
+          _settingsProvider.settings.audioVolume.audioPlayback);
     }
   }
 
@@ -373,7 +373,7 @@ class PianoProvider extends ChangeNotifier {
       return;
     }
 
-    isVisualizeMidiPlaying = true;
+    _isVisualizeMidiPlaying = true;
     MidiFile parsedMidi =
         AppFileSystem.midiFileFromRecording(visualizeMidiPath!);
 
@@ -382,17 +382,17 @@ class PianoProvider extends ChangeNotifier {
       for (int i = 0; i < track.length; i++) {
         MidiEvent midiEvent = track[i];
 
-        if (!isVisualizeMidiPlaying) {
+        if (!_isVisualizeMidiPlaying) {
           // if playing is set to false during midi visualization -> break out of the complete loop
           break midiEventTrackLoop;
         }
 
         if (midiEvent is! NoteOnEvent ||
-            (visualizeMidiCurrentEventPos ?? -1) + 1 > i) {
+            (_visualizeMidiCurrentEventPos ?? -1) + 1 > i) {
           continue;
         }
 
-        visualizeMidiCurrentEventPos = i;
+        _visualizeMidiCurrentEventPos = i;
 
         int octaveIndex =
             Piano.getOctaveIndexFromMidiNote(midiEvent.noteNumber);
@@ -443,12 +443,12 @@ class PianoProvider extends ChangeNotifier {
   }
 
   void stopVisualizeMidi() {
-    isVisualizeMidiPlaying = false;
-    visualizeMidiCurrentEventPos = null;
+    _isVisualizeMidiPlaying = false;
+    _visualizeMidiCurrentEventPos = null;
   }
 
   void pauseVisualizeMidi() {
-    isVisualizeMidiPlaying = false;
+    _isVisualizeMidiPlaying = false;
   }
 
   // ----------------------------------------------------------------
@@ -497,7 +497,7 @@ class PianoProvider extends ChangeNotifier {
     playbackPath = path;
     playbackFileName = AppFileSystem.getFilenameFromPath(path);
     isPlaybackActive = true;
-    playbackPlayer.setAudioSource(AudioSource.file(playbackPath!));
+    _playbackPlayer.setAudioSource(AudioSource.file(playbackPath!));
 
     notifyListeners();
   }

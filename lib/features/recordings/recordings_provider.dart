@@ -22,13 +22,10 @@ class RecordingsProvider extends ChangeNotifier {
   bool recordingTitleTextFieldVisible = false;
 
   bool isRecordingPlaying = false;
-  AudioPlayer playbackPlayer = AudioPlayer();
-  int? midiPlayCurrentEventPos;
-  bool isRecordingSliderModeManual = false;
-  MidiFile? parsedRecordingMidi;
-  List<List<int>> noteOnEvents = [];
-  int midiMilliSecondsDuration = 0;
-  int midiMilliSecondsPosition = 0;
+  AudioPlayer _playbackPlayer = AudioPlayer();
+  MidiFile? _parsedRecordingMidi;
+  final List<List<int>> _noteOnEvents = [];
+  int _midiMilliSecondsDuration = 0;
   double relativePlayingPosition = 0;
   Timer? _playingPositionTimer;
   int _startTimeStamp = 0;
@@ -43,15 +40,15 @@ class RecordingsProvider extends ChangeNotifier {
 
   List<Recording> get recordings => _recordings;
 
-  RecordingsProvider(this.settingsProvider) {
+  RecordingsProvider(this._settingsProvider) {
     refreshRecordingsFolderFiles();
   }
 
-  SettingsProvider settingsProvider;
+  SettingsProvider _settingsProvider;
 
   setSettingsProvider(SettingsProvider sP) {
-    settingsProvider = sP;
-    setPlaybackVolume(settingsProvider.settings.audioVolume.audioPlayback);
+    _settingsProvider = sP;
+    setPlaybackVolume(_settingsProvider.settings.audioVolume.audioPlayback);
     notifyListeners();
   }
 
@@ -243,15 +240,16 @@ class RecordingsProvider extends ChangeNotifier {
   }
 
   Duration _playingDuration() {
-    Duration midiDuration = Duration(milliseconds: midiMilliSecondsDuration);
+    Duration midiDuration = Duration(milliseconds: _midiMilliSecondsDuration);
 
-    if (playbackPlayer.duration == null) {
+    if (_playbackPlayer.duration == null) {
       return midiDuration;
     } else {
-      if (midiMilliSecondsDuration > playbackPlayer.duration!.inMilliseconds) {
+      if (_midiMilliSecondsDuration >
+          _playbackPlayer.duration!.inMilliseconds) {
         return midiDuration;
       } else {
-        return playbackPlayer.duration!;
+        return _playbackPlayer.duration!;
       }
     }
   }
@@ -262,19 +260,18 @@ class RecordingsProvider extends ChangeNotifier {
       getFormattedTime(Duration(milliseconds: _currentPosition));
 
   Future<void> setupRecordingPlayer(Recording recording) async {
-    playbackPlayer = AudioPlayer();
-    setPlaybackVolume(settingsProvider.settings.audioVolume.audioPlayback);
+    _playbackPlayer = AudioPlayer();
+    setPlaybackVolume(_settingsProvider.settings.audioVolume.audioPlayback);
 
     if (recording.playbackActive && recording.playbackPath != null) {
-      await playbackPlayer
+      await _playbackPlayer
           .setAudioSource(AudioSource.file(recording.playbackPath!));
     }
 
-    midiPlayCurrentEventPos = null;
-    parsedRecordingMidi = AppFileSystem.midiFileFromRecording(recording.path);
-    noteOnEvents.clear();
+    _parsedRecordingMidi = AppFileSystem.midiFileFromRecording(recording.path);
+    _noteOnEvents.clear();
 
-    for (List<MidiEvent> track in parsedRecordingMidi!.tracks) {
+    for (List<MidiEvent> track in _parsedRecordingMidi!.tracks) {
       int absolutePosition = 0;
       for (int i = 0; i < track.length; i++) {
         MidiEvent midiEvent = track[i];
@@ -285,7 +282,7 @@ class RecordingsProvider extends ChangeNotifier {
 
         absolutePosition += midiEvent.deltaTime + midiEvent.duration;
 
-        noteOnEvents.add([
+        _noteOnEvents.add([
           midiEvent.noteNumber,
           (absolutePosition - midiEvent.duration) ~/ 2,
           midiEvent.deltaTime,
@@ -294,7 +291,7 @@ class RecordingsProvider extends ChangeNotifier {
       }
     }
 
-    midiMilliSecondsDuration = getMidiMilliSecondsDuration();
+    _midiMilliSecondsDuration = getMidiMilliSecondsDuration();
     relativePlayingPosition = 0;
     playingDuration = _playingDuration();
 
@@ -304,7 +301,7 @@ class RecordingsProvider extends ChangeNotifier {
   int getMidiMilliSecondsDuration() {
     int milliSeconds = 0;
 
-    for (List<MidiEvent> track in parsedRecordingMidi!.tracks) {
+    for (List<MidiEvent> track in _parsedRecordingMidi!.tracks) {
       milliSeconds += track
           .map((MidiEvent midiEvent) => midiEvent is NoteOnEvent
               ? midiEvent.deltaTime + midiEvent.duration
@@ -315,10 +312,10 @@ class RecordingsProvider extends ChangeNotifier {
     return milliSeconds ~/ 2;
   }
 
-  void setPlaybackVolume(int volume) => playbackPlayer.setVolume(volume / 100);
+  void setPlaybackVolume(int volume) => _playbackPlayer.setVolume(volume / 100);
 
   Future<void> playRecording(Recording recording) async {
-    if (parsedRecordingMidi == null) {
+    if (_parsedRecordingMidi == null) {
       return;
     }
 
@@ -329,8 +326,8 @@ class RecordingsProvider extends ChangeNotifier {
     _startTimeStamp = AppTimestamp.now - _currentPosition;
 
     if (recording.playbackActive && recording.playbackPath != null) {
-      playbackPlayer.seek(Duration(milliseconds: _currentPosition));
-      playbackPlayer.play();
+      _playbackPlayer.seek(Duration(milliseconds: _currentPosition));
+      _playbackPlayer.play();
     }
 
     _playingPositionTimer =
@@ -381,29 +378,26 @@ class RecordingsProvider extends ChangeNotifier {
     // dart_midi: SetTempoEvent
     // https://pub.dev/documentation/dart_midi/latest/midi/SetTempoEvent-class.html, 30.01.2023
 
-    for (int i = 0; i < noteOnEvents.length; i++) {
+    for (int i = 0; i < _noteOnEvents.length; i++) {
       if (!isRecordingPlaying) {
         // if playing is set to false during midi playback -> break out of the complete loop
         break;
       }
 
-      if (_currentPosition > noteOnEvents[i][1]) {
+      if (_currentPosition > _noteOnEvents[i][1]) {
         continue;
       } else {
         await Future.delayed(
-            Duration(milliseconds: noteOnEvents[i][1] - _currentPosition));
+            Duration(milliseconds: _noteOnEvents[i][1] - _currentPosition));
       }
 
-      int octaveIndex = Piano.getOctaveIndexFromMidiNote(noteOnEvents[i][0]);
+      int octaveIndex = Piano.getOctaveIndexFromMidiNote(_noteOnEvents[i][0]);
 
       int playedPianoKeyWhite =
-          Piano.getPianoKeyWhiteIndex(noteOnEvents[i][0], octaveIndex);
+          Piano.getPianoKeyWhiteIndex(_noteOnEvents[i][0], octaveIndex);
 
       int playedPianoKeyBlack =
-          Piano.getPianoKeyBlackIndex(noteOnEvents[i][0], octaveIndex);
-
-      int milliSeconds = noteOnEvents[i][2] + noteOnEvents[i][3];
-      midiMilliSecondsPosition += milliSeconds;
+          Piano.getPianoKeyBlackIndex(_noteOnEvents[i][0], octaveIndex);
 
       if (playedPianoKeyWhite >= 0) {
         Piano.playPianoNote(octaveIndex, playedPianoKeyWhite);
@@ -417,7 +411,7 @@ class RecordingsProvider extends ChangeNotifier {
 
   void pauseRecording() {
     isRecordingPlaying = false;
-    playbackPlayer.pause();
+    _playbackPlayer.pause();
     _playingPositionTimer?.cancel();
   }
 }

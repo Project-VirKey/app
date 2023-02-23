@@ -9,7 +9,6 @@ import 'package:virkey/common_widgets/app_switch.dart';
 import 'package:virkey/common_widgets/app_text.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
-import 'package:virkey/utils/audio_player.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 
 class DefaultComponents extends StatefulWidget {
@@ -66,7 +65,6 @@ class _DefaultComponentsState extends State<DefaultComponents>
               onConfirm: () => {}).open(),
         ),
         AppCheckbox(onChanged: (bool value) => {}),
-        const AppAudioPlayer()
       ],
     );
   }
