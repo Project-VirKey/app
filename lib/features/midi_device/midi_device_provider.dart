@@ -8,37 +8,36 @@ import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/routing/router.dart';
 
 class MidiDeviceProvider extends ChangeNotifier {
-  MidiCommand midiCommand = MidiCommand();
+  final MidiCommand _midiCommand = MidiCommand();
 
   String setupData = '';
   List<MidiDevice>? midiDevices;
   bool connected = false;
   String? connectedDeviceName;
 
-  StreamSubscription<String>? midiSetupStream;
-  StreamSubscription<MidiPacket>? midiDataReceiveStream;
+  StreamSubscription<MidiPacket>? _midiDataReceiveStream;
 
   List<Uint8List> midiEvents = [];
 
-  MidiDeviceProvider(this.pianoProvider) {
+  MidiDeviceProvider(this._pianoProvider) {
     initialLoad();
   }
 
-  PianoProvider pianoProvider;
+  PianoProvider _pianoProvider;
 
   setPianoProvider(PianoProvider pP) {
-    pianoProvider = pP;
+    _pianoProvider = pP;
     notifyListeners();
   }
 
   // name of the Firmware for Arduino under which the MIDI-device will be listed
   // https://github.com/kuwatay/mocolufa, 14.02.2023
-  static const deviceName = 'MocoLUFA';
-  static const deviceNameAndroid = 'kuwatay@nifty.com MocoLUFA';
+  static const _deviceName = 'MocoLUFA';
+  static const _deviceNameAndroid = 'kuwatay@nifty.com MocoLUFA';
 
   Future<void> initialLoad() async {
     // lookup connected midi devices (at the app startup)
-    midiCommand.devices.then((List<MidiDevice>? mD) {
+    _midiCommand.devices.then((List<MidiDevice>? mD) {
       midiDevices = mD;
 
       if (midiDevices == null) {
@@ -53,10 +52,10 @@ class MidiDeviceProvider extends ChangeNotifier {
     });
 
     // listen for changes in the future
-    midiSetupStream = midiCommand.onMidiSetupChanged?.listen((data) async {
+    _midiCommand.onMidiSetupChanged?.listen((data) async {
       // print("setup changed $data");
       setupData = data;
-      midiDevices = await midiCommand.devices;
+      midiDevices = await _midiCommand.devices;
 
       if (midiDevice == null) {
         disconnectDevice();
@@ -76,7 +75,7 @@ class MidiDeviceProvider extends ChangeNotifier {
     }
 
     Iterable<MidiDevice>? devices = midiDevices?.where((MidiDevice mD) =>
-        mD.name == deviceName || mD.name == deviceNameAndroid);
+        mD.name == _deviceName || mD.name == _deviceNameAndroid);
     if (devices == null) {
       return null;
     } else {
@@ -92,16 +91,16 @@ class MidiDeviceProvider extends ChangeNotifier {
       return;
     }
 
-    midiCommand.disconnectDevice(midiDevice!);
-    midiDataReceiveStream?.cancel();
+    _midiCommand.disconnectDevice(midiDevice!);
+    _midiDataReceiveStream?.cancel();
 
-    await midiCommand.connectToDevice(midiDevice!).whenComplete(() {
+    await _midiCommand.connectToDevice(midiDevice!).whenComplete(() {
       print('--> Connected to MidiDevice ${midiDevices?.first.name}');
       connected = true;
       connectedDeviceName = midiDevices?.first.name;
 
-      midiDataReceiveStream =
-          midiCommand.onMidiDataReceived?.listen((MidiPacket event) {
+      _midiDataReceiveStream =
+          _midiCommand.onMidiDataReceived?.listen((MidiPacket event) {
         print(event.data);
 
         midiEvents.insert(0, event.data);
@@ -128,36 +127,36 @@ class MidiDeviceProvider extends ChangeNotifier {
         // -> only NoteOn-Events are being used
         if (event.data[2] == 0) {
           if (playedPianoKeyWhite >= 0) {
-            pianoProvider.pianoKeysWhite[playedPianoKeyWhite][1] = false;
-            pianoProvider.notify();
+            _pianoProvider.pianoKeysWhite[playedPianoKeyWhite][1] = false;
+            _pianoProvider.notify();
           }
 
           if (playedPianoKeyBlack >= 0) {
-            pianoProvider.pianoKeysBlack[playedPianoKeyBlack][1] = false;
-            pianoProvider.notify();
+            _pianoProvider.pianoKeysBlack[playedPianoKeyBlack][1] = false;
+            _pianoProvider.notify();
           }
         } else {
           if (playedPianoKeyWhite >= 0 || playedPianoKeyBlack >= 0) {
-            pianoProvider.currentOctaveIndex = octaveIndex;
+            _pianoProvider.currentOctaveIndex = octaveIndex;
           }
 
           if (playedPianoKeyWhite >= 0) {
-            pianoProvider.pianoKeysWhite[playedPianoKeyWhite][1] = true;
-            if (pianoProvider.isRecording) {
-              pianoProvider.recordingAddNote(
-                  pianoProvider.currentOctaveIndex, event.data[1]);
+            _pianoProvider.pianoKeysWhite[playedPianoKeyWhite][1] = true;
+            if (_pianoProvider.isRecording) {
+              _pianoProvider.recordingAddNote(
+                  _pianoProvider.currentOctaveIndex, event.data[1]);
             }
-            pianoProvider.notify();
+            _pianoProvider.notify();
             Piano.playPianoNote(octaveIndex, playedPianoKeyWhite);
           }
 
           if (playedPianoKeyBlack >= 0) {
-            pianoProvider.pianoKeysBlack[playedPianoKeyBlack][1] = true;
-            if (pianoProvider.isRecording) {
-              pianoProvider.recordingAddNote(
-                  pianoProvider.currentOctaveIndex, event.data[1]);
+            _pianoProvider.pianoKeysBlack[playedPianoKeyBlack][1] = true;
+            if (_pianoProvider.isRecording) {
+              _pianoProvider.recordingAddNote(
+                  _pianoProvider.currentOctaveIndex, event.data[1]);
             }
-            pianoProvider.notify();
+            _pianoProvider.notify();
             Piano.playPianoNote(octaveIndex, playedPianoKeyBlack, true);
           }
         }
@@ -168,9 +167,9 @@ class MidiDeviceProvider extends ChangeNotifier {
   void disconnectDevice() {
     connected = false;
     connectedDeviceName = null;
-    midiDataReceiveStream?.cancel();
+    _midiDataReceiveStream?.cancel();
     if (midiDevice != null) {
-      midiCommand.disconnectDevice(midiDevice!);
+      _midiCommand.disconnectDevice(midiDevice!);
     }
   }
 }

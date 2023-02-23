@@ -23,11 +23,11 @@ class Piano {
 
   // list of 3 entries for each octave
   // each containing a list of two entries for the audio data & audio player
-  static List whiteKeyData = [];
-  static List whiteKeyPlayer = [];
+  static final List _whiteKeyData = [];
+  static final List _whiteKeyPlayer = [];
 
-  static List blackKeyData = [];
-  static List blackKeyPlayer = [];
+  static final List _blackKeyData = [];
+  static final List _blackKeyPlayer = [];
 
   static const List white = [
     [
@@ -84,82 +84,82 @@ class Piano {
     ]
   ];
 
-  static const int sampleRate = 44100;
-  static const int channels = 1;
-  static const int bitsPerSample = 16;
-  static const int seconds = 3;
+  static const int _sampleRate = 44100;
+  static const int _channels = 1;
+  static const int _bitsPerSample = 16;
+  static const int _seconds = 3;
 
-  static late ByteData bytes;
-  static late Synthesizer synth;
+  static late ByteData _bytes;
+  static late Synthesizer _synth;
 
   static void loadLibrary(String path, int volume,
       [bool isAsset = false]) async {
     double soundLibraryVolume = volume / 100;
 
     if (isAsset) {
-      bytes = await rootBundle.load(path);
+      _bytes = await rootBundle.load(path);
     } else {
-      bytes = File(path).readAsBytesSync().buffer.asByteData();
+      _bytes = File(path).readAsBytesSync().buffer.asByteData();
     }
 
     // Create the synthesizer
-    synth = Synthesizer.loadByteData(
-        bytes,
+    _synth = Synthesizer.loadByteData(
+        _bytes,
         SynthesizerSettings(
-          sampleRate: sampleRate,
+          sampleRate: _sampleRate,
           blockSize: 64,
           maximumPolyphony: 64,
           enableReverbAndChorus: true,
         ));
 
-    whiteKeyData.clear();
-    blackKeyData.clear();
-    whiteKeyPlayer.clear();
-    blackKeyPlayer.clear();
+    _whiteKeyData.clear();
+    _blackKeyData.clear();
+    _whiteKeyPlayer.clear();
+    _blackKeyPlayer.clear();
 
     for (int o = 0; o < 3; o++) {
-      whiteKeyData.add([]);
-      whiteKeyPlayer.add([]);
+      _whiteKeyData.add([]);
+      _whiteKeyPlayer.add([]);
 
       for (var wK = 0; wK < white.length; wK++) {
-        whiteKeyData[o].add(
-            loadPianoKeyPcm(white[wK][1] + midiOffset + (o * keysPerOctave)));
-        whiteKeyPlayer[o].add(AudioPlayer()..setVolume(soundLibraryVolume));
-        whiteKeyPlayer[o][wK].setAudioSource(
-            MyCustomSource(wrapAudioDataInWavFileFormat(whiteKeyData[o][wK])));
+        _whiteKeyData[o].add(
+            _loadPianoKeyPcm(white[wK][1] + midiOffset + (o * keysPerOctave)));
+        _whiteKeyPlayer[o].add(AudioPlayer()..setVolume(soundLibraryVolume));
+        _whiteKeyPlayer[o][wK].setAudioSource(_MyCustomSource(
+            _wrapAudioDataInWavFileFormat(_whiteKeyData[o][wK])));
       }
 
-      blackKeyData.add([]);
-      blackKeyPlayer.add([]);
+      _blackKeyData.add([]);
+      _blackKeyPlayer.add([]);
 
       for (var bK = 0; bK < black.length; bK++) {
         if (black[bK].isEmpty) {
-          blackKeyData[o].add(null);
-          blackKeyPlayer[o].add(null);
+          _blackKeyData[o].add(null);
+          _blackKeyPlayer[o].add(null);
           continue;
         }
 
-        blackKeyData[o].add(
-            loadPianoKeyPcm(black[bK][1] + midiOffset + (o * keysPerOctave)));
-        blackKeyPlayer[o].add(AudioPlayer()..setVolume(soundLibraryVolume));
-        blackKeyPlayer[o][bK].setAudioSource(
-            MyCustomSource(wrapAudioDataInWavFileFormat(blackKeyData[o][bK])));
+        _blackKeyData[o].add(
+            _loadPianoKeyPcm(black[bK][1] + midiOffset + (o * keysPerOctave)));
+        _blackKeyPlayer[o].add(AudioPlayer()..setVolume(soundLibraryVolume));
+        _blackKeyPlayer[o][bK].setAudioSource(_MyCustomSource(
+            _wrapAudioDataInWavFileFormat(_blackKeyData[o][bK])));
       }
     }
   }
 
-  static Uint8List loadPianoKeyPcm(int midiNote) {
-    synth.reset();
-    synth.noteOn(channel: 0, key: midiNote, velocity: 120);
+  static Uint8List _loadPianoKeyPcm(int midiNote) {
+    _synth.reset();
+    _synth.noteOn(channel: 0, key: midiNote, velocity: 120);
 
     // Render the waveform (3 seconds)
-    ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: sampleRate * seconds);
-    synth.renderMonoInt16(buf16);
+    ArrayInt16 buf16 = ArrayInt16.zeros(numShorts: _sampleRate * _seconds);
+    _synth.renderMonoInt16(buf16);
 
     return buf16.bytes.buffer.asUint8List();
   }
 
-  static Uint8List wrapAudioDataInWavFileFormat(Uint8List pcmData) {
+  static Uint8List _wrapAudioDataInWavFileFormat(Uint8List pcmData) {
     List<int> wavDataIntList = [];
     int dataBytesCount = pcmData.buffer.asInt8List().length;
 
@@ -177,55 +177,55 @@ class Piano {
 
     // Wave File Header - RIFF Type Chunk
     // ChunkID: "RIFF"
-    wavDataIntList.addAll(stringToUint8ListToList('RIFF'));
+    wavDataIntList.addAll(_stringToUint8ListToList('RIFF'));
     // Chunk Data Size: length of waveform + 36 (size of header minus 8 (size of file header))
     wavDataIntList
-        .addAll(int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount + 36));
+        .addAll(_int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount + 36));
     // ChunkID: "WAVE"
-    wavDataIntList.addAll(stringToUint8ListToList('WAVE'));
+    wavDataIntList.addAll(_stringToUint8ListToList('WAVE'));
 
     // Format Chunk - fmt
     // ChunkID: "fmt "
-    wavDataIntList.addAll(stringToUint8ListToList('fmt '));
+    wavDataIntList.addAll(_stringToUint8ListToList('fmt '));
     // Chunk Data Size: 16 Bytes
-    wavDataIntList.addAll(int8ToUint8ListWith4BytesToList(16));
+    wavDataIntList.addAll(_int8ToUint8ListWith4BytesToList(16));
     // Compression Code: 1 (= PCM - Pulse Code Modulation)
-    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(1));
+    wavDataIntList.addAll(_int8ToUint8ListWith2BytesToList(1));
     // Number of Channels: 1 (mono)
-    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(channels));
+    wavDataIntList.addAll(_int8ToUint8ListWith2BytesToList(_channels));
     // Sample Rate: 44100 Hz
-    wavDataIntList.addAll(int8ToInt32ToUint8ListWith4BytesToList(sampleRate));
+    wavDataIntList.addAll(_int8ToInt32ToUint8ListWith4BytesToList(_sampleRate));
     // Average Bytes per Second
-    wavDataIntList.addAll(int8ToInt32ToUint8ListWith4BytesToList(
-        (sampleRate * bitsPerSample * channels) ~/ 8));
+    wavDataIntList.addAll(_int8ToInt32ToUint8ListWith4BytesToList(
+        (_sampleRate * _bitsPerSample * _channels) ~/ 8));
     // Block Align: number of bytes per sample slice
     wavDataIntList.addAll(
-        int8ToUint8ListWith2BytesToList((bitsPerSample * channels) ~/ 8));
+        _int8ToUint8ListWith2BytesToList((_bitsPerSample * _channels) ~/ 8));
     // Significant Bits per Sample: 16 Bit
-    wavDataIntList.addAll(int8ToUint8ListWith2BytesToList(bitsPerSample));
+    wavDataIntList.addAll(_int8ToUint8ListWith2BytesToList(_bitsPerSample));
 
     // Data Chunk - data
     // ChunkID: "data"
-    wavDataIntList.addAll(stringToUint8ListToList('data'));
+    wavDataIntList.addAll(_stringToUint8ListToList('data'));
     // Chunk Data Size: length of waveform
     wavDataIntList
-        .addAll(int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount));
+        .addAll(_int8ToInt32ToUint8ListWith4BytesToList(dataBytesCount));
     // sample data: PCM data
     wavDataIntList.addAll(pcmData.buffer.asInt8List());
 
     return Uint8List.fromList(wavDataIntList);
   }
 
-  static List<int> stringToUint8ListToList(String input) =>
+  static List<int> _stringToUint8ListToList(String input) =>
       ascii.encode(input).toList();
 
-  static List<int> int8ToUint8ListWith2BytesToList(int input) =>
+  static List<int> _int8ToUint8ListWith2BytesToList(int input) =>
       (Uint8List(2)..buffer.asByteData().setInt8(0, input));
 
-  static List<int> int8ToUint8ListWith4BytesToList(int input) =>
+  static List<int> _int8ToUint8ListWith4BytesToList(int input) =>
       (Uint8List(4)..buffer.asByteData().setUint8(0, input));
 
-  static List<int> int8ToInt32ToUint8ListWith4BytesToList(int input) =>
+  static List<int> _int8ToInt32ToUint8ListWith4BytesToList(int input) =>
       (Uint8List(4)..buffer.asByteData().setInt32(0, input, Endian.big))
           .reversed
           .toList();
@@ -235,24 +235,24 @@ class Piano {
     // initiate AudioPlayer and use WAV-File-Byte-Data as source
 
     if (isBlackKey) {
-      blackKeyPlayer[octaveIndex][arIndex].seek(const Duration(seconds: 0));
-      blackKeyPlayer[octaveIndex][arIndex].play();
+      _blackKeyPlayer[octaveIndex][arIndex].seek(const Duration(seconds: 0));
+      _blackKeyPlayer[octaveIndex][arIndex].play();
     } else {
-      whiteKeyPlayer[octaveIndex][arIndex].seek(const Duration(seconds: 0));
-      whiteKeyPlayer[octaveIndex][arIndex].play();
+      _whiteKeyPlayer[octaveIndex][arIndex].seek(const Duration(seconds: 0));
+      _whiteKeyPlayer[octaveIndex][arIndex].play();
     }
   }
 
   static void changeNotePlayerVolume(int volume) {
     double soundLibraryVolume = volume / 100;
 
-    for (List octave in whiteKeyPlayer) {
+    for (List octave in _whiteKeyPlayer) {
       for (AudioPlayer keyPlayer in octave) {
         keyPlayer.setVolume(soundLibraryVolume);
       }
     }
 
-    for (List octave in blackKeyPlayer) {
+    for (List octave in _blackKeyPlayer) {
       for (AudioPlayer? keyPlayer in octave) {
         keyPlayer?.setVolume(soundLibraryVolume);
       }
@@ -298,13 +298,13 @@ class Piano {
     });
   }
 
-  static MidiParser midiParser = MidiParser();
+  static final MidiParser _midiParser = MidiParser();
 
   static Future<void> midiToWav(String midiFilePath, String destinationPath,
       [String? playbackPath,
       int? soundLibraryVolume,
       int? audioPlaybackVolume]) async {
-    MidiFile midiFile = midiParser.parseMidiFromFile(File(midiFilePath));
+    MidiFile midiFile = _midiParser.parseMidiFromFile(File(midiFilePath));
 
     String tempDirPath = (await getTemporaryDirectory()).path;
 
@@ -341,7 +341,7 @@ class Piano {
         }
 
         int neededEmptyBytes =
-            (sampleRate * (previousDeltaTime / 1000)).round();
+            (_sampleRate * (previousDeltaTime / 1000)).round();
         if (neededEmptyBytes.isOdd) {
           neededEmptyBytes--;
         }
@@ -356,10 +356,10 @@ class Piano {
         if (playedPianoKeyWhite >= 0) {
           File wavFile = File(
               '$tempDirPath${Platform.pathSeparator}temp_white_$index.wav');
-          wavFile.writeAsBytesSync(wrapAudioDataInWavFileFormat(
+          wavFile.writeAsBytesSync(_wrapAudioDataInWavFileFormat(
               Uint8List.fromList([
             ...emptyBytes,
-            ...whiteKeyData[octaveIndex][playedPianoKeyWhite]
+            ..._whiteKeyData[octaveIndex][playedPianoKeyWhite]
           ])));
           tempFilePaths.add(wavFile.path);
         }
@@ -367,10 +367,10 @@ class Piano {
         if (playedPianoKeyBlack >= 0) {
           File wavFile = File(
               '$tempDirPath${Platform.pathSeparator}temp_black_$index.wav');
-          wavFile.writeAsBytesSync(wrapAudioDataInWavFileFormat(
+          wavFile.writeAsBytesSync(_wrapAudioDataInWavFileFormat(
               Uint8List.fromList([
             ...emptyBytes,
-            ...blackKeyData[octaveIndex][playedPianoKeyBlack]
+            ..._blackKeyData[octaveIndex][playedPianoKeyBlack]
           ])));
           tempFilePaths.add(wavFile.path);
         }
@@ -382,8 +382,8 @@ class Piano {
         audioPlaybackVolume != null) {
       tempFilePaths.add(playbackPath);
 
-      List<double> wavWeights =
-          getKeyboardAndPlaybackWeight(soundLibraryVolume, audioPlaybackVolume);
+      List<double> wavWeights = _getKeyboardAndPlaybackWeight(
+          soundLibraryVolume, audioPlaybackVolume);
 
       weights = [
         // number of tempFilePaths (stored notes) subtracted by 1 (-1), because playback path is added
@@ -394,10 +394,10 @@ class Piano {
       weights = List.filled(tempFilePaths.length, 1);
     }
 
-    await combineAudioFiles(destinationPath, tempFilePaths, weights);
+    await _combineAudioFiles(destinationPath, tempFilePaths, weights);
   }
 
-  static List<double> getKeyboardAndPlaybackWeight(
+  static List<double> _getKeyboardAndPlaybackWeight(
       int soundLibraryVolume, int playbackVolume) {
     int volumeDifference = soundLibraryVolume - playbackVolume;
     if (volumeDifference.isNegative) {
@@ -407,7 +407,7 @@ class Piano {
     }
   }
 
-  static Future<void> combineAudioFiles(String outputFilepath,
+  static Future<void> _combineAudioFiles(String outputFilepath,
       List<String> inputFilePaths, List<double> weights) async {
     File outputFile = File(outputFilepath);
     if (await outputFile.exists()) {
@@ -432,69 +432,23 @@ class Piano {
       }
     });
   }
-
-/*
-  static Future<void> combineAudioFiles(String outputFilepath,
-      List<String> inputFilePaths, List<double> weights) async {
-    final FfmpegCommand ffmpegCommand = FfmpegCommand(
-      inputs: [],
-      args: [
-        for (final arg in inputFilePaths) ...[CliArg(name: 'i', value: arg)],
-      ],
-      filterGraph: FilterGraph(chains: [
-        FilterChain(inputs: [], filters: [
-          CustomAMixFilter(inputCount: inputFilePaths.length, weights: weights)
-        ], outputs: [])
-      ]),
-      outputFilepath: outputFilepath,
-    );
-
-    // print(ffmpegCommand.toCli());
-
-    File outputFile = File(outputFilepath);
-    if (await outputFile.exists()) {
-      await outputFile.delete();
-    }
-
-    await Ffmpeg().run(ffmpegCommand);
-  }
-   */
 }
 
-/*class CustomAMixFilter implements Filter {
-  const CustomAMixFilter({
-    required this.inputCount,
-    required this.weights,
-  });
-
-  final int inputCount;
-  final List<double> weights;
-
-  @override
-  String toCli() {
-    // ffmpeg amix filter: for combining all generated audio files to one
-    // duration=longest -> resulting audio file has the length of the longest audio file
-    // normalize=0 -> is active by default: normalizes the audio inputs; deactivated: =0
-    // https://ffmpeg.org/ffmpeg-filters.html#amix, 30.01.2023
-    return 'amix=inputs=$inputCount:duration=longest:normalize=0:weights="${weights.join(' ')}"';
-  }
-}*/
-
 // Feed your own stream of bytes into the player
-class MyCustomSource extends StreamAudioSource {
-  final List<int> bytes;
+class _MyCustomSource extends StreamAudioSource {
+  final List<int> _bytes;
 
-  MyCustomSource(this.bytes);
+  _MyCustomSource(this._bytes);
 
   @override
   Future<StreamAudioResponse> request([int? start, int? end]) async {
     start ??= 0;
-    end ??= bytes.length;
+    end ??= _bytes.length;
     return StreamAudioResponse(
-      sourceLength: bytes.length,
+      sourceLength: _bytes.length,
       contentLength: end - start,
       offset: start,
-      stream: Stream.value(bytes.sublist(start, end)),
+      stream: Stream.value(_bytes.sublist(start, end)),
       contentType: 'audio/mpeg',
     );
   }

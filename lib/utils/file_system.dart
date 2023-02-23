@@ -107,9 +107,6 @@ class AppFileSystem {
 
     await createFolder(recordingsFolder);
     await createFolder(soundLibrariesFolder);
-
-    // print(await createFile('recordings.txt', recordingsFolder, 'Test Content'));
-    // print(await listFilesInFolder(recordingsFolder));
   }
 
   static Future<void> loadBasePath() async {

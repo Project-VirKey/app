@@ -27,7 +27,7 @@ class IntroductionOverlay {
 
   void open() {
     Provider.of<IntroductionProvider>(context, listen: false)
-        .currentSlideIndex = 0;
+        .setNewSlideIndex(0);
     _overlay.open();
   }
 
@@ -174,10 +174,8 @@ class IntroductionOverlay {
                         child: ExpandablePageView.builder(
                           controller: _pageController,
                           itemCount: _slides.length,
-                          onPageChanged: (int index) {
-                            introductionProvider.currentSlideIndex = index;
-                            introductionProvider.notify();
-                          },
+                          onPageChanged: (int index) =>
+                              introductionProvider.setNewSlideIndex(index),
                           itemBuilder: (context, index) {
                             return Column(
                               children: [

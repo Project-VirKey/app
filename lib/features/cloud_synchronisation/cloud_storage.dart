@@ -30,7 +30,7 @@ class AppCloudStorage {
     }
    */
 
-  static Reference storageRef = FirebaseStorage.instance.ref();
+  static Reference _storageRef = FirebaseStorage.instance.ref();
 
   static Future<void> initialLoad() async {
     if (FirebaseAuth.instance.currentUser?.uid == null) {
@@ -39,8 +39,8 @@ class AppCloudStorage {
 
     // print('cloud storage initialLoad');
 
-    storageRef =
-        storageRef.child(FirebaseAuth.instance.currentUser?.uid as String);
+    _storageRef =
+        _storageRef.child(FirebaseAuth.instance.currentUser?.uid as String);
 
     // String testFileName = 'winning-elevation-111355.mp3';
 
@@ -56,7 +56,7 @@ class AppCloudStorage {
 
   static Future<void> downloadFile(
       String fileName, String destinationPath) async {
-    Reference cloudFileRef = storageRef.child(fileName);
+    Reference cloudFileRef = _storageRef.child(fileName);
     File file = File('$destinationPath$fileName');
 
     DownloadTask downloadTask = cloudFileRef.writeToFile(file);
@@ -87,7 +87,7 @@ class AppCloudStorage {
 
     try {
       Reference destinationReference =
-          storageRef.child(AppFileSystem.getFilenameFromPath(filePath));
+          _storageRef.child(AppFileSystem.getFilenameFromPath(filePath));
 
       await destinationReference.putFile(file);
       return destinationReference.name;
@@ -101,14 +101,14 @@ class AppCloudStorage {
 
   static Future<void> deleteFile(String fileName) async {
     // Create a reference to the file to delete
-    Reference desertRef = storageRef.child(fileName);
+    Reference desertRef = _storageRef.child(fileName);
 
     // Delete the file
     await desertRef.delete();
   }
 
   static Future<void> listAllFiles() async {
-    ListResult listResult = await storageRef.listAll();
+    ListResult listResult = await _storageRef.listAll();
     for (var prefix in listResult.prefixes) {
       // The prefixes under storageRef.
       // You can call listAll() recursively on them.
