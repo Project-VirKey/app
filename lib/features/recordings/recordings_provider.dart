@@ -58,7 +58,8 @@ class RecordingsProvider extends ChangeNotifier {
 
   Future<void> refreshRecordingsFolderFiles() async {
     await loadRecordingsFolderFiles();
-    loadRecordings();
+    await loadRecordings();
+    // TODO: call function to reload from shared preferences
   }
 
   Future<void> loadRecordingsFolderFiles() async {
@@ -85,9 +86,11 @@ class RecordingsProvider extends ChangeNotifier {
     for (var recordingFile
         in AppFileSystem.filterFilesList(_recordingsFolderFiles, ['mid'])
             .reversed) {
+      // TODO: get recording url from local storage
       Recording recording = Recording(
         title: AppFileSystem.getFilenameWithoutExtension(recordingFile.path),
         path: recordingFile.path,
+        url: '',
       );
 
       addRecordingItem(recording);
@@ -95,6 +98,17 @@ class RecordingsProvider extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  void loadRecordingsFromSharedPreferences() {
+    if (AppSharedPreferences.loadedSharedPreferences == null) {
+      AppSharedPreferences.saveData(recordings: _recordings);
+    } else {
+      AppSharedPreferences.loadedSharedPreferences?['recordings'];
+    }
+
+    // TODO: check difference between shared-preferences and existing files
+    // AppSharedPreferences.saveData(recordings: _recordings);
   }
 
   void addRecordingItem(Recording recording) {
@@ -153,9 +167,12 @@ class RecordingsProvider extends ChangeNotifier {
     for (var element
         in AppFileSystem.filterFilesList(_recordingsFolderFiles, ['mid'])
             .reversed) {
+      // TODO: get recording url from local storage
       Recording recording = Recording(
-          title: AppFileSystem.getFilenameWithoutExtension(element.path),
-          path: element.path);
+        title: AppFileSystem.getFilenameWithoutExtension(element.path),
+        path: element.path,
+        url: '',
+      );
       addRecordingItem(recording);
       await loadPlayback(recording);
     }
@@ -420,11 +437,13 @@ class Recording {
   Recording(
       {required this.title,
       required this.path,
+      required this.url,
       this.playbackPath,
       this.playbackTitle});
 
   String title;
   String path;
+  String url;
   String? playbackPath;
   String? playbackTitle;
   bool playbackActive = true;

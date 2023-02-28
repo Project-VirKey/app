@@ -37,8 +37,6 @@ class AppCloudStorage {
       return;
     }
 
-    // print('cloud storage initialLoad');
-
     _storageRef =
         _storageRef.child(FirebaseAuth.instance.currentUser?.uid as String);
 
@@ -54,32 +52,15 @@ class AppCloudStorage {
     // deleteFile(testFileName);
   }
 
-  static Future<void> downloadFile(
+  static Future<bool> downloadFile(
       String fileName, String destinationPath) async {
     Reference cloudFileRef = _storageRef.child(fileName);
     File file = File('$destinationPath$fileName');
 
     DownloadTask downloadTask = cloudFileRef.writeToFile(file);
 
-    downloadTask.snapshotEvents.listen((taskSnapshot) {
-      switch (taskSnapshot.state) {
-        case TaskState.running:
-          // TODO: Handle this case.
-          break;
-        case TaskState.paused:
-          // TODO: Handle this case.
-          break;
-        case TaskState.success:
-          // TODO: Handle this case.
-          break;
-        case TaskState.canceled:
-          // TODO: Handle this case.
-          break;
-        case TaskState.error:
-          // TODO: Handle this case.
-          break;
-      }
-    });
+    TaskSnapshot taskSnapshot = await downloadTask;
+    return taskSnapshot.state == TaskState.success;
   }
 
   static Future<String?> uploadFromFile(String filePath) async {
@@ -95,8 +76,6 @@ class AppCloudStorage {
       print(e);
       return null;
     }
-
-    // TODO: snapshotEvents
   }
 
   static Future<void> deleteFile(String fileName) async {
