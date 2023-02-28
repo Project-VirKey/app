@@ -77,6 +77,7 @@ dependencies:
   # https://github.com/arthenica/ffmpeg-kit/wiki/LTS-Releases, 19.02.2023
   # "Quotes"-Problem solved with (Troubleshooting Guide from another plugin, which uses ffmpeg_kit): https://github.com/sbis04/video_trimmer#troubleshooting, 19.02.2023
   ffmpeg_kit_flutter_min: "5.1.0-LTS"
+  wakelock: ^0.6.2
 
   # reinstall dependencies with:
   # pod install

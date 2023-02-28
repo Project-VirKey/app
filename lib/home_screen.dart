@@ -18,9 +18,11 @@ import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/recordings/recordings_title_bar.dart';
 import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
+import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/platform_helper.dart';
 import 'package:virkey/utils/snackbar.dart';
+import 'package:wakelock/wakelock.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -45,9 +47,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // https://pub.dev/packages/after_layout
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // check for field in settings -> if introduction overlay should be displayed
-      if (!Provider.of<SettingsProvider>(context, listen: false)
-          .settings
-          .introDisplayed) {
+      // using loadedSharedPreferences because settings in provider have not yet been initialised at this point
+      if (!AppSharedPreferences
+          .loadedSharedPreferences?['settings'].introDisplayed) {
         _introductionOverlay.open();
         Provider.of<SettingsProvider>(context, listen: false)
             .setIntroDisplayed(true);
@@ -106,6 +108,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   onPressed: () {
                                     context.go('/piano');
                                     recordingsProvider.pauseRecording();
+
+                                    // enable the wakelock - keep awake
+                                    Wakelock.enable();
                                   },
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
