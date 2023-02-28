@@ -7,6 +7,7 @@ import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/features/midi_device/midi_device_provider.dart';
+import 'package:wakelock/wakelock.dart';
 
 class PianoPlayButton extends StatefulWidget {
   const PianoPlayButton({Key? key}) : super(key: key);
@@ -75,7 +76,12 @@ class _PianoPlayButtonState extends State<PianoPlayButton>
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(AppRadius.radius)),
           ),
-          onPressed: () => context.go('/piano'),
+          onPressed: () {
+            context.go('/piano');
+
+            // enable the wakelock - keep awake
+            Wakelock.enable();
+          },
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[

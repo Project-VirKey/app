@@ -18,6 +18,7 @@ import 'package:virkey/features/settings/settings_overlay.dart';
 import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/utils/platform_helper.dart';
 import 'package:virkey/utils/snackbar.dart';
+import 'package:wakelock/wakelock.dart';
 
 class PianoScreen extends StatefulWidget {
   const PianoScreen({Key? key}) : super(key: key);
@@ -108,9 +109,13 @@ class _PianoScreenState extends State<PianoScreen>
                                         .open();
                                   } else {
                                     context.go('/');
+
                                     if (pianoProvider.isSomethingPlaying) {
                                       pianoProvider.playPause();
                                     }
+
+                                    // disable the wakelock - keep awake
+                                    Wakelock.disable();
                                   }
                                 },
                                 size: 30,

@@ -7,5 +7,6 @@ class IntroductionProvider extends ChangeNotifier {
 
   void setNewSlideIndex(int newSlideIndex) {
     _currentSlideIndex = newSlideIndex;
+    notifyListeners();
   }
 }
