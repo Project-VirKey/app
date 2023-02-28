@@ -55,8 +55,6 @@ class AppFirestore {
       return;
     }
 
-    print('firestore initialLoad');
-
     if (await checkUserDocumentExists()) {
       document = (await getDocument())!;
     } else {

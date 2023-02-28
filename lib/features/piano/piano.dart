@@ -91,9 +91,11 @@ class Piano {
 
   static late ByteData _bytes;
   static late Synthesizer _synth;
+  static late String loadedLibraryPath;
 
   static void loadLibrary(String path, int volume,
       [bool isAsset = false]) async {
+    loadedLibraryPath = path;
     double soundLibraryVolume = volume / 100;
 
     if (isAsset) {

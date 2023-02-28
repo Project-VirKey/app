@@ -59,13 +59,19 @@ Future<void> main() async {
             midiDeviceProvider?.setPianoProvider(pianoProvider);
             return midiDeviceProvider ?? MidiDeviceProvider(pianoProvider);
           }),
-      ChangeNotifierProxyProvider<SettingsProvider, CloudProvider>(
+      ChangeNotifierProxyProvider2<SettingsProvider, RecordingsProvider,
+              CloudProvider>(
           create: (BuildContext context) => CloudProvider(
-              Provider.of<SettingsProvider>(context, listen: false)),
-          update: (BuildContext context, SettingsProvider settingsProvider,
+              Provider.of<SettingsProvider>(context, listen: false),
+              Provider.of<RecordingsProvider>(context, listen: false)),
+          update: (BuildContext context,
+              SettingsProvider settingsProvider,
+              RecordingsProvider recordingsProvider,
               CloudProvider? cloudProvider) {
             cloudProvider?.setSettingsProvider(settingsProvider);
-            return cloudProvider ?? CloudProvider(settingsProvider);
+            cloudProvider?.setRecordingsProvider(recordingsProvider);
+            return cloudProvider ??
+                CloudProvider(settingsProvider, recordingsProvider);
           })
     ],
     child: const App(),
