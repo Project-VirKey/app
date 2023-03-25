@@ -48,7 +48,7 @@ class AppFileSystem {
       }
     } else {
       // open native share dialog for mobile
-      Share.share(path, subject: filename);
+      await Share.shareFiles([path], subject: filename);
     }
   }
 

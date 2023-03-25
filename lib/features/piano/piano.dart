@@ -416,11 +416,11 @@ class Piano {
       await outputFile.delete();
     }
 
-    FFmpegKit.executeAsync(
+    await FFmpegKit.execute(
             '-i "${inputFilePaths.join('" -i "')}" -filter_complex amix=inputs=${inputFilePaths.length}:duration=longest:normalize=0:weights="${weights.join(' ')}" "$outputFilepath"')
         .then((dynamic session) async {
       final returnCode = await session.getReturnCode();
-
+      print(await session.getOutput());
       if (ReturnCode.isSuccess(returnCode)) {
         // SUCCESS
         print('FFMPEG yay');
@@ -429,7 +429,7 @@ class Piano {
         print('FFMPEG cancel');
       } else {
         // ERROR
-        // on android simulator error is produces (returnCode is null), but export still works (19.02.2023)
+        // on android simulator error is produced (returnCode is null), but export still works (19.02.2023)
         print('FFMPEG error - $returnCode');
       }
     });
