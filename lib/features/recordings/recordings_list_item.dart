@@ -307,11 +307,10 @@ class RecordingsListItem extends StatelessWidget {
                                   '${AppFileSystem.recordingsFolderPath}${recording.title}_Export.wav';
 
                               await Piano.midiToWav(
-                                  recording.path, exportRecordingPath);
-
-                              AppFileSystem.exportFile(
-                                  path: exportRecordingPath,
-                                  dialogTitle: 'Export WAV');
+                                      recording.path, exportRecordingPath)
+                                  .then((value) => AppFileSystem.exportFile(
+                                      path: exportRecordingPath,
+                                      dialogTitle: 'Export WAV'));
                             },
                           ),
                         ),
