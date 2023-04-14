@@ -1,17 +1,20 @@
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:virkey/features/recordings/recordings_provider.dart';
 import 'package:virkey/features/settings/settings_model.dart';
 import 'package:virkey/utils/timestamp.dart';
 
 class AppSharedPreferences {
   static Map<String, dynamic>? loadedSharedPreferences;
 
-  static void saveData({
-    // required int lastUpdated,
-    Settings? settings,
-  }) async {
+  static void saveData(
+      {Settings? settings, List<Recording>? recordings}) async {
     final prefs = await SharedPreferences.getInstance();
     if (settings != null) {
       await prefs.setString('settings', settingsToJson(settings));
+    }
+    if (recordings != null) {
+      print(recordings.toString());
+      // await prefs.setString('recordings', recordings.toString());
     }
     await prefs.setInt('lastUpdated', AppTimestamp.now);
   }
@@ -37,6 +40,10 @@ class AppSharedPreferences {
       try {
         loadedSharedPreferences['settings'] =
             settingsFromJson(prefs.getString('settings') ?? '');
+
+        // TODO: implement array with Recordings-objects
+        print(prefs.getString('recordings'));
+        loadedSharedPreferences['recordings'] = prefs.getString('recordings');
       } catch (e) {
         return null;
       }

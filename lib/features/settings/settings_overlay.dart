@@ -271,11 +271,23 @@ class SettingsOverlay {
                                       AppFileSystem.soundLibrariesFolder,
                                       AppFileSystem.getFilenameFromPath(
                                           soundFontFile.path)))) {
-                                    await AppFileSystem.copyFileToFolder(
-                                        soundFontFile,
-                                        AppFileSystem.soundLibrariesFolder);
+                                    String soundLibraryPath =
+                                        await AppFileSystem.copyFileToFolder(
+                                            soundFontFile,
+                                            AppFileSystem.soundLibrariesFolder);
 
-                                    settingsProvider.loadSoundLibraries();
+                                    // settingsProvider.loadSoundLibraries();
+                                    // TODO: test sound-font import
+                                    settingsProvider.settings.soundLibraries
+                                        .add(SoundLibrary(
+                                            name: AppFileSystem
+                                                .getFilenameWithoutExtension(
+                                                    soundLibraryPath),
+                                            selected: false,
+                                            path: soundLibraryPath,
+                                            url: '',
+                                            defaultLibrary: false));
+                                    settingsProvider.notify();
 
                                     AppSnackBar(
                                             message: 'Imported SoundFont!',
@@ -309,6 +321,14 @@ class SettingsOverlay {
                                   title: soundLibrary.name,
                                   child: Row(
                                     children: [
+                                      // TODO: if sf deleted -> add icon for upload
+                                      if (!soundLibrary.defaultLibrary)
+                                        if (soundLibrary.deleted)
+                                          AppIcon(
+                                            icon: HeroIcons.cloudArrowUp,
+                                            color: AppColors.dark,
+                                            onPressed: () => {},
+                                          ),
                                       if (!soundLibrary.defaultLibrary)
                                         AppIcon(
                                             icon: HeroIcons.trash,
@@ -323,8 +343,25 @@ class SettingsOverlay {
                                                   File(soundLibrary.path)
                                                       .delete()
                                                       .whenComplete(() async {
+                                                    settingsProvider
+                                                        .settings.soundLibraries
+                                                        .firstWhere((sL) =>
+                                                            sL.name ==
+                                                            soundLibrary.name)
+                                                        .deleted = true;
+
+                                                    AppSharedPreferences
+                                                        .saveData(
+                                                            settings:
+                                                                settingsProvider
+                                                                    .settings);
+
                                                     await settingsProvider
                                                         .loadSoundLibraries();
+                                                    settingsProvider
+                                                        .loadSoundLibrariesData();
+
+                                                    // TODO: call cloud storage delete function & set deleted to true (for soundLibrary object)
                                                   });
                                                 }).open()),
                                       const SizedBox(

@@ -121,7 +121,7 @@ class AppFileSystem {
 
     // check Permission for storage (iOS) or for manageExternalStorage (android)
     // var status = Platform.isIOS ? await Permission.storage.status : await Permission.manageExternalStorage.status;
-    var status = await Permission.storage.status;
+    PermissionStatus status = await Permission.storage.status;
     if (status.isGranted) {
       return true;
     } else {

@@ -107,6 +107,7 @@ class SoundLibrary {
     required this.path,
     required this.url,
     required this.defaultLibrary,
+    this.deleted = false,
   });
 
   String name;
@@ -114,6 +115,7 @@ class SoundLibrary {
   String path;
   String url;
   bool defaultLibrary;
+  bool deleted;
 
   factory SoundLibrary.fromJson(Map<String, dynamic> json) => SoundLibrary(
         name: json["name"],
@@ -121,6 +123,7 @@ class SoundLibrary {
         path: json["path"],
         url: json["url"],
         defaultLibrary: json["defaultLibrary"],
+        deleted: json["deleted"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -129,5 +132,6 @@ class SoundLibrary {
         "path": path,
         "url": url,
         "defaultLibrary": defaultLibrary,
+        "deleted": deleted,
       };
 }

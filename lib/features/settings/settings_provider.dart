@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:virkey/features/piano/piano.dart';
 import 'package:virkey/features/settings/settings_model.dart';
@@ -19,6 +20,8 @@ class SettingsProvider extends ChangeNotifier {
 
   Settings get settings => _settings;
 
+  Settings? _loadedSettings;
+
   SettingsProvider() {
     initialLoad();
   }
@@ -34,14 +37,14 @@ class SettingsProvider extends ChangeNotifier {
     // load the data from SharedPreferences when the Provider is placed
     lastUpdated =
         AppSharedPreferences.loadedSharedPreferences?['lastUpdated'] ?? 0;
-    Settings? loadedSettings =
-        AppSharedPreferences.loadedSharedPreferences?['settings'];
+    _loadedSettings = AppSharedPreferences.loadedSharedPreferences?['settings'];
 
-    if (loadedSettings == null) {
+    if (_loadedSettings == null) {
       AppSharedPreferences.saveData(settings: _settings);
     }
 
-    if (loadedSettings != null) {
+    if (_loadedSettings != null) {
+      Settings loadedSettings = _loadedSettings!;
       _settings.audioVolume = loadedSettings.audioVolume;
       _settings.introDisplayed = loadedSettings.introDisplayed;
       if (PlatformHelper.isDesktop &&
@@ -52,36 +55,80 @@ class SettingsProvider extends ChangeNotifier {
       _settings.defaultSavedFiles.wavAndPlayback =
           loadedSettings.defaultSavedFiles.wavAndPlayback;
 
+      // SoundLibrary? selectedLibrary = _loadedSettings.soundLibraries
+      //     .where((soundLibrary) => soundLibrary.selected)
+      //     .first;
+      //
+      // for (var i = 0; i < _settings.soundLibraries.length; i++) {
+      //   int loadedSoundLibraryIndex = _loadedSettings.soundLibraries.indexWhere(
+      //       (SoundLibrary soundLibrary) =>
+      //           soundLibrary.name == _settings.soundLibraries[i].name);
+      //
+      //   if (loadedSoundLibraryIndex != -1) {
+      //     _settings.soundLibraries[i].url =
+      //         _loadedSettings.soundLibraries[i].url;
+      //   }
+      //
+      //   _settings.soundLibraries[i].selected =
+      //       _settings.soundLibraries[i].name == selectedLibrary.name;
+      // }
+      loadSoundLibrariesData();
+    }
+
+    // load the selected sound library
+    SoundLibrary? soundLibrary = _settings.soundLibraries
+        .where((soundLibrary) => soundLibrary.selected)
+        .firstOrNull;
+
+    if (soundLibrary == null) {
+      soundLibrary = _settings.soundLibraries
+          .where((soundLibrary) => soundLibrary.defaultLibrary)
+          .firstOrNull;
+      if (soundLibrary != null) {
+        selectSoundLibrary(soundLibrary);
+      }
+    }
+
+    if (soundLibrary != null) {
+      Piano.loadLibrary(soundLibrary.path, _settings.audioVolume.soundLibrary,
+          soundLibrary.defaultLibrary);
+    }
+
+    print('------------------');
+    // print(_loadedSettings?.toJson());
+    print(_settings.toJson());
+    print('------------------');
+  }
+
+  void loadSoundLibrariesData() {
+    if (_loadedSettings != null) {
+      Settings loadedSettings = _loadedSettings!;
+
       SoundLibrary? selectedLibrary = loadedSettings.soundLibraries
           .where((soundLibrary) => soundLibrary.selected)
-          .first;
+          .firstOrNull;
+
+      selectedLibrary ??= loadedSettings.soundLibraries
+          .where((soundLibrary) => soundLibrary.defaultLibrary)
+          .firstOrNull;
 
       for (var i = 0; i < _settings.soundLibraries.length; i++) {
         int loadedSoundLibraryIndex = loadedSettings.soundLibraries.indexWhere(
             (SoundLibrary soundLibrary) =>
                 soundLibrary.name == _settings.soundLibraries[i].name);
 
-        if (loadedSoundLibraryIndex != -1) {
+        if (loadedSoundLibraryIndex >= 0) {
           _settings.soundLibraries[i].url =
-              loadedSettings.soundLibraries[i].url;
+              loadedSettings.soundLibraries[loadedSoundLibraryIndex].url;
+          _settings.soundLibraries[i].deleted =
+              loadedSettings.soundLibraries[loadedSoundLibraryIndex].deleted;
         }
 
         _settings.soundLibraries[i].selected =
-            _settings.soundLibraries[i].name == selectedLibrary.name;
+            _settings.soundLibraries[i].name == selectedLibrary?.name;
       }
+      notifyListeners();
     }
-
-    // load the selected sound library
-    SoundLibrary soundLibrary = _settings.soundLibraries
-        .where((soundLibrary) => soundLibrary.selected)
-        .first;
-    Piano.loadLibrary(soundLibrary.path, _settings.audioVolume.soundLibrary,
-        soundLibrary.defaultLibrary);
-
-    print('------------------');
-    // print(loadedSettings?.toJson());
-    print(_settings.toJson());
-    print('------------------');
   }
 
   Future<void> loadSoundLibraries() async {
