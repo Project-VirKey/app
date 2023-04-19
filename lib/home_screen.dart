@@ -10,7 +10,6 @@ import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/constants/radius.dart';
 import 'package:virkey/constants/shadows.dart';
 import 'package:virkey/features/app_introduction/introduction_overlay.dart';
-import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/features/midi_device/midi_device_provider.dart';
 import 'package:virkey/features/piano/piano_play_button.dart';
 import 'package:virkey/features/recordings/recordings_list.dart';
@@ -21,7 +20,6 @@ import 'package:virkey/features/settings/settings_provider.dart';
 import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/utils/confirm_overlay.dart';
 import 'package:virkey/utils/platform_helper.dart';
-import 'package:virkey/utils/snackbar.dart';
 import 'package:wakelock/wakelock.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -153,33 +151,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                     ),
                   ),
-                  Consumer<CloudProvider>(
-                    builder: (BuildContext context, CloudProvider cloudProvider,
-                            Widget? child) =>
-                        AppIcon(
-                      icon: HeroIcons.arrowPathRoundedSquare,
-                      color: AppColors.dark,
-                      onPressed: () {
-                        if (cloudProvider.loggedIn) {
-                          AppConfirmOverlay(
-                                  context: context,
-                                  displayText: 'Synchronise with the Cloud',
-                                  confirmButtonText: 'Synchronise',
-                                  onConfirm: () {
-                                    cloudProvider.synchronise();
-                                  },
-                                  vsync: this)
-                              .open();
-                        } else {
-                          AppSnackBar(
-                                  message: 'Login to synchronise!',
-                                  context: context,
-                                  vsync: this)
-                              .open();
-                        }
-                      },
-                      size: 30,
-                    ),
+                  AppIcon(
+                    icon: HeroIcons.arrowPathRoundedSquare,
+                    color: AppColors.dark,
+                    onPressed: () {
+                      AppConfirmOverlay(
+                              context: context,
+                              displayText: 'Synchronise with the Cloud',
+                              confirmButtonText: 'Synchronise',
+                              onConfirm: () {},
+                              vsync: this)
+                          .open();
+                    },
+                    size: 30,
                   ),
                 ],
               ),

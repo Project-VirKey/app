@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:virkey/constants/colors.dart';
 import 'package:virkey/constants/fonts.dart';
 import 'package:virkey/features/app_introduction/introduction_provider.dart';
-import 'package:virkey/features/cloud_synchronisation/cloud_provider.dart';
 import 'package:virkey/features/midi_device/midi_device_provider.dart';
 import 'package:virkey/features/piano/piano_provider.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
@@ -59,20 +58,6 @@ Future<void> main() async {
             midiDeviceProvider?.setPianoProvider(pianoProvider);
             return midiDeviceProvider ?? MidiDeviceProvider(pianoProvider);
           }),
-      ChangeNotifierProxyProvider2<SettingsProvider, RecordingsProvider,
-              CloudProvider>(
-          create: (BuildContext context) => CloudProvider(
-              Provider.of<SettingsProvider>(context, listen: false),
-              Provider.of<RecordingsProvider>(context, listen: false)),
-          update: (BuildContext context,
-              SettingsProvider settingsProvider,
-              RecordingsProvider recordingsProvider,
-              CloudProvider? cloudProvider) {
-            cloudProvider?.setSettingsProvider(settingsProvider);
-            cloudProvider?.setRecordingsProvider(recordingsProvider);
-            return cloudProvider ??
-                CloudProvider(settingsProvider, recordingsProvider);
-          })
     ],
     child: const App(),
   ));
