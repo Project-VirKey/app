@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:virkey/features/cloud_synchronisation/cloud_storage.dart';
 import 'package:virkey/features/cloud_synchronisation/firestore.dart';
 import 'package:virkey/features/piano/piano.dart';
 import 'package:virkey/features/recordings/recordings_provider.dart';
@@ -10,8 +11,6 @@ import 'package:virkey/features/settings/settings_shared_preferences.dart';
 import 'package:virkey/firebase_options.dart';
 import 'package:virkey/utils/file_system.dart';
 
-import 'cloud_storage.dart';
-
 class CloudProvider extends ChangeNotifier {
   final Cloud _cloud = Cloud(loggedIn: false);
 
@@ -20,7 +19,7 @@ class CloudProvider extends ChangeNotifier {
   bool get loggedIn => _cloud.loggedIn;
 
   CloudProvider(this._settingsProvider, this._recordingsProvider) {
-    // initialLoad();
+    initialLoad();
   }
 
   Future<void> initialLoad() async {
@@ -95,22 +94,22 @@ class CloudProvider extends ChangeNotifier {
     print(_settingsProvider.settings.toJson());
 
     // sync settings (key-value pairs)
-    if (AppFirestore.document == null ||
-        AppFirestore.document!['lastUpdated'] == null) {
-      print('upload to cloud');
+    if (AppFirestore.remoteDocument == null ||
+        AppFirestore.remoteDocument!['lastUpdated'] == null) {
+      print('upload to cloud 01');
       // upload to cloud
       AppFirestore.setDocument(createCloudJson());
     } else {
       print('check most recent Update');
 
       print(
-          '----- local: ${_settingsProvider.lastUpdated} * remote: ${AppFirestore.document!['lastUpdated']} => ${isLocalLatest(_settingsProvider.lastUpdated, AppFirestore.document!['lastUpdated'])} -----');
+          '----- local: ${_settingsProvider.lastUpdated} * remote: ${AppFirestore.remoteDocument!['lastUpdated']} => ${isLocalLatest(_settingsProvider.lastUpdated, AppFirestore.remoteDocument!['lastUpdated'])} -----');
 
       if (_settingsProvider.lastUpdated !=
-          AppFirestore.document!['lastUpdated']) {
+          AppFirestore.remoteDocument!['lastUpdated']) {
         if (isLocalLatest(_settingsProvider.lastUpdated,
-            AppFirestore.document!['lastUpdated'])) {
-          print('upload to cloud');
+            AppFirestore.remoteDocument!['lastUpdated'])) {
+          print('upload to cloud 02');
           // upload local version
           AppFirestore.setDocument(createCloudJson());
         } else {
@@ -168,7 +167,7 @@ class CloudProvider extends ChangeNotifier {
 
     // -------
 
-    for (var remoteRecording in AppFirestore.document?['settings']
+    for (var remoteRecording in AppFirestore.remoteDocument?['settings']
         ['recordings']) {
       int localRecordingIndex = _recordingsProvider.recordings.indexWhere(
           (Recording recording) => remoteRecording['title'] == recording.title);
@@ -227,7 +226,7 @@ class CloudProvider extends ChangeNotifier {
 
     for (var localRecording in _recordingsProvider.recordings) {
       int remoteRecordingIndex =
-          AppFirestore.document?['settings']['recordings'].indexWhere(
+          AppFirestore.remoteDocument?['settings']['recordings'].indexWhere(
               (var recording) => recording['title'] == localRecording.title);
 
       if (remoteRecordingIndex == -1) {
@@ -245,8 +244,10 @@ class CloudProvider extends ChangeNotifier {
   }
 
   Future<void> syncSoundFonts() async {
+    bool changes = false;
+
     // sync sound-libraries
-    for (var remoteSoundLibrary in AppFirestore.document?['settings']
+    for (var remoteSoundLibrary in AppFirestore.remoteDocument?['settings']
         ['soundLibraries']) {
       int localSoundLibraryIndex = _settingsProvider.settings.soundLibraries
           .indexWhere((settings_model.SoundLibrary localSoundLibrary) =>
@@ -254,6 +255,7 @@ class CloudProvider extends ChangeNotifier {
 
       if (remoteSoundLibrary['defaultLibrary']) {
         print('continue on default soundfont');
+        continue;
       }
 
       if (remoteSoundLibrary['deleted'] != null) {
@@ -291,6 +293,7 @@ class CloudProvider extends ChangeNotifier {
                   '${AppFileSystem.soundLibrariesFolderPath}${remoteSoundLibrary['name']}.sf2',
               url: remoteSoundLibrary['url'],
               defaultLibrary: false));
+          changes = true;
         }
         // else:
         // if download was not successful -> sound-font will not be added to local sound-fonts
@@ -306,8 +309,12 @@ class CloudProvider extends ChangeNotifier {
         if (localSoundLibraryUrl.isEmpty) {
           _settingsProvider.settings.soundLibraries[localSoundLibraryIndex]
               .url = remoteSoundLibrary['url'];
+          changes = true;
         }
       }
+
+      print(
+          'SF Name ${_settingsProvider.settings.soundLibraries[localSoundLibraryIndex].name}');
 
       if (!remoteUrlSet && localSoundLibraryAvailable) {
         String? cloudUrl = await AppCloudStorage.uploadFromFile(
@@ -316,12 +323,13 @@ class CloudProvider extends ChangeNotifier {
         if (cloudUrl != null) {
           _settingsProvider
               .settings.soundLibraries[localSoundLibraryIndex].url = cloudUrl;
+          changes = true;
         }
       }
     }
 
     for (var localSoundLibrary in _settingsProvider.settings.soundLibraries) {
-      int remoteSoundLibraryIndex = AppFirestore.document?['settings']
+      int remoteSoundLibraryIndex = AppFirestore.remoteDocument?['settings']
               ['soundLibraries']
           .indexWhere((var soundLibrary) =>
               soundLibrary['name'] == localSoundLibrary.name);
@@ -333,26 +341,31 @@ class CloudProvider extends ChangeNotifier {
             await AppCloudStorage.uploadFromFile(localSoundLibrary.path);
         if (cloudUrl != null) {
           localSoundLibrary.url = cloudUrl;
+          changes = true;
         }
       }
     }
 
-    AppFirestore.setDocument(createCloudJson());
+    if (changes) {
+      print('upload to cloud 03');
+      AppFirestore.setDocument(createCloudJson(), ignoreLastUpdated: true);
+    }
   }
 
   Future<void> setSettingsFromCloud() async {
-    _settingsProvider.lastUpdated = AppFirestore.document?['lastUpdated'];
+    _settingsProvider.lastUpdated = AppFirestore.remoteDocument?['lastUpdated'];
 
     _settingsProvider.settings.audioVolume = settings_model.AudioVolume(
-        soundLibrary: AppFirestore.document?['settings']['audioVolume']
+        soundLibrary: AppFirestore.remoteDocument?['settings']['audioVolume']
             ['soundLibrary'],
-        audioPlayback: AppFirestore.document?['settings']['audioVolume']
+        audioPlayback: AppFirestore.remoteDocument?['settings']['audioVolume']
             ['audioPlayback']);
 
     _settingsProvider.settings.defaultSavedFiles =
         settings_model.DefaultSavedFiles(
-            wav: AppFirestore.document?['settings']['defaultSavedFiles']['wav'],
-            wavAndPlayback: AppFirestore.document?['settings']
+            wav: AppFirestore.remoteDocument?['settings']
+                ['defaultSavedFiles']['wav'],
+            wavAndPlayback: AppFirestore.remoteDocument?['settings']
                 ['defaultSavedFiles']['wavAndPlayback']);
 
     print('#########');

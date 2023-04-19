@@ -20,7 +20,7 @@ class AppFirestore {
 
   static FirebaseFirestore? db = FirebaseFirestore.instance;
 
-  static Map<String, dynamic>? document;
+  static Map<String, dynamic>? remoteDocument;
 
   static Future<bool> checkUserDocumentExists() async {
     // check if document exists
@@ -33,7 +33,16 @@ class AppFirestore {
         false;
   }
 
-  static Future<void> setDocument(Map<String, dynamic> document) async {
+  static Future<void> setDocument(Map<String, dynamic> document,
+      {bool ignoreLastUpdated = false}) async {
+    print(
+        '!!!!!! - Set local to remote Document - !!!!!! ${document['lastUpdated']}');
+    if (ignoreLastUpdated &&
+        remoteDocument != null &&
+        remoteDocument!.containsKey('lastUpdated')) {
+      document['lastUpdated'] = remoteDocument!['lastUpdated'];
+    }
+
     // create document with userId (uid) as title
     // https://stackoverflow.com/a/61724209/17399214, 19.12.2022
     await db
@@ -56,9 +65,10 @@ class AppFirestore {
     }
 
     if (await checkUserDocumentExists()) {
-      document = (await getDocument())!;
+      remoteDocument = (await getDocument())!;
     } else {
-      document = {};
+      remoteDocument = {};
+      print('upload to cloud 00');
       setDocument({});
     }
   }
