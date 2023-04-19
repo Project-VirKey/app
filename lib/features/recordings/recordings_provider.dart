@@ -102,7 +102,7 @@ class RecordingsProvider extends ChangeNotifier {
 
   void loadRecordingsFromSharedPreferences() {
     if (AppSharedPreferences.loadedSharedPreferences == null) {
-      AppSharedPreferences.saveData(recordings: _recordings);
+      AppSharedPreferences.saveData();
     } else {
       AppSharedPreferences.loadedSharedPreferences?['recordings'];
     }
